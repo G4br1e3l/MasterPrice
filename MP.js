@@ -1,17 +1,19 @@
-const { default: makeWASocket, makeInMemoryStore, useMultiFileAuthState, makeCacheableSignalKeyStore, Browsers, fetchLatestBaileysVersion, DisconnectReason } = require("@adiwajshing/baileys")
-const fs = require("fs")
-const P = require('pino')
-const cfonts = require("cfonts")
-const chalk = require("chalk")
-const { Read } = require('./functions/reader.js')
+import pkg1 from '@adiwajshing/baileys'
+const { default: makeWASocket, makeInMemoryStore, useMultiFileAuthState, makeCacheableSignalKeyStore, Browsers, fetchLatestBaileysVersion, DisconnectReason } = pkg1
+import { readFileSync, statSync, unlinkSync } from "fs"
+import P from 'pino'
+import pkg from 'cfonts'
+const { render } = pkg
+import chalk from "chalk"
+import { Read } from './functions/reader.js'
 
 process.on('uncaughtException', function (err) {
     return
     //console.error(err.stack)
 })
 
-const MSG = JSON.parse(fs.readFileSync('./root/messages.json', 'utf8'))
-const PACKAGE = JSON.parse(fs.readFileSync('./package.json', 'utf8'))
+const MSG = JSON.parse(readFileSync('./root/messages.json', 'utf8'))
+const PACKAGE = JSON.parse(readFileSync('./package.json', 'utf8'))
 
 const MAIN_LOGGER = P({ timestamp: () => `,"time":"${new Date().toJSON()}"` })
 
@@ -32,10 +34,10 @@ const history = !process.argv.includes('--no-store')? makeInMemoryStore({
 history?.readFromFile('./root/connections/history.json')
 
 function ClearStore(filename){
-    var stats = fs.statSync(filename)
+    var stats = statSync(filename)
     var fileSizeInBytes = stats.size
     if (fileSizeInBytes >= 1000000){
-        fs.unlinkSync(filename)
+        unlinkSync(filename)
         setTimeout( () => { history.writeToFile('./root/connections/history.json')}, 5)
     }
 }
@@ -50,9 +52,9 @@ async function M_P() {
     const { state, saveCreds } = await useMultiFileAuthState('./root/connections')
     const { version, isLatest } = await fetchLatestBaileysVersion()
 
-    var CFG = JSON.parse(fs.readFileSync('./root/config.json', 'utf8'))
-    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(cfonts.render((`${CFG.bot.name} Por ${PACKAGE.author.split(' ')[0]} v.${PACKAGE.version}`), { font: 'shade', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 1, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: false, transitionGradient: true, env: 'node' }).string))
-    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(cfonts.render((`${PACKAGE.name} - ${PACKAGE.description} |Versao Atual: ${version} Atualizado: ${isLatest}`), { font: 'console', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 0, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: true, transitionGradient: true, env: 'node' }).string))
+    var CFG = JSON.parse(readFileSync('./root/config.json', 'utf8'))
+    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(render((`${CFG.bot.name} Por ${PACKAGE.author.split(' ')[0]} v.${PACKAGE.version}`), { font: 'shade', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 1, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: false, transitionGradient: true, env: 'node' }).string))
+    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(render((`${PACKAGE.name} - ${PACKAGE.description} |Versao Atual: ${version} Atualizado: ${isLatest}`), { font: 'console', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 0, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: true, transitionGradient: true, env: 'node' }).string))
 
     const MP = makeWASocket({
         logger: P({
@@ -84,7 +86,7 @@ async function M_P() {
                     break
                     case false:
                         console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.lostconnection))
-                        fs.unlinkSync('./root/connections')
+                        unlinkSync('./root/connections')
                         M_P()
                     break
                 }
