@@ -5,6 +5,10 @@ const cfonts = require("cfonts")
 const chalk = require("chalk")
 const { Read } = require('./functions/reader.js')
 
+process.on('uncaughtException', function (err) {
+    console.error(err.stack)
+})
+
 const MSG = JSON.parse(fs.readFileSync('./root/messages.json', 'utf8'))
 const PACKAGE = JSON.parse(fs.readFileSync('./package.json', 'utf8'))
 
@@ -12,23 +16,15 @@ const MAIN_LOGGER = P({ timestamp: () => `,"time":"${new Date().toJSON()}"` })
 
 const logger = MAIN_LOGGER.child({ })
 logger.level = 'silent'
-
-const useStore = !process.argv.includes('--no-store')
+logger.stream = 'store'
 
 const msgRetryCounterMap = {}
 
-const history = useStore? makeInMemoryStore({
+const history = !process.argv.includes('--no-store')? makeInMemoryStore({
     logger: P({
         level: 'silent',
         stream: "store",
-        transport: {
-            target: 'pino-pretty',
-            options: {
-                levelFirst: true,
-                //ignore: 'pid,hostname,node,browser,helloMsg,path',
-                colorize: true
-            }
-        }
+        transport: { target: 'pino-pretty', options: { levelFirst: true, /*ignore: 'pid,hostname,node,browser,helloMsg,path',*/ colorize: true }}
     })
 }) : undefined
 
@@ -56,28 +52,19 @@ async function M_P() {
     var CFG = JSON.parse(fs.readFileSync('./root/config.json', 'utf8'))
     console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(cfonts.render((`${CFG.bot.name} Por ${PACKAGE.author.split(' ')[0]} v.${PACKAGE.version}`), { font: 'shade', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 1, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: false, transitionGradient: true, env: 'node' }).string))
     console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(cfonts.render((`${PACKAGE.name} - ${PACKAGE.description} |Versao Atual: ${version} Atualizado: ${isLatest}`), { font: 'console', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 0, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: true, transitionGradient: true, env: 'node' }).string))
-    
+
     const MP = makeWASocket({
         logger: P({
-        level: 'silent',
-        stream: "store",
-        transport: {
-            target: 'pino-pretty',
-            options: {
-                levelFirst: true,
-                //ignore: 'pid,hostname,node,browser,helloMsg,path',
-                colorize: true
-            }
-        }
+            level: 'silent',
+            stream: "store",
+            transport: { target: 'pino-pretty', options: { levelFirst: true, /*ignore: 'pid,hostname,node,browser,helloMsg,path',*/ colorize: true } }
         }),
         msgRetryCounterMap,
         generateHighQualityLinkPreview: true,
         printQRInTerminal: true,
         browser: Browsers.macOS('Desktop'),
         syncFullHistory: true,
-        auth: { creds: state.creds,
-                keys: makeCacheableSignalKeyStore(state.keys, logger)
-        }
+        auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) }
     })
 
     MP.ev.on('connection.update', (update) => {
