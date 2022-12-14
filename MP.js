@@ -1,4 +1,4 @@
-const { default: makeWASocket, makeInMemoryStore, useMultiFileAuthState, makeCacheableSignalKeyStore, DisconnectReason } = require("@adiwajshing/baileys")
+const { default: makeWASocket, makeInMemoryStore, useMultiFileAuthState, makeCacheableSignalKeyStore, Browsers, fetchLatestBaileysVersion, DisconnectReason } = require("@adiwajshing/baileys")
 const fs = require("fs")
 const P = require('pino')
 const cfonts = require("cfonts")
@@ -51,11 +51,11 @@ setInterval(() => {
 async function M_P() {
 
     const { state, saveCreds } = await useMultiFileAuthState('./root/connections')
-    //const { version, isLatest } = await fetchLatestBaileysVersion()
+    const { version, isLatest } = await fetchLatestBaileysVersion()
 
     var CFG = JSON.parse(fs.readFileSync('./root/config.json', 'utf8'))
     console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(cfonts.render((`${CFG.bot.name} Por ${PACKAGE.author.split(' ')[0]} v.${PACKAGE.version}`), { font: 'shade', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 1, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: false, transitionGradient: true, env: 'node' }).string))
-    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(cfonts.render((`${PACKAGE.name} - ${PACKAGE.description}`), { font: 'console', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 0, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: true, transitionGradient: true, env: 'node' }).string))
+    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(cfonts.render((`${PACKAGE.name} - ${PACKAGE.description} |Versao Atual: ${version} Atualizado: ${isLatest}`), { font: 'console', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 0, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: true, transitionGradient: true, env: 'node' }).string))
     
     const MP = makeWASocket({
         logger: P({
@@ -72,7 +72,9 @@ async function M_P() {
         }),
         msgRetryCounterMap,
         generateHighQualityLinkPreview: true,
-        printQRInTerminal: true, 
+        printQRInTerminal: true,
+        browser: Browsers.macOS('Desktop'),
+        syncFullHistory: true,
         auth: { creds: state.creds,
                 keys: makeCacheableSignalKeyStore(state.keys, logger)
         }
@@ -115,6 +117,8 @@ async function M_P() {
     MP.ev.on('messages.upsert', message => {
         Read(MP, message)
     })
+
+    return MP
 }
 
 M_P()
