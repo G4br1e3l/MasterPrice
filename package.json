@@ -1,8 +1,9 @@
 {
-  "name": "WHATSBOT",
+  "name": "whatsbot",
   "version": "1.4.3",
   "description": "Bot para gerenciamento de grupos, com o melhor desempenho.",
   "main": "MP.js",
+  "type": "module",
   "author": "Gabriel Henrique de Jesus Silva",
   "license": "ISC",
   "dependencies": {

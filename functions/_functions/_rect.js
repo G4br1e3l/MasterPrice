@@ -1,5 +1,5 @@
-const react = async ({client, param, answer}) => {
-        
+export const react = async ({client, param, answer}) => {
+
     let number_user = param.messages[0].key.participant === undefined? param.messages[0].key.remoteJid : param.messages[0].key.participant
     let nbr1 = number_user.includes("@")? number_user.split("@")[0] : number_user
     let user2 = nbr1.includes(":")? nbr1.split(":")[0] : nbr1
@@ -19,5 +19,3 @@ const react = async ({client, param, answer}) => {
         }
     )
 }
-
-module.exports = { react }

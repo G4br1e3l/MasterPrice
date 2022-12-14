@@ -1,6 +1,6 @@
-const chalk = require("chalk")
+import chalk from "chalk"
 
-const console_message = ({message_param, name, user, entry, hour, date}) =>{
+export const console_message = ({message_param, name, user, entry, hour, date}) =>{
 
     let user1 = user.includes("@")? user.split("@")[0] : user
     let user2 = user1.includes(":")? user1.split(":")[0] : user1
@@ -14,5 +14,3 @@ const console_message = ({message_param, name, user, entry, hour, date}) =>{
         .replaceAll('@date', date)
     ))
 }
-
-module.exports = { console_message }

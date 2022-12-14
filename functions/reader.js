@@ -1,26 +1,27 @@
-const fs = require("fs")
-const chalk = require("chalk")
+import { readFileSync } from "fs"
+import chalk from "chalk"
 
-const moment = require("moment-timezone")
+import pkg from 'moment-timezone'
+const { tz } = pkg;
 
-var set_me = JSON.parse(fs.readFileSync("./root/config.json"))
-const messages_config = JSON.parse(fs.readFileSync("./root/messages.json"))
+var set_me = JSON.parse(readFileSync("./root/config.json"))
+const messages_config = JSON.parse(readFileSync("./root/messages.json"))
 
-const { commands } = require('./commands.js')
-const { named } = require('./_functions/_cfgd.js')
-const { get_message } = require('./_functions/_gtms.js')
-const { get_group_data } = require('./_functions/_gpdt.js')
-const { console_message } = require('./_functions/_csmg.js')
+import { commands } from './commands.js'
+import { named } from './_functions/_cfgd.js'
+import { get_message } from './_functions/_gtms.js'
+import { get_group_data } from './_functions/_gpdt.js'
+import { console_message } from './_functions/_csmg.js'
 
-const Read = async (MP, message) => {
+export const Read = async (MP, message) => {
 
     if(message.messages[0].key.fromMe === true) return
     if(!set_me?.bot?.verified?.includes('DONE')) named({MP:MP})
 
     var typed = get_message({msg: message})
-    
-    var hour = moment.tz("America/Sao_Paulo").format("HH:mm:ss")
-    var date = moment.tz("America/Sao_Paulo").format("DD/MM/YY")
+
+    var hour = tz("America/Sao_Paulo").format("HH:mm:ss")
+    var date = tz("America/Sao_Paulo").format("DD/MM/YY")
 
     switch(typed[0] === set_me.prefix? 'Command' : 'Message'){
         case 'Command':
@@ -79,4 +80,3 @@ const Read = async (MP, message) => {
         break
     }
 }
-module.exports = { Read }

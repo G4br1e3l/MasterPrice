@@ -1,6 +1,6 @@
-const { obj } = require('./_objc.js')
+import { obj } from './_objc.js'
 
-const get_message = ({msg}) => {
+export const get_message = ({msg}) => {
 
     const prefix = "!"
 
@@ -24,7 +24,7 @@ const get_message = ({msg}) => {
     msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]][is_msg].toString() :
 
     is_msg === 'imageMessage'?
-    msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]][is_msg][obj(msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]][is_msg])[4]].toString().length > 1? 
+    msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]][is_msg][obj(msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]][is_msg])[4]].toString().length > 1?
     msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]][is_msg][obj(msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]][is_msg])[4]].toString() :
     '*Imagem*' :
 
@@ -52,13 +52,11 @@ const get_message = ({msg}) => {
     msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]][obj(msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]])[2]].toString() :
     msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]][obj(msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]])[2]][obj(msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]][obj(msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]])[2]])[0]].toString() :
 
-    is_msg === 'messageContextInfo'? obj(msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]]).includes('pollCreationMessage')? '*Enquete*' : 
-    
+    is_msg === 'messageContextInfo'? obj(msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[Type]]).includes('pollCreationMessage')? '*Enquete*' :
+
     'undefined' :
 
     'undefined'
 
     return typed
 }
-
-module.exports = { get_message }

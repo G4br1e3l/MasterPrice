@@ -1,8 +1,8 @@
-const fs = require("fs")
+import { readFileSync, writeFileSync } from "fs"
 
-var set_me = JSON.parse(fs.readFileSync("./root/config.json"))
+var set_me = JSON.parse(readFileSync("./root/config.json"))
 
-const named = ({MP}) => {
+export const named = ({MP}) => {
 
     let MP_ID = MP.authState?.me?.id ?? MP.user.id
     let MP_VName = MP.authState?.me?.verifiedName ?? MP.user.verifiedName
@@ -16,7 +16,5 @@ const named = ({MP}) => {
     set_me.bot.user_name = N_name
     set_me.bot.verified = 'DONE'
 
-    fs.writeFileSync("./root/config.json", JSON.stringify(set_me))
+    writeFileSync("./root/config.json", JSON.stringify(set_me))
 }
-
-module.exports = { named }

@@ -1,11 +1,11 @@
-const fs = require("fs")
+import { readFileSync } from "fs"
 
-const send = async ({client, param, answer, path_image}) => {
+export const send = async ({client, param, answer, path_image}) => {
     var quoted = param?.messages[0]?.quoted? param.messages[0].quoted : param.messages[0]
-    
+
     return await client.sendMessage(
         param.messages[0].key.remoteJid, {
-            image: fs.readFileSync(path_image),
+            image: readFileSync(path_image),
             caption: answer
         },
         {
@@ -13,5 +13,3 @@ const send = async ({client, param, answer, path_image}) => {
         }
     )
 }
-
-module.exports = { send }

@@ -1,48 +1,46 @@
-const fs = require("fs")
+import { readFileSync, writeFileSync } from "fs"
 
-var set_me = JSON.parse(fs.readFileSync("./root/config.json"))
+var set_me = JSON.parse(readFileSync("./root/config.json"))
 
-const { say } = require('./_functions/_sayd.js')
-const { react } = require('./_functions/_rect.js')
-const { send } = require('./_functions/_send.js')
+import { say } from './_functions/_sayd.js'
+import { react } from './_functions/_rect.js'
+import { send } from './_functions/_send.js'
 
 /*
 send({
-    client: MP, 
-    param: message, 
+    client: MP,
+    param: message,
     answer: 'Hello!',
     path_image: './database/images/download.webp'
 })
 say({
-    client: MP, 
-    param: message, 
+    client: MP,
+    param: message,
     answer: 'Por favor.'
-}).finally(() => 
+}).finally(() =>
 react({
-    client: MP, 
-    param: message, 
+    client: MP,
+    param: message,
     answer: '🙂'
 }))
 */
 
-const save = ({file_path, filename}) =>  fs.writeFileSync(file_path, JSON.stringify(filename))
+const save = ({file_path, filename}) =>  writeFileSync(file_path, JSON.stringify(filename))
 
-const commands = async ({MP, typed, group_data, message}) => {
+export const commands = async ({MP, typed, group_data, message}) => {
 
     var args = (typed.split(set_me.prefix)[1]).trim().split(/ +/)
-    const arguments = []
+    const argumentas = []
     args.forEach(word => {
-        arguments.push(word.toLowerCase())
+        argumentas.push(word.toLowerCase())
     })
 
-    async function run ({arguments}){
-        switch(arguments[0]){
+    async function run ({argumentas}){
+        switch(argumentas[0]){
             case '':
             break
             default: return
         }
     }
-    await Promise.resolve().then( async () => await run({arguments: arguments}))
+    await Promise.resolve().then( async () => await run({arguments: argumentas}))
 }
-
-module.exports = { commands }
