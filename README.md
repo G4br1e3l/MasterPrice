@@ -1,5 +1,5 @@
-# MasterPrice - 100% JavaScript WhatsApp Web API por NodeJS
-### MasterPrice é um bot para gerenciamento de grupos no Whatsapp.
+# MasterPrice - WhatsApp Web API por NodeJS
+### MasterPrice é um bot para gerenciamento no Whatsapp feito 100% em JavaScript.
 
 MasterPrice é um bot gerenciado diretamente pelo terminal, seja via Termux/Linux ou Via Prompt de Comando em computadores Windows, onde, suporta interações com multi-dispositivos & versões Web do WhatsApp[^1].
 
