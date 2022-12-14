@@ -2,8 +2,6 @@ import { obj } from './_objc.js'
 
 export const get_message = ({msg}) => {
 
-    const prefix = "!"
-
     let is_msg =
     obj(msg[obj(msg)[0]][0])[0] === 'messageStubParameters'? obj(msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[6]])[0]?.toString() :
     obj(msg[obj(msg)[0]][0])[0] === 'key'? obj(msg[obj(msg)[0]][0][obj(msg[obj(msg)[0]][0])[3]])[0]?.toString() :
@@ -45,6 +43,7 @@ export const get_message = ({msg}) => {
     is_msg === 'viewOnceMessage'? '*VerOculto*' :
     is_msg === 'listResponseMessage'? '*Respondeu_Lista*' :
     is_msg === 'buttonsResponseMessage'? '*Respondeu_Botao*' :
+    is_msg === 'documentWithCaptionMessage'? '*Documento_Texto*' :
     is_msg === 'pollUpdateMessage'? '*Respondeu_Enquete*' :
     is_msg === 'senderKeyDistributionMessage'?
 
