@@ -1,0 +1,24 @@
+{
+  "name": "WHATSBOT",
+  "version": "1.4.3",
+  "description": "Bot para gerenciamento de grupos, com o melhor desempenho.",
+  "main": "MP.js",
+  "author": "Gabriel Henrique de Jesus Silva",
+  "license": "ISC",
+  "dependencies": {
+    "@adiwajshing/baileys": "github:adiwajshing/baileys",
+    "@adiwajshing/keyed-db": "^0.2.4",
+    "axios": "^1.2.1",
+    "cfonts": "^2.9.0",
+    "libsignal": "^2.0.1",
+    "moment-timezone": "^0.5.32",
+    "node-fetch": "^2.6.1",
+    "pino-pretty": "^9.1.1"
+  },
+  "repository": {
+    "type": "git"
+  },
+  "devDependencies": {
+    "@types/chalk": "^2.2.0"
+  }
+}

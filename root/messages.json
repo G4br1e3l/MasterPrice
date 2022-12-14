@@ -1,0 +1,22 @@
+{
+    "params": {
+        "index": {
+            "disclaimer": "PLEASE, DO NOT CHANGE OR REMOVE THE @param PARAMETER. THIS CAN BREAK SOME COMMANDS.",
+
+            "upconnection" : "Ouvindo Conexão.",
+            "connecting": "Conectando.",
+            "reconecting": "Reconectando.",
+            "online": "@botname ::: ONLINE.",
+            "downconnection": "Conexão anterior caiu.",
+            "lostconnection": "Não consegui reconectar... Por favor, faça login novamente."
+        },
+        "entry": {
+            "disclaimer": "PLEASE, DO NOT CHANGE OR REMOVE THE @param PARAMETER. THIS CAN BREAK SOME COMMANDS.",
+
+            "botmessage": "[@date][@hour] @botname > Mensagem do BOT < @botname | @groupname",
+            "usercommand": "[@date][@hour] @botname > [@user] usou o comando ::: [@entry]",
+            "usermessage": "[@date][@hour] @botname > [@user] disse ::: [@entry]"
+        }
+    }
+    
+}
