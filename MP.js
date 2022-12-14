@@ -8,7 +8,6 @@ import chalk from "chalk"
 import { Read } from './functions/reader.js'
 
 process.on('uncaughtException', function (err) {
-    return
     //console.error(err.stack)
 })
 
@@ -103,6 +102,10 @@ async function M_P() {
     MP.ev.on("creds.update", saveCreds )
 
     history?.bind(MP.ev)
+
+    MP.ev.process(async(events) => {
+        if(events['messages.upsert']) { console.log(Object.keys(events['messages.upsert'].messages[0].message)) }
+    })
 
     MP.ev.on('messages.upsert', message => {
         Read(MP, message)
