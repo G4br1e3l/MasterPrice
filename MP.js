@@ -6,7 +6,8 @@ const chalk = require("chalk")
 const { Read } = require('./functions/reader.js')
 
 process.on('uncaughtException', function (err) {
-    console.error(err.stack)
+    return
+    //console.error(err.stack)
 })
 
 const MSG = JSON.parse(fs.readFileSync('./root/messages.json', 'utf8'))
