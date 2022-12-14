@@ -60,7 +60,7 @@ Acesse o arquivo [configuracoes.json](root/config.json) na fonte do BOT para con
 
 ### Configurações para as mensagens[^3]
 
-Acesse o arquivo [mensagens.json](fonte/configuracoes/mensagens.json) na fonte do BOT para configurar os valores de acordo com suas necessidades:
+Acesse o arquivo [mensagens.json](root/messages.json) na fonte do BOT para configurar os valores de acordo com suas necessidades:
 
 ```
 {
