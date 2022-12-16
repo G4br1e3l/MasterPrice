@@ -13,12 +13,10 @@ import { get_message } from './_functions/_gtms.js'
 import { get_group_data } from './_functions/_gpdt.js'
 import { console_message } from './_functions/_csmg.js'
 
-export const Read = async (MP, message) => {
+export const Read = async ({MP, typed, message}) => {
 
     if(message.messages[0].key.fromMe === true) return
     if(!set_me?.bot?.verified?.includes('DONE')) named({MP:MP})
-
-    var typed = get_message({msg: message})
 
     var hour = tz("America/Sao_Paulo").format("HH:mm:ss")
     var date = tz("America/Sao_Paulo").format("DD/MM/YY")
@@ -27,7 +25,9 @@ export const Read = async (MP, message) => {
         case 'Command':
             switch(message?.messages[0]?.key?.participant? 'Group' : 'Private'){
                 case 'Group':
+                    console.log(message)
                     var group_data = await get_group_data(MP, message)
+                    console.log(group_data)
 
                     await Promise.resolve().then( async () => commands({MP: MP, typed: typed, group_data: group_data, message: message})).finally( () =>
                         console_message({
