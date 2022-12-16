@@ -23,7 +23,7 @@ const Array_Base =  [
 'senderKeyDistributionMessage',
 'messageContextInfo',
 'messageStubParameters',
-'key'
+'key' 
 ]*/
 
 export const Typed = ({events}) => {
@@ -33,7 +33,7 @@ export const Typed = ({events}) => {
     var MessageType = Object.keys(events['messages.upsert']?.messages[0]?.message)[0]
     if(MessageType === 'senderKeyDistributionMessage') MessageType = Object.keys(events['messages.upsert']?.messages[0]?.message)[2] ?? Object.keys(events['messages.upsert']?.messages[0]?.message)[0]
     if(MessageType === 'messageContextInfo') MessageType = Object.keys(events['messages.upsert']?.messages[0]?.message)[1] ?? Object.keys(events['messages.upsert']?.messages[0]?.message)[0]
-    if(MessageType === 'senderKeyDistributionMessage') if(events['messages.upsert'].messages[0].message[MessageType].groupId === 'status@broadcast') return console.log('Publicação de status detectada.')
+    if(MessageType === 'senderKeyDistributionMessage') if(events['messages.upsert'].messages[0].message[MessageType].groupId === 'status@broadcast') return 'Publicação de status detectada.'
 
     switch(MessageType){
         case 'extendedTextMessage':

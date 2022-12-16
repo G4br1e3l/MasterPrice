@@ -1,20 +1,21 @@
 import Baileys from '@adiwajshing/baileys'
 const { default: makeWASocket, makeInMemoryStore, useMultiFileAuthState, makeCacheableSignalKeyStore, Browsers, fetchLatestBaileysVersion, DisconnectReason } = Baileys
-import fs from "fs"
+import { readFileSync, readdirSync, unlink } from "fs"
 import P from 'pino'
 import CFonts from 'cfonts'
 const { render } = CFonts
 import chalk from "chalk"
 import { Read } from './functions/reader.js'
-
+import { named } from './functions/_functions/_cfgd.js'
 import { Typed } from './functions/_functions/_fmsg.js'
 
 process.on('uncaughtException', function (err) {
     //console.error(err.stack)
 })
 
-const MSG = JSON.parse(fs.readFileSync('./root/messages.json', 'utf8'))
-const PACKAGE = JSON.parse(fs.readFileSync('./package.json', 'utf8'))
+const MSG = JSON.parse(readFileSync('./root/messages.json', 'utf8'))
+const PACKAGE = JSON.parse(readFileSync('./package.json', 'utf8'))
+var set_me = JSON.parse(readFileSync("./root/config.json"))
 
 const MAIN_LOGGER = P({ timestamp: () => `,"time":"${new Date().toJSON()}"` })
 
@@ -35,7 +36,7 @@ async function M_P() {
     const { state, saveCreds } = await useMultiFileAuthState('./root/connections')
     const { version, isLatest } = await fetchLatestBaileysVersion()
 
-    var CFG = JSON.parse(fs.readFileSync('./root/config.json', 'utf8'))
+    var CFG = JSON.parse(readFileSync('./root/config.json', 'utf8'))
     console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(render((`${CFG.bot.name} Por ${PACKAGE.author.split(' ')[0]} v.${PACKAGE.version}`), { font: 'shade', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 1, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: false, transitionGradient: true, env: 'node' }).string))
     console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(render((`${PACKAGE.name} - ${PACKAGE.description} |Versao Atual: ${version} Atualizado: ${isLatest}`), { font: 'console', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 0, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: true, transitionGradient: true, env: 'node' }).string))
 
@@ -48,6 +49,8 @@ async function M_P() {
         syncFullHistory: true,
         auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) }
     })
+
+    if(set_me.bot.verified !== ('DONE')) named({MP:MP})
 
     MP.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect } = update
@@ -64,9 +67,9 @@ async function M_P() {
                     break
                     case false:
                         console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.lostconnection))
-                        let files = fs.readdirSync('./root/connections')
+                        let files = readdirSync('./root/connections')
                         files.forEach(file => {
-                            fs.unlink(`./root/connections/${file}`, (() => {}))
+                            unlink(`./root/connections/${file}`, (() => {}))
                         })
                         M_P()
                     break
@@ -87,6 +90,7 @@ async function M_P() {
 
     MP.ev.process(async(events) => {
         if(events['messages.upsert']) {
+            if(events['messages.upsert']?.messages[0]?.key?.fromMe === true) return
             Read({MP: MP, typed: Typed({events: events}), message: events['messages.upsert']})
         }
     })

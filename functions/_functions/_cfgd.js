@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "fs"
+import { writeFileSync, readFileSync } from "fs"
 
 var set_me = JSON.parse(readFileSync("./root/config.json"))
 

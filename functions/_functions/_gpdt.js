@@ -1,7 +1,7 @@
 export const get_group_data = async (MP, msg) => {
-
-    setTimeout(async () => Gp = await MP.groupMetadata(msg?.messages[0]?.key?.remoteJid), 4000)
-    try {Gp} catch { Gp = await MP.groupMetadata(msg?.messages[0]?.key?.remoteJid) }
-
+    let Gp = ``
+    setTimeout(async () => Gp = await MP.groupMetadata(msg?.messages[0]?.key?.remoteJid), 6000)
+    if(Gp === ``) Gp = await MP.groupMetadata(msg?.messages[0]?.key?.remoteJid ?? 'undefined')
+    setInterval(() => { Gp = `` }, 10_000)
     return Gp
 }
