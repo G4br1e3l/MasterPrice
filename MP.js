@@ -50,8 +50,6 @@ async function M_P() {
         auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) }
     })
 
-    if(set_me.bot.verified !== ('DONE')) named({MP:MP})
-
     MP.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect } = update
         try { if (update.receivedPendingNotifications === true){ console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(`As notificações pendentes foram recebidas.`)) } else {}} catch {}
@@ -90,6 +88,7 @@ async function M_P() {
 
     MP.ev.process(async(events) => {
         if(events['messages.upsert']) {
+            if(set_me.bot.verified !== ('DONE')) named({MP:MP})
             if(events['messages.upsert']?.messages[0]?.key?.fromMe === true) return
             Read({MP: MP, typed: Typed({events: events}), message: events['messages.upsert']})
         }
