@@ -10,7 +10,7 @@ import { named } from './functions/_functions/_cfgd.js'
 import { Typed } from './functions/_functions/_fmsg.js'
 
 process.on('uncaughtException', function (err) {
-    //console.error(err.stack)
+    console.error(err.stack) 
 })
 
 const MSG = JSON.parse(readFileSync('./root/messages.json', 'utf8'))
@@ -50,47 +50,92 @@ async function M_P() {
         auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) }
     })
 
-    MP.ev.on('connection.update', (update) => {
-        const { connection, lastDisconnect } = update
-        try { if (update.receivedPendingNotifications === true){ console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(`As notificações pendentes foram recebidas.`)) } else {}} catch {}
-        switch(connection){
-            case 'close':
-                const PossoReconectar = (lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut
-                console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.downconnection))
-
-                switch(PossoReconectar){
-                    case true:
-                        console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.reconecting))
-                        M_P()
-                    break
-                    case false:
-                        console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.lostconnection))
-                        let files = readdirSync('./root/connections')
-                        files.forEach(file => {
-                            unlink(`./root/connections/${file}`, (() => {}))
-                        })
-                        M_P()
-                    break
-                }
-            break
-            case 'open':
-                console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.online.replaceAll('@botname', CFG.bot.name)))
-            break
-            case 'connecting':
-                console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Conectando..'))
-            break
-        }
-    })
-
-    MP.ev.on("creds.update", saveCreds )
-
     history?.bind(MP.ev)
 
     MP.ev.process(async(events) => {
+
+        if(events['connection.update']) {
+            
+            const { connection, lastDisconnect, receivedPendingNotifications, isOnline, qr } = events['connection.update']
+            
+            if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Escaneie o QR Code.'))
+            if(isOnline) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Ativando status online.'))
+            if(receivedPendingNotifications) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(`As notificações pendentes foram recebidas.`))
+            
+            switch(connection){
+                case 'close':
+                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.downconnection))
+
+                    if((lastDisconnect.error)?.output?.statusCode === DisconnectReason.loggedOut) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Ultima sessão desconectada.'))
+
+                    switch((lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut){
+                        case true:
+                            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.reconecting))
+                            await M_P()
+                        break
+                        case false:
+                            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.lostconnection))
+                            let files = readdirSync('./root/connections')
+                            files.forEach(file => { unlink(`./root/connections/${file}`, (() => { })) })
+                            await M_P()
+                        break
+                    }
+                break
+                case 'open':
+                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.online.replaceAll('@botname', CFG.bot.name)))
+                break
+                case 'connecting':
+                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Conectando.'))
+                break
+            }
+        }
+
+        if(events.call) {
+            //console.log('recv call event', events.call)
+        }
+
+        if(events['creds.update']) {
+            await saveCreds()
+        }
+        
+        if(events['contacts.upsert']) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Contatos Salvos.'))
+        
+        if(events['messages.update']) {
+            //console.log('chats update ', events['messages.update'])
+        }
+        if(events['message-receipt.update']) {
+            //console.log('chats update ', events['message-receipt.update'])
+        }
+        if(events['messages.reaction']) {
+            //console.log('chats update ', events['messages.reaction'])
+        }
+        if(events['messaging-history.set']) {
+            const { chats, contacts, messages, isLatest } = events['messaging-history.set']
+            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(
+                `Recebidos:\nQuantidade de conversas ::: ${chats.length},\nQuantidade de contatos ::: ${contacts.length},\nQuantidade de mensagens ::: ${messages.length}`
+            ))
+        }
+
+        if(events['presence.update']) {
+            //console.log(events['presence.update'])
+        }
+
+        if(events['chats.update']) {
+            //console.log('chats update ', events['chats.update'])
+        }
+        if(events['chats.delete']) {
+            //console.log('chats deleted ', events['chats.delete'])
+        }
+        if(events['chats.upsert']) {
+           //console.log('chats upsert ', events['chats.upsert'])
+        }
+
+        if(events['group-participants.update']) var groupMetadata = await MP.groupMetadata(events['group-participants.update'].id)
+
         if(events['messages.upsert']) {
             if(set_me.bot.verified !== ('DONE')) named({MP:MP})
             if(events['messages.upsert']?.messages[0]?.key?.fromMe === true) return
-            Read({MP: MP, typed: Typed({events: events}), message: events['messages.upsert']})
+            Read({MP: MP, typed: Typed({events: events}), message: events['messages.upsert'], groupMetadata: groupMetadata})
         }
     })
 
