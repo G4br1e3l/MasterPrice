@@ -33,6 +33,9 @@ export const commands = async ({MP, typed, group_data, message}) => {
         var date = tz("America/Sao_Paulo").format("DD/MM/YY")
 
         switch(_args[0]){
+            case 'fora':
+                console.log(group_data)
+            break
             case 'menu':
                 await sendCaptionImageQuoted({
                     client: MP,

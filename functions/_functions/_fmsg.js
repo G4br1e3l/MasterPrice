@@ -1,42 +1,8 @@
-/**/
-/*const Array_Base =  [*/
-/*'extendedTextMessage',*/
-/*'pollCreationMessage',*/
-/*'conversation',*/
-/*'imageMessage',*/
-/*'videoMessage',*/
-/*'audioMessage',*/
-/*'documentMessage',*/
-/*'locationMessage',*/
-/*'protocolMessage',*/
-/*'liveLocationMessage',*/
-/*'contactMessage',*/
-/*'stickerMessage',*/
-/*'productMessage',*/
-/*'reactionMessage',*/
-/*'viewOnceMessage',
-/*'listResponseMessage',*/
-/*'buttonsResponseMessage',*/
-/*'documentWithCaptionMessage',*/
-/*'pollUpdateMessage',*/
-/*'low',*/
-/*'senderKeyDistributionMessage',*/
-/*'messageContextInfo',*/
-/*'messageStubParameters',*/
-/*'key'*/
-/*]*/
-
 export const Typed = ({events}) => {
 
     var Typed = ``
-    var MessageType = Object.keys(events['messages.upsert']?.messages[0]?.message)[0]
-
-    if(MessageType === 'senderKeyDistributionMessage') {
-        if(events['messages.upsert'].messages[0].message[MessageType].groupId === 'status@broadcast') return 'Publicação de status detectada.'
-        MessageType = Object.keys(events['messages.upsert']?.messages[0]?.message)[2] ?? 
-        Object.keys(events['messages.upsert']?.messages[0]?.message)[0]
-    }
-    if(MessageType === 'messageContextInfo') MessageType = Object.keys(events['messages.upsert']?.messages[0]?.message)[1] ?? Object.keys(events['messages.upsert']?.messages[0]?.message)[0]
+    const MessageType = Object.keys(events['messages.upsert']?.messages[0]?.message).find((key) => !['senderKeyDistributionMessage', 'messageContextInfo'].includes(key))
+    if(events['messages.upsert'].messages[0].message[MessageType].groupId === 'status@broadcast') return 'Publicação de status detectada.'
 
     switch(MessageType){
         case 'extendedTextMessage':
