@@ -45,7 +45,9 @@ async function M_P() {
         msgRetryCounterMap,
         generateHighQualityLinkPreview: true,
         printQRInTerminal: true,
-        browser: Browsers.macOS('Desktop'),
+        browser: ['NS Multi Device', 'Chrome', '3.0'],
+        version: version,
+        defaultQueryTimeoutMs: undefined,
         syncFullHistory: true,
         auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) }
     })
@@ -130,16 +132,16 @@ async function M_P() {
            //console.log('chats upsert ', events['chats.upsert'])
         }
 
-        if(events['group-participants.update']) var groupMetadata = await MP.groupMetadata(events['group-participants.update'].id)
+        if(events['group-participants.update']) await MP.groupMetadata(events['group-participants.update'].id)
 
         if(events['messages.upsert']) {
-            if(set_me.bot.verified !== ('DONE')) named({MP:MP})
-            if(events['messages.upsert']?.messages[0]?.key?.fromMe === true) return
-            Read({MP: MP, typed: Typed({events: events}), message: events['messages.upsert'], groupMetadata: groupMetadata})
+            if(!set_me.bot.verified.includes('DONE')) named({MP:MP})
+            if(events['messages.upsert']?.messages[0]?.key?.fromMe) return
+            Read({MP: MP, typed: Typed({events: events}), message: events['messages.upsert']})
         }
     })
 
     return MP
 }
 
-M_P()
+M_P(), (err) => console.log("[ Connection Error ]", color(String(err), 'red'));
