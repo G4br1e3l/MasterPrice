@@ -142,7 +142,9 @@ async function M_P() {
            //console.log('chats upsert ', events['chats.upsert'])
         }
 
-        if(events['group-participants.update']) await MP.groupMetadata(events['group-participants.update'].id)
+        if(events['group-participants.update']){
+            //console.log('group participants update ', events['group-participants.update'])
+        }
 
         if(events['messages.upsert']) {
             if(!set_me.bot.verified.includes('DONE')) named({MP:MP})
