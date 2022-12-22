@@ -20,4 +20,5 @@ const Await = new Set()
 export const Cooldown = (x) => { Await.add(x); setTimeout(() => Await.delete(x), 4000) }
 export const DownColling = (x) => Await.delete(x)
 export const isColling = (x) => !!Await.has(x)
+export const sizeCooldown = (x) => Await
 //
