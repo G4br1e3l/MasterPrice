@@ -1,16 +1,25 @@
+//
 import chalk from "chalk"
+import { readFileSync } from "fs"
+import { hour, date, set } from './_dlay.js'
 
-export const console_message = ({message_param, name, user, entry, hour, date}) =>{
+//
+const set_me = JSON.parse(readFileSync("./root/config.json"))
 
-    let user1 = user.includes("@")? user.split("@")[0] : user
-    let user2 = user1.includes(":")? user1.split(":")[0] : user1
+//
+export const console_message = ({ message_param, user, entry }) =>{
 
-    return console.log(chalk.rgb(123, 45, 67).bold(
+    do {
+        user = set('@', user)
+        user = set(':', user)
+    } while (user.includes('@') || user.includes(':'))
+
+    console.log(chalk.rgb(123, 45, 67).bold(
         message_param
-        .replaceAll('@botname', name)
-        .replaceAll('@user', user2)
+        .replaceAll('@botname', `${set_me.bot.name} ::: ${set_me.bot.user_name}`)
+        .replaceAll('@user', user)
         .replaceAll('@entry', chalk.hex('#DEADED').bgGreen.bold(entry))
-        .replaceAll('@hour', hour)
-        .replaceAll('@date', date)
+        .replaceAll('@hour', hour())
+        .replaceAll('@date', date())
     ))
 }

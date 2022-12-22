@@ -1,20 +1,23 @@
-export const sendReaction = async ({client, param, answer}) => {
+//
+import { Key } from './_dlay.js'
 
-    let number_user = param.messages[0].key.participant === undefined? param.messages[0].key.remoteJid : param.messages[0].key.participant
-    let nbr1 = number_user.includes("@")? number_user.split("@")[0] : number_user
-    let user2 = nbr1.includes(":")? nbr1.split(":")[0] : nbr1
+//
+export const sendReaction = async ({ client, param, answer }) => {
+
+    const Message = Key(param.messages[0])
+
+    const number_user = Message.participant ?? Message.remoteJid ?? ''
 
     return await client.sendMessage(
-        param.messages[0].key.remoteJid, {
+        Message.remoteJid, {
             react: {
                 key: {
-                    remoteJid: param.messages[0].key.remoteJid,
+                    remoteJid: Message.remoteJid,
                     fromMe: false,
-                    id: param.messages[0].key.id,
-                    participant: `${user2}@s.whatsapp.net`
+                    id: Message.id,
+                    participant: number_user
                 },
                 text: answer,
-                senderTimestampMs: { low: -12487820, high: 388, unsigned: false }
             }
         }
     )

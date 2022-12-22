@@ -1,20 +1,27 @@
-import { delay, fdelay } from './_dlay.js'
-export const sendMessageTypingQuoted = async ({client, param, answer}) => {
-    var quoted = param?.messages[0]?.quoted? param.messages[0].quoted : param.messages[0]
-    await client.presenceSubscribe(param.messages[0].key.remoteJid).then( async () => {
-        await fdelay().then( async () =>{
-            await client.sendPresenceUpdate('composing', param.messages[0].key.remoteJid).then( async () => {
-                await delay().then( async ()=> {
-                    await client.sendPresenceUpdate('paused', param.messages[0].key.remoteJid).then( async () => {
+//
+import { Delay, Key } from './_dlay.js'
+
+//
+export const sendMessageTypingQuoted = async ({ client, param, answer }) => {
+
+    const a = param.messages[0]
+    
+    const Message = Key(a)
+
+    await client.presenceSubscribe(Message.remoteJid).then( async () => {
+        await Delay(2000).then( async () =>{
+            await client.sendPresenceUpdate('composing', Message.remoteJid).then( async () => {
+                await Delay(500).then( async ()=> {
+                    await client.sendPresenceUpdate('paused', Message.remoteJid).then( async () => {
                         return await client.sendMessage(
-                            param.messages[0].key.remoteJid, {
+                            Message.remoteJid, {
                                 text: answer,
                                 contextInfo: {
-                                    mentionedJid: [param.messages[0].key.remoteJid]
+                                    mentionedJid: [Message.remoteJid]
                                 }
                             },
                             {
-                                quoted: quoted
+                                quoted: a.quoted ?? a ?? null
                             }
                         )
                     })

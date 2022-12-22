@@ -1,8 +1,18 @@
-export const main_menu = ({data, hora, nome, bot_nome}) => {
+//
+import { readFileSync } from "fs"
+
+//
+const set_me = JSON.parse(readFileSync("./root/config.json"))
+
+//
+import { date, hour } from '../_dlay.js'
+
+//
+export const Menu = () => {
     return `
         ‥…━━━☆𝐌𝐀𝐈𝐍 𝐌𝐄𝐍𝐔☆━━━…‥
-        ☆ ${nome} ☆ ${bot_nome} 
-        ☆ ${data} ‥…☆…‥ ${hora}
+        ☆ ${set_me.bot.user_name} ☆ ${set_me.bot.name} 
+        ☆ ${date()} ‥…☆…‥ ${hour()}
         »»————-　🄾🄿🅃🄸🄾🄽🅂 1　————-««
     ☆
     ☆

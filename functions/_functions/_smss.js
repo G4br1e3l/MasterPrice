@@ -1,9 +1,16 @@
-export const sendMessage = async ({client, param, answer}) => {
+//
+import { Key } from './_dlay.js'
+
+//
+export const sendMessage = async ({ client, param, answer }) => {
+
+    const Message = Key(param.messages[0])
+
     return await client.sendMessage(
-        param.messages[0].key.remoteJid, {
+        Message.remoteJid, {
             text: answer,
             contextInfo: {
-                mentionedJid: [param.messages[0].key.remoteJid]
+                mentionedJid: [Message.remoteJid]
             }
         },
     )

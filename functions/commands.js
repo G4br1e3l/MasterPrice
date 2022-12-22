@@ -1,8 +1,14 @@
-import { readFileSync, /*writeFileSync*/ } from "fs"
-import pkg from 'moment-timezone'
-const { tz } = pkg;
-var set_me = JSON.parse(readFileSync("./root/config.json"))
-import { main_menu } from './_functions/menus/main.js'
+//
+import { readFileSync } from "fs"
+
+//
+const set_me = JSON.parse(readFileSync("./root/config.json"))
+const MSG = JSON.parse(readFileSync('./root/messages.json', 'utf8'))
+
+//
+import { Menu } from './_functions/menus/main.js'
+import { Spam, isSpam, Key, Cooldown, isColling, DownColling } from './_functions/_dlay.js' 
+import { TenCount, getGroupData } from './_functions/_cmds.js' 
 
 //functions response
 import { sendReaction } from './_functions/_rect.js'
@@ -17,9 +23,23 @@ import { sendCaptionImageQuoted } from './_functions/_send.js'
 import { sendCaptionImageTyping } from './_functions/_senk.js'
 import { sendCaptionImageTypingQuoted } from './_functions/_senp.js'
 
-//const save = ({file_path, filename}) =>  writeFileSync(file_path, JSON.stringify(filename))
+//
+export const commands = async ({ MP, typed, group_data, message }) => {
 
-export const commands = async ({MP, typed, group_data, message}) => {
+    if(isSpam(Key(message.messages[0]).remoteJid)) {
+        return await sendMessageQuoted({
+            client: MP,
+            param: message,
+            answer: MSG.commands.flood
+        })
+        .then( async () => {
+            await sendReaction({
+                client: MP,
+                param: message,
+                answer: set_me.reaction.error
+            })
+        })
+    }
 
     var args = (typed.split(set_me.prefix)[1]).trim().split(/ +/)
     const _args = []
@@ -29,25 +49,59 @@ export const commands = async ({MP, typed, group_data, message}) => {
 
     async function run ({_args}){
 
-        var hour = tz("America/Sao_Paulo").format("HH:mm:ss")
-        var date = tz("America/Sao_Paulo").format("DD/MM/YY")
+        if(isColling(Key(message.messages[0]).remoteJid)) {
+            return await sendMessageQuoted({
+                client: MP,
+                param: message,
+                answer: MSG.commands.cooldown
+            })
+            .then( async () => {
+                await sendReaction({
+                    client: MP,
+                    param: message,
+                    answer: set_me.reaction.error
+                })
+            })
+        }
 
         switch(_args[0]){
-            case 'fora':
-                console.log(group_data)
+            case 'comma':
+                if(!getGroupData({
+                    Type: 'isAdmin',
+                    groupMetadata: group_data,
+                    message: message
+                })) return await sendMessage({
+                    client: MP,
+                    param: message,
+                    answer: MSG.commands.noprivilege
+                })
+
+                if(!getGroupData({
+                    Type: 'isBotAdmin',
+                    groupMetadata: group_data,
+                    message: message
+                })) return await sendMessage({
+                    client: MP,
+                    param: message,
+                    answer: MSG.commands.nopermission
+                })
+
+            break
+            case 'funny':
+                TenCount({ MP: MP, message: message })
             break
             case 'menu':
                 await sendCaptionImageQuoted({
                     client: MP,
                     param: message,
-                    answer: main_menu({ data: date, hora: hour, nome: set_me.bot.user_name, bot_nome: set_me.bot.name }),
-                    path_image: './database/images/main_menu.webp'
+                    answer: Menu(),
+                    path_image: set_me.pathimage.menu
                 })
                 .finally( async () => {
                     await sendReaction({
                         client: MP,
                         param: message,
-                        answer: '🔥'
+                        answer: set_me.reaction.success
                     })
                 })
             break
@@ -83,28 +137,47 @@ export const commands = async ({MP, typed, group_data, message}) => {
                 await sendCaptionImage({
                     client: MP,
                     param: message,
-                    answer: main_menu({ data: date, hora: hour, nome: set_me.bot.user_name, bot_nome: set_me.bot.name }),
-                    path_image: './database/images/main_menu.webp'
+                    answer: Menu(),
+                    path_image: set_me.pathimage.menu
                 })
             break
             case 'teste6':
                 await sendCaptionImageTyping({
                     client: MP,
                     param: message,
-                    answer: main_menu({ data: date, hora: hour, nome: set_me.bot.user_name, bot_nome: set_me.bot.name }),
-                    path_image: './database/images/main_menu.webp'
+                    answer: Menu(),
+                    path_image: set_me.pathimage.menu
                 })
             break
             case 'teste7':
                 await sendCaptionImageTypingQuoted({
                     client: MP,
                     param: message,
-                    answer: main_menu({ data: date, hora: hour, nome: set_me.bot.user_name, bot_nome: set_me.bot.name }),
-                    path_image: './database/images/main_menu.webp'
+                    answer: Menu(),
+                    path_image: set_me.pathimage.menu
                 })
             break
-            default: return
+            default:
+                await sendMessageQuoted({
+                    client: MP,
+                    param: message,
+                    answer: MSG.commands.notfound
+                })
+                .then( async () => {
+                    await sendReaction({
+                        client: MP,
+                        param: message,
+                        answer: set_me.reaction.error
+                    })
+                })
+                .finally(() => Spam(Key(message.messages[0]).remoteJid))
+            break
         }
+
+        DownColling(Key(message.messages[0]).remoteJid)
     }
-    await Promise.resolve().then( async () => await run({_args: _args}).finally(() => { return }))
+    await run({_args: _args})
+    .then(() => Cooldown(Key(message.messages[0]).remoteJid))
+    .finally(() => { return })
+
 }

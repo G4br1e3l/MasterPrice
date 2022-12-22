@@ -1,8 +1,11 @@
+//
 import { writeFileSync, readFileSync } from "fs"
 
-var set_me = JSON.parse(readFileSync("./root/config.json"))
+//
+const set_me = JSON.parse(readFileSync("./root/config.json"))
 
-export const named = ({MP}) => {
+//
+export const named = ({ MP }) => {
 
     let MP_ID = MP.authState?.me?.id ?? MP.user.id
     let MP_VName = MP.authState?.me?.verifiedName ?? MP.user.verifiedName

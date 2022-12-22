@@ -1,18 +1,24 @@
+//
 import { readFileSync } from "fs"
+import { Key } from './_dlay.js'
 
-export const sendCaptionImageQuoted = async ({client, param, answer, path_image}) => {
-    var quoted = param?.messages[0]?.quoted? param.messages[0].quoted : param.messages[0]
+//
+export const sendCaptionImageQuoted = async ({ client, param, answer, path_image }) => {
+
+    const a = param.messages[0]
+
+    const Message = Key(a)
 
     return await client.sendMessage(
-        param.messages[0].key.remoteJid, {
+        Message.remoteJid, {
             image: readFileSync(path_image),
             caption: answer,
             contextInfo: {
-                mentionedJid: [param.messages[0].key.remoteJid]
+                mentionedJid: [Message.remoteJid]
             }
         },
         {
-            quoted: quoted
+            quoted: a.quoted ?? a ?? null
         }
     )
 }

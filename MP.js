@@ -1,3 +1,4 @@
+//
 import Baileys from '@adiwajshing/baileys'
 const { default: makeWASocket, makeInMemoryStore, useMultiFileAuthState, makeCacheableSignalKeyStore, Browsers, fetchLatestBaileysVersion, DisconnectReason } = Baileys
 import { readFileSync, readdirSync, unlink } from "fs"
@@ -5,18 +6,25 @@ import P from 'pino'
 import CFonts from 'cfonts'
 const { render } = CFonts
 import chalk from "chalk"
+
+//
 import { Read } from './functions/reader.js'
 import { named } from './functions/_functions/_cfgd.js'
 import { Typed } from './functions/_functions/_fmsg.js'
 
+//
 process.on('uncaughtException', function (err) {
     console.error(err.stack) 
 })
 
+console.warn = () => {};
+
+//
 const MSG = JSON.parse(readFileSync('./root/messages.json', 'utf8'))
 const PACKAGE = JSON.parse(readFileSync('./package.json', 'utf8'))
-var set_me = JSON.parse(readFileSync("./root/config.json"))
+const set_me = JSON.parse(readFileSync("./root/config.json"))
 
+//
 const MAIN_LOGGER = P({ timestamp: () => `,"time":"${new Date().toJSON()}"` })
 
 const logger = MAIN_LOGGER.child({ })
@@ -45,7 +53,7 @@ async function M_P() {
         msgRetryCounterMap,
         generateHighQualityLinkPreview: true,
         printQRInTerminal: true,
-        browser: ['NS Multi Device', 'Chrome', '3.0'],
+        browser: ['MasterPrice', 'macOS', '3.0'],
         version: version,
         defaultQueryTimeoutMs: undefined,
         syncFullHistory: true,
@@ -57,26 +65,28 @@ async function M_P() {
     MP.ev.process(async(events) => {
 
         if(events['connection.update']) {
+
+            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.updating))
             
             const { connection, lastDisconnect, receivedPendingNotifications, isOnline, qr } = events['connection.update']
             
-            if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Escaneie o QR Code.'))
-            if(isOnline) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Ativando status online.'))
-            if(receivedPendingNotifications) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(`As notificações pendentes foram recebidas.`))
+            if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.qrscan))
+            if(isOnline) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.staging))
+            if(receivedPendingNotifications) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.notify))
             
             switch(connection){
                 case 'close':
-                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.downconnection))
+                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.downconnection))
 
                     if((lastDisconnect.error)?.output?.statusCode === DisconnectReason.loggedOut) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Ultima sessão desconectada.'))
 
                     switch((lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut){
                         case true:
-                            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.reconecting))
+                            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.reconecting))
                             await M_P()
                         break
                         case false:
-                            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.lostconnection))
+                            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.lostconnection))
                             let files = readdirSync('./root/connections')
                             files.forEach(file => { unlink(`./root/connections/${file}`, (() => { })) })
                             await M_P()
@@ -84,10 +94,10 @@ async function M_P() {
                     }
                 break
                 case 'open':
-                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.params.index.online.replaceAll('@botname', CFG.bot.name)))
+                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.connected.replaceAll('@botname', CFG.bot.name)))
                 break
                 case 'connecting':
-                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Conectando.'))
+                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.connecting))
                 break
             }
         }

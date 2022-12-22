@@ -1,14 +1,22 @@
-export const sendMessageQuoted = async ({client, param, answer}) => {
-    var quoted = param?.messages[0]?.quoted? param.messages[0].quoted : param.messages[0]
+//
+import { Key } from './_dlay.js'
+
+//
+export const sendMessageQuoted = async ({ client, param, answer }) => {
+
+    const a = param.messages[0]
+    
+    const Message = Key(a)
+
     return await client.sendMessage(
-        param.messages[0].key.remoteJid, {
+        Message.remoteJid, {
             text: answer,
             contextInfo: {
-                mentionedJid: [param.messages[0].key.remoteJid]
+                mentionedJid: [Message.remoteJid]
             }
         },
         {
-            quoted: quoted
+            quoted: a.quoted ?? a ?? null
         }
     )
 }

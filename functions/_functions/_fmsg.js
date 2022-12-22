@@ -1,46 +1,55 @@
-export const Typed = ({events}) => {
+//
+export const Typed = ({ events }) => {
 
-    var Typed = ``
-    const MessageType = Object.keys(events['messages.upsert']?.messages[0]?.message).find((key) => !['senderKeyDistributionMessage', 'messageContextInfo'].includes(key))
-    if(events['messages.upsert'].messages[0].message[MessageType].groupId === 'status@broadcast') return 'Publicação de status detectada.'
+    let Typed = ``
+
+    const Message = events['messages.upsert'].messages[0].message
+
+    if(Message === undefined || Message === null) return 'Mensagem indedfinida.'
+
+    const MessageType = Object.keys(Message)
+    .find((key) => !['senderKeyDistributionMessage', 'messageContextInfo']
+    .includes(key))
+    
+    if(Message[MessageType].groupId === 'status@broadcast') return 'Publicação de status detectada.'
 
     switch(MessageType){
         case 'extendedTextMessage':
-            Typed = events['messages.upsert']?.messages[0]?.message[MessageType]?.text ?? MessageType
+            Typed = Message[MessageType]?.text ?? MessageType
         break
         case 'conversation':
-            Typed = events['messages.upsert']?.messages[0]?.message[MessageType] ?? MessageType
+            Typed = Message[MessageType] ?? MessageType
         break
         case 'imageMessage':
-            Typed = events['messages.upsert']?.messages[0]?.message[MessageType]?.caption ?? MessageType
+            Typed = Message[MessageType]?.caption ?? MessageType
         break
         case 'videoMessage':
-            Typed = events['messages.upsert']?.messages[0]?.message[MessageType]?.caption ?? MessageType
+            Typed = Message[MessageType]?.caption ?? MessageType
         break
         case 'documentWithCaptionMessage':
-            Typed = events['messages.upsert']?.messages[0]?.message[MessageType]?.message?.documentMessage?.caption ?? MessageType
+            Typed = Message[MessageType]?.message?.documentMessage?.caption ?? MessageType
         break
         case 'pollCreationMessage':
-            Typed = events['messages.upsert']?.messages[0]?.message[MessageType]?.name ?? MessageType
-            //Typed = events['messages.upsert']?.messages[0]?.message[MessageType]?.options ?? MessageType
+            Typed = Message[MessageType]?.name ?? MessageType
+            //Typed = Message[MessageType]?.options ?? MessageType
         break
         case 'viewOnceMessage':
-            Typed = `viewOnceMessage: `, events['messages.upsert']?.messages[0]?.message ?? `viewOnceMessage: `, MessageType
+            Typed = `viewOnceMessage: `, Message ?? `viewOnceMessage: `, MessageType
         break
         case 'messageStubParameters':
-            Typed = `messageStubParameters: `, events['messages.upsert']?.messages[0]?.message ?? `messageStubParameters: `, MessageType
+            Typed = `messageStubParameters: `, Message ?? `messageStubParameters: `, MessageType
         break
         case 'key':
-            Typed = `key: `, events['messages.upsert']?.messages[0]?.message ?? `key: `, MessageType
+            Typed = `key: `, Message ?? `key: `, MessageType
         break
         case 'low':
-            Typed = `low: `, events['messages.upsert']?.messages[0]?.message ?? `low: `, MessageType
+            Typed = `low: `, Message ?? `low: `, MessageType
         break
         case 'protocolMessage':
-            Typed = `Protocolo: `, events['messages.upsert']?.messages[0]?.message ?? MessageType
+            Typed = `Protocolo: `, Message ?? MessageType
         break
         default:
-            Typed = `Tipo: ${MessageType} Menssagem:`, events['messages.upsert']?.messages[0]?.message ?? events['messages.upsert']?.messages[0] ?? events['messages.upsert']
+            Typed = `Tipo: ${MessageType} Menssagem:`, Message ?? events['messages.upsert']?.messages[0] ?? events['messages.upsert']
         break
     }
 
