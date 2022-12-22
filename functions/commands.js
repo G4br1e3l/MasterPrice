@@ -7,8 +7,8 @@ const MSG = JSON.parse(readFileSync('./root/messages.json', 'utf8'))
 
 //
 import { Menu } from './_functions/menus/main.js'
-import { Spam, isSpam, Key, Cooldown, isColling, DownColling } from './_functions/_dlay.js' 
-import { TenCount, getGroupData } from './_functions/_cmds.js' 
+import { Spam, isSpam, Key, Cooldown, isColling, DownColling, sizeCooldown } from './_functions/_dlay.js'
+import { TenCount, getGroupData } from './_functions/_cmds.js'
 
 //functions response
 import { sendReaction } from './_functions/_rect.js'
@@ -49,6 +49,21 @@ export const commands = async ({ MP, typed, group_data, message }) => {
 
     async function run ({_args}){
 
+        if(sizeCooldown().size >= 2) {
+            return await sendMessageQuoted({
+                client: MP,
+                param: message,
+                answer: MSG.commands.awaitqueue
+            })
+            .then( async () => {
+                await sendReaction({
+                    client: MP,
+                    param: message,
+                    answer: set_me.reaction.error
+                })
+            })
+        }
+
         if(isColling(Key(message.messages[0]).remoteJid)) {
             return await sendMessageQuoted({
                 client: MP,
@@ -66,25 +81,7 @@ export const commands = async ({ MP, typed, group_data, message }) => {
 
         switch(_args[0]){
             case 'comma':
-                if(!getGroupData({
-                    Type: 'isAdmin',
-                    groupMetadata: group_data,
-                    message: message
-                })) return await sendMessage({
-                    client: MP,
-                    param: message,
-                    answer: MSG.commands.noprivilege
-                })
-
-                if(!getGroupData({
-                    Type: 'isBotAdmin',
-                    groupMetadata: group_data,
-                    message: message
-                })) return await sendMessage({
-                    client: MP,
-                    param: message,
-                    answer: MSG.commands.nopermission
-                })
+                Secure({MP: MP, group_data: group_data, message: message})
 
             break
             case 'funny':
@@ -180,4 +177,26 @@ export const commands = async ({ MP, typed, group_data, message }) => {
     .then(() => Cooldown(Key(message.messages[0]).remoteJid))
     .finally(() => { return })
 
+}
+
+const Secure = async ({MP, group_data, message}) => {
+    if(!getGroupData({
+        Type: 'isAdmin',
+        groupMetadata: group_data,
+        message: message
+    })) return await sendMessage({
+        client: MP,
+        param: message,
+        answer: MSG.commands.noprivilege
+    })
+
+    if(!getGroupData({
+        Type: 'isBotAdmin',
+        groupMetadata: group_data,
+        message: message
+    })) return await sendMessage({
+        client: MP,
+        param: message,
+        answer: MSG.commands.nopermission
+    })
 }
