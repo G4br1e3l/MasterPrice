@@ -147,8 +147,8 @@ async function M_P() {
         }
 
         if(events['messages.upsert']) {
-            if(!set_me.bot.verified.includes('DONE')) named({MP:MP})
             if(events['messages.upsert']?.messages[0]?.key?.fromMe) return
+            if(!set_me.bot.verified.includes('DONE')) named({MP:MP})
             Read({MP: MP, typed: Typed({events: events}), message: events['messages.upsert']})
         }
     })
@@ -156,4 +156,4 @@ async function M_P() {
     return MP
 }
 
-M_P(), (err) => console.log("[ Connection Error ]", color(String(err), 'red'));
+M_P(), (err) => console.log(`[MASTERPRICE ERROR] `, err)
