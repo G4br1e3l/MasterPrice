@@ -1,1 +1,17 @@
-{"bot":{"name":"MasterPrice","user_id":"","user_name":"","verified":""},"prefix":"!"}
+{
+    "bot": {
+        "name": "MasterPrice",
+        "user_id": "",
+        "user_name": "",
+        "verified": ""
+    },
+    "prefix": "!",
+    "reaction": {
+        "error": "🥵",
+        "success": "👽",
+        "ongoing": "🥶"
+    },
+    "pathimage":{
+        "menu":"./database/images/main_menu.webp"
+    }
+}

@@ -1,22 +1,25 @@
 {
-    "params": {
-        "index": {
-            "disclaimer": "PLEASE, DO NOT CHANGE OR REMOVE THE @param PARAMETER. THIS CAN BREAK SOME COMMANDS.",
-
-            "upconnection" : "Ouvindo Conexão.",
-            "connecting": "Conectando.",
-            "reconecting": "Reconectando.",
-            "online": "@botname ::: ONLINE.",
-            "downconnection": "Conexão anterior caiu.",
-            "lostconnection": "Não consegui reconectar... Por favor, faça login novamente."
-        },
-        "entry": {
-            "disclaimer": "PLEASE, DO NOT CHANGE OR REMOVE THE @param PARAMETER. THIS CAN BREAK SOME COMMANDS.",
-
-            "botmessage": "[@date][@hour] @botname > Mensagem do BOT < @botname | @groupname",
-            "usercommand": "[@date][@hour] @botname > [@user] usou o comando ::: [@entry]",
-            "usermessage": "[@date][@hour] @botname > [@user] disse ::: [@entry]"
-        }
+    "connect": {
+        "qrscan":"Escaneie o QR Code.",
+        "staging":"Ativando status online.",
+        "notify":"As notificações pendentes foram recebidas.",
+        "updating" : "Atualizando Conexão.",
+        "connecting": "Conectando.",
+        "reconecting": "Reconectando.",
+        "connected": "@botname ::: ONLINE.",
+        "downconnection": "Conexão anterior caiu.",
+        "lostconnection": "Não consegui reconectar... Por favor, faça login novamente."
+    },
+    "entry": {
+        "botmessage": "[@date][@hour] @botname > Mensagem do BOT < @botname | @groupname",
+        "usercommand": "[@date][@hour] @botname > [@user] usou o comando ::: [@entry]",
+        "usermessage": "[@date][@hour] @botname > [@user] disse ::: [@entry]"
+    },
+    "commands":{
+        "cooldown":"Espere seu outro comando ser executado!",
+        "flood":"Sem flood de comandos!",
+        "notfound":"Comando não encontrado.",
+        "noprivilege":"Você não é administrador para utilizar este comando.",
+        "nopermission":"Sinto muito, não sou administrador para executar este comando."
     }
-    
 }
