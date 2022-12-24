@@ -1,11 +1,11 @@
 //
 export const Typed = ({ events }) => {
 
-    let Typed = ``
+    if(events['messages.upsert'].messages[0].key.fromMe) return 'Mensagem do BOT.'
 
     const Message = events['messages.upsert'].messages[0].message
 
-    if(Message === undefined || Message === null) return 'Mensagem indedfinida.'
+    if(Message === undefined || Message === null) return 'Mensagem indefinida.'
 
     const MessageType = Object.keys(Message)
     .find((key) => !['senderKeyDistributionMessage', 'messageContextInfo']
@@ -13,12 +13,17 @@ export const Typed = ({ events }) => {
     
     if(Message[MessageType].groupId === 'status@broadcast') return 'Publicação de status detectada.'
 
+    let Typed = ``
+
     switch(MessageType){
         case 'extendedTextMessage':
             Typed = Message[MessageType]?.text ?? MessageType
         break
         case 'conversation':
             Typed = Message[MessageType] ?? MessageType
+        break
+        case 'reactionMessage':
+            Typed = 'Reação a uma mensagem.'
         break
         case 'imageMessage':
             Typed = Message[MessageType]?.caption ?? MessageType

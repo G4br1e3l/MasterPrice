@@ -3,7 +3,6 @@ import { readFileSync } from "fs"
 
 //
 const MSG = JSON.parse(readFileSync("./root/messages.json"))
-const set_me = JSON.parse(readFileSync("./root/config.json"))
 
 //
 import { commands } from './commands.js'
@@ -11,7 +10,11 @@ import { console_message } from './_functions/_csmg.js'
 import { Key } from './_functions/_dlay.js' 
 
 export const Read = async ({ MP, typed, message }) => {
-    
+
+    var set_me = JSON.parse(readFileSync("./root/config.json"))
+
+    if(typed === 'Mensagem indefinida.') return
+
     const Message = Key(message.messages[0])
 
     switch(typed[0] === set_me.prefix){

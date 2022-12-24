@@ -15,7 +15,7 @@
         "usermessage": "[@date][@hour] @botname > [@user] disse ::: [@entry]"
     },
     "commands":{
-        "cooldown":"Espere seu outro comando ser executado!",
+        "cooldown":"Espere o comando anterior terminar de ser executado!",
         "flood":"Sem flood de comandos!",
         "notfound":"Comando não encontrado.",
         "noprivilege":"Você não é administrador para utilizar este comando.",

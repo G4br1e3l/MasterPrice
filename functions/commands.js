@@ -2,13 +2,13 @@
 import { readFileSync } from "fs"
 
 //
-const set_me = JSON.parse(readFileSync("./root/config.json"))
 const MSG = JSON.parse(readFileSync('./root/messages.json', 'utf8'))
 
 //
 import { Menu } from './_functions/menus/main.js'
 import { Spam, isSpam, Key, Cooldown, isColling, DownColling, sizeCooldown } from './_functions/_dlay.js'
 import { TenCount, getGroupData } from './_functions/_cmds.js'
+import { Dimiss } from './_commands/_make.js'
 
 //functions response
 import { sendReaction } from './_functions/_rect.js'
@@ -25,6 +25,43 @@ import { sendCaptionImageTypingQuoted } from './_functions/_senp.js'
 
 //
 export const commands = async ({ MP, typed, group_data, message }) => {
+
+    var set_me = JSON.parse(readFileSync("./root/config.json"))
+    var Distributed = JSON.parse(readFileSync("./database/commands/distributed.json"))
+
+    const isAdmin = async () => {
+        if(!getGroupData({ Type: 'isAdmin', groupMetadata: group_data, message: message})) {
+            return await sendMessageQuoted({
+                client: MP,
+                param: message,
+                answer: MSG.commands.noprivilege
+            })
+            .finally( async () => {
+                await sendReaction({
+                    client: MP,
+                    param: message,
+                    answer: set_me.reaction.error
+                })
+            })
+        }
+    }
+
+    const isBotAdmin = async () => { 
+        if(!getGroupData({ Type: 'isBotAdmin', groupMetadata: group_data, message: message})) {
+            return await sendMessageQuoted({
+                client: MP,
+                param: message,
+                answer: MSG.commands.nopermission
+            })
+            .finally( async () => {
+                await sendReaction({
+                    client: MP,
+                    param: message,
+                    answer: set_me.reaction.error
+                })
+            })
+        }
+    }
 
     if(isSpam(Key(message.messages[0]).remoteJid)) {
         return await sendMessageQuoted({
@@ -79,12 +116,32 @@ export const commands = async ({ MP, typed, group_data, message }) => {
             })
         }
 
-        switch(_args[0]){
-            case 'comma':
-                Secure({MP: MP, group_data: group_data, message: message})
+        if(!Distributed.off.secure.includes(_args[0])){
+            if(!group_data) {
+                return await sendMessageQuoted({
+                    client: MP,
+                    param: message,
+                    answer: 'Este comando pode apenas ser utilizado em grupos!'
+                })
+                .finally( async () => {
+                    await sendReaction({
+                        client: MP,
+                        param: message,
+                        answer: set_me.reaction.error
+                    })
+                })
+            }
 
+            if(await isBotAdmin() || await isAdmin()) return
+        }
+
+        switch(_args[0]){
+            case 'make':
+            case 'dimiss':
+                await Dimiss({ MP:MP, message:message, _args:_args })
             break
             case 'funny':
+                if(await isBotAdmin() || await isAdmin()) return
                 TenCount({ MP: MP, message: message })
             break
             case 'menu':
@@ -177,26 +234,4 @@ export const commands = async ({ MP, typed, group_data, message }) => {
     .then(() => Cooldown(Key(message.messages[0]).remoteJid))
     .finally(() => { return })
 
-}
-
-const Secure = async ({MP, group_data, message}) => {
-    if(!getGroupData({
-        Type: 'isAdmin',
-        groupMetadata: group_data,
-        message: message
-    })) return await sendMessage({
-        client: MP,
-        param: message,
-        answer: MSG.commands.noprivilege
-    })
-
-    if(!getGroupData({
-        Type: 'isBotAdmin',
-        groupMetadata: group_data,
-        message: message
-    })) return await sendMessage({
-        client: MP,
-        param: message,
-        answer: MSG.commands.nopermission
-    })
 }

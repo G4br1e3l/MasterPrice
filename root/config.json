@@ -11,7 +11,7 @@
         "success": "👽",
         "ongoing": "🥶"
     },
-    "pathimage":{
-        "menu":"./database/images/main_menu.webp"
+    "pathimage": {
+        "menu": "./database/images/main_menu.webp"
     }
 }

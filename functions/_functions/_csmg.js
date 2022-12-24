@@ -4,10 +4,11 @@ import { readFileSync } from "fs"
 import { hour, date, set } from './_dlay.js'
 
 //
-const set_me = JSON.parse(readFileSync("./root/config.json"))
-
-//
 export const console_message = ({ message_param, user, entry }) =>{
+
+    var set_me = JSON.parse(readFileSync("./root/config.json"))
+
+    if(entry === 'Mensagem do BOT.') return
 
     do {
         user = set('@', user)
