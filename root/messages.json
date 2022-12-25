@@ -20,6 +20,7 @@
         "notfound":"Comando não encontrado.",
         "noprivilege":"Você não é administrador para utilizar este comando.",
         "nopermission":"Sinto muito, não sou administrador para executar este comando.",
-        "awaitqueue": "Aguarde. No momento há muitas pessoas utilizando comandos."
+        "awaitqueue": "Aguarde. No momento há muitas pessoas utilizando comandos.",
+        "noowner":"Você não é um dos donos para executar este comando!"
     }
 }

@@ -1,1 +1,16 @@
-{"off":{"secure":["funny"]}}
+{
+    "off": {
+        "secure": []
+    },
+    "commands": {
+        "only": {
+            "group": []
+        },
+        "default": [
+            "provide",
+            "unprovide",
+            "restrict",
+            "unrestrict"
+        ]
+    }
+}

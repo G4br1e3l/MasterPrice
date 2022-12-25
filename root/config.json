@@ -3,7 +3,8 @@
         "name": "MasterPrice",
         "user_id": "",
         "user_name": "",
-        "verified": ""
+        "verified": "",
+        "owners": []
     },
     "prefix": "!",
     "reaction": {
