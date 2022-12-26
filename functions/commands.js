@@ -1,19 +1,21 @@
-//
+//import :p
 import { readFileSync } from "fs"
 
-//
+//constant imports
 const MSG = JSON.parse(readFileSync('./root/messages.json', 'utf8'))
 
-//
+//client functions
+import { sendReaction } from './_functions/_rect.js'
+import { sendMessageQuoted } from './_functions/_smsq.js'
+
+//commands functions
 import { Spam, isSpam, Key, Cooldown, isColling, DownColling, sizeCooldown } from './_functions/_dlay.js'
 import { getGroupData } from './_functions/_cmds.js'
+
+//classes functions
 import { Provide } from './_commands/_provide.js'
 import { Restrict } from './_commands/_restrict.js'
 import { Owner } from './_commands/_owner.js'
-
-//functions response
-import { sendReaction } from './_functions/_rect.js'
-import { sendMessageQuoted } from './_functions/_smsq.js'
 
 /*
 import { Menu } from './_functions/menus/main.js'
@@ -33,6 +35,8 @@ export const commands = async ({ MP, typed, group_data, message }) => {
 
     var getConfigProperties = JSON.parse(readFileSync("./root/config.json"))
     var getGroupProperties = JSON.parse(readFileSync("./database/commands/distributed.json"))
+
+    const Message = message.messages[0] ?? ''
 
     const isAdmin = async () => {
         if(group_data) {
@@ -76,8 +80,8 @@ export const commands = async ({ MP, typed, group_data, message }) => {
 
     const isOwner = async () => {
         if(!getConfigProperties.bot.owners.includes(
-            (Key(message.messages[0]).participant ?? 
-            Key(message.messages[0]).remoteJid).split('@')[0]
+            (Key(Message).participant ??
+            Key(Message).remoteJid).split('@')[0]
             )) {
             return await sendMessageQuoted({
                 client: MP,
@@ -95,7 +99,7 @@ export const commands = async ({ MP, typed, group_data, message }) => {
         return false
     }
 
-    if(isSpam(Key(message.messages[0]).remoteJid)) {
+    if(isSpam(Key(Message).remoteJid)) {
         return await sendMessageQuoted({
             client: MP,
             param: message,
@@ -110,13 +114,11 @@ export const commands = async ({ MP, typed, group_data, message }) => {
         })
     }
 
-    var args = (typed.split(getConfigProperties.prefix)[1]).trim().split(/ +/)
     const _args = []
-    args.forEach(word => {
-        _args.push(word.toLowerCase())
-    })
+    var args = (typed.split(getConfigProperties.prefix)[1]).trim().split(/ +/)
+    args.forEach(word => { _args.push(word.toLowerCase()) })
 
-    async function run ({_args}){
+    async function run ({ _args }){
 
         if(sizeCooldown().size >= 2) {
             return await sendMessageQuoted({
@@ -133,7 +135,7 @@ export const commands = async ({ MP, typed, group_data, message }) => {
             })
         }
 
-        if(isColling(Key(message.messages[0]).remoteJid)) {
+        if(isColling(Key(Message).remoteJid)) {
             return await sendMessageQuoted({
                 client: MP,
                 param: message,
@@ -196,13 +198,13 @@ export const commands = async ({ MP, typed, group_data, message }) => {
                         answer: getConfigProperties.reaction.error
                     })
                 })
-                .finally(() => Spam(Key(message.messages[0]).remoteJid))
+                .finally(() => Spam(Key(Message).remoteJid))
             break
         }
 
-        DownColling(Key(message.messages[0]).remoteJid)
+        DownColling(Key(Message).remoteJid)
     }
     await run({ _args: _args })
-    .then(() => Cooldown(Key(message.messages[0]).remoteJid))
+    .then(() => Cooldown(Key(Message).remoteJid))
     .finally(() => { return })
 }
