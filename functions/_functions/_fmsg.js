@@ -1,5 +1,10 @@
+import proto, { getContentType } from '@adiwajshing/baileys'
 //
 export const Typed = ({ events }) => {
+
+    const MessageType = getContentType(events['messages.upsert'].messages[0].message)
+
+    //onsole.log(events['messages.upsert'].messages[0])
 
     if(events['messages.upsert'].messages[0].key.fromMe) return 'Mensagem do BOT.'
 
@@ -7,13 +12,21 @@ export const Typed = ({ events }) => {
 
     if(Message === undefined || Message === null) return 'Mensagem indefinida.'
 
-    const MessageType = Object.keys(Message)
+    /*const MessageType = Object.keys(Message)
     .find((key) => !['senderKeyDistributionMessage', 'messageContextInfo']
-    .includes(key))
+    .includes(key))*/
     
     if(Message[MessageType].groupId === 'status@broadcast') return 'Publicação de status detectada.'
 
-    let Typed = ``
+    let Typed = `` 
+
+    //let m = events['messages.upsert'].messages[0]
+    //m.pushName = 'teste'
+    //m.message[MessageType] = 'teste'
+    //m.teste = 'teste'
+    //m.testa = 'teste'
+
+    //console.log(m)
 
     switch(MessageType){
         case 'extendedTextMessage':

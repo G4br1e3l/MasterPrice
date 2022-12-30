@@ -17,18 +17,21 @@ import { Provide } from './_commands/_provide.js'
 import { Restrict } from './_commands/_restrict.js'
 import { Owner } from './_commands/_owner.js'
 
+
 /*
 import { Menu } from './_functions/menus/main.js'
 
 import { sendMessage } from './_functions/_smss.js'
 import { sendMessageTyping } from './_functions/_smst.js'
 import { sendMessageTypingQuoted } from './_functions/_smtq.js'
-
+import { sendMessage } from './_functions/_smss.js'
+import { sendMessageTypingQuoted } from './_functions/_smtq.js'
 import { sendCaptionImage } from './_functions/_sqnd.js'
 import { sendCaptionImageQuoted } from './_functions/_send.js'
 import { sendCaptionImageTyping } from './_functions/_senk.js'
 import { sendCaptionImageTypingQuoted } from './_functions/_senp.js'
 */
+
 
 //
 export const commands = async ({ MP, typed, group_data, message }) => {
@@ -170,6 +173,66 @@ export const commands = async ({ MP, typed, group_data, message }) => {
         }
 
         switch(_args[0]){
+            case '':
+                // send a buttons message!
+                const buttons = [
+                {buttonId: 'id1', buttonText: {displayText: 'Button 1'}, type: 1},
+                {buttonId: 'id2', buttonText: {displayText: 'Button 2'}, type: 1},
+                {buttonId: 'id3', buttonText: {displayText: 'Button 3'}, type: 1}
+                ]
+
+                var buttonMessage = {
+                text: "Hi it's button message",
+                footer: 'Hello World',
+                buttons: buttons,
+                headerType: 1
+                }
+
+                const aaa = message.messages[0]
+                let Messagea = Key(aaa)
+
+                await MP.sendMessage(Messagea.remoteJid, buttonMessage)
+                const sections = [
+                {
+                title: "Section 1",
+                rows: [
+                {title: "Option 1", rowId: "option1"},
+                {title: "Option 2", rowId: "option2", description: "This is a description"}
+                ]
+                },
+                {
+                title: "Section 2",
+                rows: [
+                {title: "Option 3", rowId: "option3"},
+                {title: "Option 4", rowId: "option4", description: "This is a description V2"}
+                ]
+                },
+                ]
+
+                const listMessage = {
+                text: "This is a list",
+                footer: "nice footer, link: https://google.com",
+                title: "Amazing boldfaced list title",
+                buttonText: "Required, text on the button to view the list",
+                sections
+                }
+                await MP.sendMessage(Messagea.remoteJid, listMessage)
+
+                const needhelpmenu = `!!!!!!!!!!!!!!!!!!!!!!`
+     
+                let butRun = [
+                {buttonId: `!!!!!!!!!!!!!!!!!!!!!!`, buttonText: {displayText: '!!!!!!!!!!!!!!!!!!!!!!'}, type: 1}
+                ]
+                var buttonMessage = {
+                    image: readFileSync(getConfigProperties.pathimage.menu),
+                    caption: needhelpmenu,
+                    footer: `!!!!!!!!!!!!!!!!!!!!!!`,
+                    buttons: butRun,
+                    headerType: 4
+                }
+                await MP.sendMessage(Messagea.remoteJid, buttonMessage)
+
+            break
             case 'provide':
             case 'unprovide':
                 if(await isOwner()) return
