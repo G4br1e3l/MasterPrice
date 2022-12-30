@@ -157,11 +157,3 @@ async function M_P() {
 }
 
 M_P(), (err) => console.log(`[MASTERPRICE ERROR] `, err)
-
-let file = require.resolve(__filename)
-watchFile(file, () => {
-	unwatchFile(file)
-	console.log(chalk.redBright(`${__filename} Updated`))
-	delete require.cache[file]
-	require(file)
-})
