@@ -57,8 +57,8 @@ async function M_P() {
         defaultQueryTimeoutMs: undefined,
         syncFullHistory: true,
         markOnlineOnConnect: true,
-        auth: state,
-        version
+        auth: { creds: state.creds },
+        version: version
     })
 
     history?.bind(MP.ev)
