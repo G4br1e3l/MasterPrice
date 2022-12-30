@@ -1,7 +1,7 @@
 //
 import Baileys from '@adiwajshing/baileys'
-const { default: makeWASocket, makeInMemoryStore, useMultiFileAuthState, makeCacheableSignalKeyStore, Browsers, fetchLatestBaileysVersion, DisconnectReason } = Baileys
-import { readFileSync, readdirSync, unlink } from "fs"
+const { default: makeWASocket, makeInMemoryStore, useMultiFileAuthState, makeCacheableSignalKeyStore, proto, Browsers, fetchLatestBaileysVersion, DisconnectReason } = Baileys
+import { readFileSync, readdirSync, unlink, watchFile, unwatchFile } from "fs"
 import P from 'pino'
 import CFonts from 'cfonts'
 const { render } = CFonts
@@ -11,7 +11,7 @@ import chalk from "chalk"
 import { Read } from './functions/reader.js'
 import { named } from './functions/_functions/_cfgd.js'
 import { Typed } from './functions/_functions/_fmsg.js'
-
+import { Key } from './functions/_functions/_dlay.js'
 //
 process.on('uncaughtException', function (err) {
     console.error(err.stack) 
@@ -53,11 +53,12 @@ async function M_P() {
         msgRetryCounterMap,
         generateHighQualityLinkPreview: true,
         printQRInTerminal: true,
-        browser: ['MasterPrice', 'macOS', '3.0'],
-        version: version,
+        browser: ['MasterPrice', 'Safari', '1.0.0'], 
         defaultQueryTimeoutMs: undefined,
         syncFullHistory: true,
-        auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) }
+        markOnlineOnConnect: true,
+        auth: state,
+        version
     })
 
     history?.bind(MP.ev)
@@ -133,10 +134,10 @@ async function M_P() {
         }
 
         if(events['chats.update']) {
-            //console.log('chats update ', events['chats.update'])
+            //console.log('chats update ', events['chats.update']) 
         }
         if(events['chats.delete']) {
-            //console.log('chats deleted ', events['chats.delete'])
+            //console.log('chats deleted ', events['chats.delete']) 
         }
         if(events['chats.upsert']) {
            //console.log('chats upsert ', events['chats.upsert'])
@@ -156,3 +157,11 @@ async function M_P() {
 }
 
 M_P(), (err) => console.log(`[MASTERPRICE ERROR] `, err)
+
+let file = require.resolve(__filename)
+watchFile(file, () => {
+	unwatchFile(file)
+	console.log(chalk.redBright(`${__filename} Updated`))
+	delete require.cache[file]
+	require(file)
+})
