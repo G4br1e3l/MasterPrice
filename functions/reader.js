@@ -11,6 +11,8 @@ import { Key } from './_functions/_dlay.js'
 
 export const Read = async ({ MP, typed, message }) => {
 
+    typed = typed.msg.text
+
     var set_me = JSON.parse(readFileSync("./root/config.json"))
 
     if(typed === 'Mensagem indefinida.') return
