@@ -39,7 +39,7 @@ export const commands = async ({ MP, typed, group_data, message }) => {
     var getConfigProperties = JSON.parse(readFileSync("./root/config.json"))
     var getGroupProperties = JSON.parse(readFileSync("./database/commands/distributed.json"))
 
-    const Message = message.messages[0] ?? ''
+    const Message = typed.msg.text
 
     const isAdmin = async () => {
         if(group_data) {
