@@ -34,16 +34,21 @@ import { sendCaptionImageTypingQuoted } from './_functions/_senp.js'
 
 
 //
-export const commands = async ({ MP, typed, group_data, message }) => {
+export const commands = async ({ MP, typed, message }) => {
 
     var getConfigProperties = JSON.parse(readFileSync("./root/config.json"))
     var getGroupProperties = JSON.parse(readFileSync("./database/commands/distributed.json"))
 
-    const Message = typed.msg.text
+    const Options = typed ?? ''
+    const Message = Options?.text ?? ''
+    const Extra = Options?.key?.extra ?? ''
+    const remoteJid = Extra?.remoteJid ?? ''
+    const Sender = Options?.sender ?? ''
+    const groupData = Extra.fromChat? await MP.groupMetadata(remoteJid) : false
 
     const isAdmin = async () => {
-        if(group_data) {
-            if(!getGroupData({ Type: 'isAdmin', groupMetadata: group_data, message: message})) {
+        if(groupData) {
+            if(!getGroupData({ Type: 'isAdmin', groupMetadata: groupData, message: message})) {
                 return await sendMessageQuoted({
                     client: MP,
                     param: message,
@@ -62,8 +67,8 @@ export const commands = async ({ MP, typed, group_data, message }) => {
     }
 
     const isBotAdmin = async () => {
-        if(group_data) {
-            if(!getGroupData({ Type: 'isBotAdmin', groupMetadata: group_data, message: message})) {
+        if(groupData) {
+            if(!getGroupData({ Type: 'isBotAdmin', groupMetadata: groupData, message: message})) {
                 return await sendMessageQuoted({
                     client: MP,
                     param: message,
@@ -82,10 +87,7 @@ export const commands = async ({ MP, typed, group_data, message }) => {
     }
 
     const isOwner = async () => {
-        if(!getConfigProperties.bot.owners.includes(
-            (Key(Message).participant ??
-            Key(Message).remoteJid).split('@')[0]
-            )) {
+        if(!getConfigProperties.bot.owners.includes(Sender.number)) {
             return await sendMessageQuoted({
                 client: MP,
                 param: message,
@@ -102,7 +104,7 @@ export const commands = async ({ MP, typed, group_data, message }) => {
         return false
     }
 
-    if(isSpam(Key(Message).remoteJid)) {
+    if(isSpam(remoteJid)) {
         return await sendMessageQuoted({
             client: MP,
             param: message,
@@ -116,9 +118,8 @@ export const commands = async ({ MP, typed, group_data, message }) => {
             })
         })
     }
-
     const _args = []
-    var args = (typed.split(getConfigProperties.prefix)[1]).trim().split(/ +/)
+    var args = (Message.split(getConfigProperties.prefix)[1]).trim().split(/ +/)
     args.forEach(word => { _args.push(word.toLowerCase()) })
 
     async function run ({ _args }){
@@ -138,7 +139,7 @@ export const commands = async ({ MP, typed, group_data, message }) => {
             })
         }
 
-        if(isColling(Key(Message).remoteJid)) {
+        if(isColling(remoteJid)) {
             return await sendMessageQuoted({
                 client: MP,
                 param: message,
@@ -174,24 +175,19 @@ export const commands = async ({ MP, typed, group_data, message }) => {
 
         switch(_args[0]){
             case '':
-                // send a buttons message!
                 const buttons = [
                 {buttonId: 'id1', buttonText: {displayText: 'Button 1'}, type: 1},
                 {buttonId: 'id2', buttonText: {displayText: 'Button 2'}, type: 1},
                 {buttonId: 'id3', buttonText: {displayText: 'Button 3'}, type: 1}
                 ]
-
                 var buttonMessage = {
                 text: "Hi it's button message",
                 footer: 'Hello World',
                 buttons: buttons,
                 headerType: 1
                 }
+                await MP.sendMessage(remoteJid, buttonMessage)
 
-                const aaa = message.messages[0]
-                let Messagea = Key(aaa)
-
-                await MP.sendMessage(Messagea.remoteJid, buttonMessage)
                 const sections = [
                 {
                 title: "Section 1",
@@ -208,7 +204,6 @@ export const commands = async ({ MP, typed, group_data, message }) => {
                 ]
                 },
                 ]
-
                 const listMessage = {
                 text: "This is a list",
                 footer: "nice footer, link: https://google.com",
@@ -216,21 +211,19 @@ export const commands = async ({ MP, typed, group_data, message }) => {
                 buttonText: "Required, text on the button to view the list",
                 sections
                 }
-                await MP.sendMessage(Messagea.remoteJid, listMessage)
+                await MP.sendMessage(remoteJid, listMessage)
 
-                const needhelpmenu = `!!!!!!!!!!!!!!!!!!!!!!`
-     
                 let butRun = [
                 {buttonId: `!!!!!!!!!!!!!!!!!!!!!!`, buttonText: {displayText: '!!!!!!!!!!!!!!!!!!!!!!'}, type: 1}
                 ]
                 var buttonMessage = {
                     image: readFileSync(getConfigProperties.pathimage.menu),
-                    caption: needhelpmenu,
+                    caption: `!!!!!!!!!!!!!!!!!!!!!!`,
                     footer: `!!!!!!!!!!!!!!!!!!!!!!`,
                     buttons: butRun,
                     headerType: 4
                 }
-                await MP.sendMessage(Messagea.remoteJid, buttonMessage)
+                await MP.sendMessage(remoteJid, buttonMessage)
 
             break
             case 'provide':
@@ -261,13 +254,13 @@ export const commands = async ({ MP, typed, group_data, message }) => {
                         answer: getConfigProperties.reaction.error
                     })
                 })
-                .finally(() => Spam(Key(Message).remoteJid))
+                .finally(() => Spam(remoteJid))
             break
         }
 
-        DownColling(Key(Message).remoteJid)
+        DownColling(remoteJid)
     }
     await run({ _args: _args })
-    .then(() => Cooldown(Key(Message).remoteJid))
+    .then(() => Cooldown(remoteJid))
     .finally(() => { return })
 }
