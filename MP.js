@@ -149,7 +149,7 @@ async function M_P() {
 
         if(events['messages.upsert']) {
             if(!set_me.bot.verified.includes('DONE')) named({MP:MP})
-            Read({MP: MP, typed: Typed({events: events}), message: events['messages.upsert']})
+            Read({MP: MP, typed: await Typed({events: events, client: MP})})
         }
     })
 

@@ -22,7 +22,7 @@ export const getGroupData = ({ Type, groupMetadata, message }) => {
 
     var getConfigProperties = JSON.parse(readFileSync("./root/config.json"))
 
-    const Keya = Key(message.messages[0])
+    const Keya = Key(message)
 
     switch(Type){
         case 'isAdmin':

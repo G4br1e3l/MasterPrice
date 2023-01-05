@@ -1,27 +1,23 @@
 //
-import { Delay, Key } from './_dlay.js'
+import { Delay } from './_dlay.js'
 
 //
 export const sendMessageTypingQuoted = async ({ client, param, answer }) => {
 
-    const a = param.messages[0]
-    
-    const Message = Key(a)
-
-    await client.presenceSubscribe(Message.remoteJid).then( async () => {
+    await client.presenceSubscribe(param.details[0].messageJid).then( async () => {
         await Delay(2000).then( async () =>{
-            await client.sendPresenceUpdate('composing', Message.remoteJid).then( async () => {
+            await client.sendPresenceUpdate('composing', param.details[0].messageJid).then( async () => {
                 await Delay(500).then( async ()=> {
-                    await client.sendPresenceUpdate('paused', Message.remoteJid).then( async () => {
+                    await client.sendPresenceUpdate('paused', param.details[0].messageJid).then( async () => {
                         return await client.sendMessage(
-                            Message.remoteJid, {
+                            param.details[0].messageJid, {
                                 text: answer,
                                 contextInfo: {
-                                    mentionedJid: [Message.remoteJid]
+                                    mentionedJid: [param.details[0].messageJid]
                                 }
                             },
                             {
-                                quoted: a.quoted ?? a ?? null
+                                quoted: param.details[0].messageQuoted
                             }
                         )
                     })

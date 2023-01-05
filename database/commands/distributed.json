@@ -1,10 +1,10 @@
 {
     "off": {
-        "secure": []
+        "secure": ["menu",""]
     },
     "commands": {
         "only": {
-            "group": []
+            "group": ["menu",""]
         },
         "default": [
             "provide",

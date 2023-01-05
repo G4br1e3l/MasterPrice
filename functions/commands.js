@@ -9,18 +9,16 @@ import { sendReaction } from './_functions/_rect.js'
 import { sendMessageQuoted } from './_functions/_smsq.js'
 
 //commands functions
-import { Spam, isSpam, Key, Cooldown, isColling, DownColling, sizeCooldown } from './_functions/_dlay.js'
-import { getGroupData } from './_functions/_cmds.js'
+import { Spam, isSpam, Cooldown, isColling, DownColling, sizeCooldown } from './_functions/_dlay.js'
 
 //classes functions
 import { Provide } from './_commands/_provide.js'
 import { Restrict } from './_commands/_restrict.js'
 import { Owner } from './_commands/_owner.js'
 
-
 /*
 import { Menu } from './_functions/menus/main.js'
-
+//
 import { sendMessage } from './_functions/_smss.js'
 import { sendMessageTyping } from './_functions/_smst.js'
 import { sendMessageTypingQuoted } from './_functions/_smtq.js'
@@ -32,62 +30,59 @@ import { sendCaptionImageTyping } from './_functions/_senk.js'
 import { sendCaptionImageTypingQuoted } from './_functions/_senp.js'
 */
 
-
 //
-export const commands = async ({ MP, typed, message }) => {
+export const commands = async ({ MP, typed }) => {
 
     var getConfigProperties = JSON.parse(readFileSync("./root/config.json"))
     var getGroupProperties = JSON.parse(readFileSync("./database/commands/distributed.json"))
 
     const Options = typed ?? ''
-    const Message = Options?.text ?? ''
-    const Extra = Options?.key?.extra ?? ''
-    const remoteJid = Extra?.remoteJid ?? ''
-    const Sender = Options?.sender ?? ''
-    const groupData = Extra.fromChat? await MP.groupMetadata(remoteJid) : false
+    const remoteJid = Options.msg.key.parameters.details[0].messageJid ?? ''
+    const Sender = Options.msg.key.parameters.details[1].sender ?? ''
+    const Message = Sender.messageText ?? ''
+    const message = Options.msg.key.parameters ?? ''
+    const Boolean = Options.msg.key.boolean
 
     const isAdmin = async () => {
-        if(groupData) {
-            if(!getGroupData({ Type: 'isAdmin', groupMetadata: groupData, message: message})) {
-                return await sendMessageQuoted({
+        if(!Boolean.isAdmin) {
+            await sendMessageQuoted({
+                client: MP,
+                param: message,
+                answer: MSG.commands.noprivilege
+            })
+            .then( async () => {
+                await sendReaction({
                     client: MP,
                     param: message,
-                    answer: MSG.commands.noprivilege
+                    answer: getConfigProperties.reaction.error
                 })
-                .finally( async () => {
-                    await sendReaction({
-                        client: MP,
-                        param: message,
-                        answer: getConfigProperties.reaction.error
-                    })
-                })
-            }
+            })
+            .finally(() => { return false })
         }
-        return false
+        return true
     }
 
     const isBotAdmin = async () => {
-        if(groupData) {
-            if(!getGroupData({ Type: 'isBotAdmin', groupMetadata: groupData, message: message})) {
-                return await sendMessageQuoted({
+        if(!Boolean.isAdmin) {
+            await sendMessageQuoted({
+                client: MP,
+                param: message,
+                answer: MSG.commands.nopermission
+            })
+            .then( async () => {
+                await sendReaction({
                     client: MP,
                     param: message,
-                    answer: MSG.commands.nopermission
+                    answer: getConfigProperties.reaction.error
                 })
-                .finally( async () => {
-                    await sendReaction({
-                        client: MP,
-                        param: message,
-                        answer: getConfigProperties.reaction.error
-                    })
-                })
-            }
+            })
+            .finally(() => { return false })
         }
-        return false
+        return true
     }
 
     const isOwner = async () => {
-        if(!getConfigProperties.bot.owners.includes(Sender.number)) {
+        if(!getConfigProperties.bot.owners.includes(Sender.messageNumber)) {
             return await sendMessageQuoted({
                 client: MP,
                 param: message,
@@ -118,6 +113,7 @@ export const commands = async ({ MP, typed, message }) => {
             })
         })
     }
+
     const _args = []
     var args = (Message.split(getConfigProperties.prefix)[1]).trim().split(/ +/)
     args.forEach(word => { _args.push(word.toLowerCase()) })
@@ -154,7 +150,7 @@ export const commands = async ({ MP, typed, message }) => {
             })
         }
 
-        if(getGroupProperties.commands.only.group.includes(_args[0])) {
+        if(getGroupProperties.commands.only.group.includes(_args[0]) && !Boolean.isGroup) {
             return await sendMessageQuoted({
                 client: MP,
                 param: message,
@@ -170,7 +166,7 @@ export const commands = async ({ MP, typed, message }) => {
         }
 
         if(!getGroupProperties.off.secure.includes(_args[0])){
-            if(await isBotAdmin() || await isAdmin()) return
+            if(await isAdmin() || await isBotAdmin()) return
         }
 
         switch(_args[0]){

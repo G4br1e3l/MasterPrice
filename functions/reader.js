@@ -8,14 +8,14 @@ const MSG = JSON.parse(readFileSync("./root/messages.json"))
 import { commands } from './commands.js'
 import { console_message } from './_functions/_csmg.js'
 
-export const Read = async ({ MP, typed, message }) => {
+export const Read = async ({ MP, typed }) => {
 
     const Options = typed ?? false
-    const Message = Options?.msg ?? false
-    const Text = Message?.text ?? false
-    const Sender = Message?.sender?.number ?? false
+    const Text = Options?.msg?.key?.parameters?.details[1]?.sender?.messageText ?? ''
+    const Sender = Options?.msg?.key?.parameters?.details[1]?.sender?.messageNumber ?? ''
 
-    if(!Options || !Message) return
+    if(!Options || !Text || !Sender) return
+    if(Text === '""') return
 
     var set_me = JSON.parse(readFileSync("./root/config.json"))
 
@@ -23,8 +23,7 @@ export const Read = async ({ MP, typed, message }) => {
         case true:
             await commands({
                 MP: MP,
-                typed: Message,
-                message: message
+                typed: Options,
             })
             console_message({
                 message_param: MSG.entry.usercommand,
