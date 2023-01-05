@@ -114,7 +114,7 @@ export const Typed = async ({ events, client }) => {
                             messageQuotedText: Message[MessageType]?.contextInfo?.quotedMessage ?? Message[MessageType] ?? null,
                             messageQuoted: Body.quoted ?? Body ?? null,
                             messageMentionedJids: Message[MessageType]?.contextInfo?.mentionedJid ?? null,
-                            messageGroupMetadata: usesMeta? await client.groupMetadata(Key.remoteJid) : null,
+                            messageGroupMetadata: usesMeta? usesMeta : null,
                             messageButtonId: Message[MessageType]?.selectedButtonId ?? null,
                             messageButtonText: Message[MessageType]?.selectedDisplayText ?? null,
                             messageListId: Message[MessageType]?.title ?? null,
