@@ -120,8 +120,6 @@ export const commands = async ({ MP, typed }) => {
 
     async function run ({ _args }){
 
-        console.log(_args)
-
         if(sizeCooldown().size >= 2) {
             return await sendMessageQuoted({
                 client: MP,
@@ -136,7 +134,7 @@ export const commands = async ({ MP, typed }) => {
                 })
             })
         }
-        console.log(_args)
+
         if(isColling(remoteJid)) {
             return await sendMessageQuoted({
                 client: MP,
@@ -151,7 +149,7 @@ export const commands = async ({ MP, typed }) => {
                 })
             })
         }
-        console.log(_args)
+
         if(getGroupProperties.commands.only.group.includes(_args[0]) && !Boolean.isGroup) {
             return await sendMessageQuoted({
                 client: MP,
@@ -166,11 +164,11 @@ export const commands = async ({ MP, typed }) => {
                 })
             })
         }
-        console.log(_args)
+
         if(!getGroupProperties.off.secure.includes(_args[0])){
             if(await isAdmin() || await isBotAdmin()) return
         }
-        console.log(_args)
+
         switch(_args[0]){
             case '':
                 const buttons = [
