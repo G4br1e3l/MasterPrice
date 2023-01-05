@@ -8,7 +8,7 @@ const { find } = pkg1
 
 import { getGroupData } from './_cmds.js'
 
-const emojis = '😃'
+const sym = '😃'
 
 //
 export const Typed = async ({ events, client }) => {
@@ -19,6 +19,7 @@ export const Typed = async ({ events, client }) => {
         return Buffer.from(Content).equals(Buffer.from(x))
     }
     const buff2 = (z) => Buffer.from(String(Events)).equals(Buffer.from(z))
+    const test = (c) => new RegExp(Array.from(c).join('|')).test(Text)
 
     var getConfigProperties = JSON.parse(readFileSync("./root/config.json"))
 
@@ -74,11 +75,12 @@ export const Typed = async ({ events, client }) => {
                         isLiveLocationMessage: buff('liveLocationMessage') ?? false,
                         isrequestPaymentMessage: buff('requestPaymentMessage') ?? false,
                         isReactionMessage: buff('reactionMessage') ?? false,
-                        isEmojiMessage: new RegExp(Array.from(emojis).join('|')).test(Text) ?? false,
+                        isSymbolsMessage: test(sym) ?? false,
                         isQuotedMessage: !!Message[MessageType]?.contextInfo?.quotedMessage ?? false,
                         isLinkMessage: !!find(Text)[0] ?? false,
                         isForeignerMessage: !!!Buffer.from((Key.participant ?? Key.remoteJid).split('@')[0].substring(0,2)).equals(Buffer.from('55')) ?? false,
-                        isTextMessage: typeof(Text) === 'string'? true : false,
+                        isTextMessage: test('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZàèìòùâãáéíóúÀÈÌÙÀÁÉÍÓÚÃÂäëïöüÄËÏÖÜ') ?? false,
+                        isNumberMessage: test('0123456789') ?? false,
                     },{
                         chat:{
                             isFirstMessage: false,
@@ -123,7 +125,7 @@ export const Typed = async ({ events, client }) => {
                         sender: {
                             messageName: Body.pushName ?? (Key.participant ?? Key.remoteJid).split('@')[0] ?? false,
                             messageNumber: (Key.participant ?? Key.remoteJid).split('@')[0] ?? false,
-                            messageText: Text ?? '',
+                            messageText: Text,
                         },
                     }],
                 },
