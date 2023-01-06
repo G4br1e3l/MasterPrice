@@ -1,9 +1,6 @@
 import { readFileSync } from "fs"
 
-import { Owned } from '../_functions/_cmds.js'
-
-import { sendReaction } from '../_functions/_rect.js'
-import { sendMessageQuoted } from '../_functions/_smsq.js'
+import { Owned, sendReaction, sendMessageQuoted } from '../_functions/_cmds.js'
 
 export const Owner = async ({ MP, message, _args }) => {
 

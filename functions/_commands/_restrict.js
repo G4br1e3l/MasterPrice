@@ -1,9 +1,6 @@
 import { readFileSync } from "fs"
 
-import { Restricted } from '../_functions/_cmds.js'
-
-import { sendReaction } from '../_functions/_rect.js'
-import { sendMessageQuoted } from '../_functions/_smsq.js'
+import { Restricted, sendReaction, sendMessageQuoted } from '../_functions/_cmds.js'
 
 export const Restrict = async ({ MP, message, _args }) => {
 

@@ -9,9 +9,8 @@ import chalk from "chalk"
 
 //
 import { Read } from './functions/reader.js'
-import { named } from './functions/_functions/_cfgd.js'
+import { Named } from './functions/_functions/_cmds.js'
 import { Typed } from './functions/_functions/_fmsg.js'
-import { Key } from './functions/_functions/_dlay.js'
 //
 process.on('uncaughtException', function (err) {
     console.error(err.stack) 
@@ -148,7 +147,7 @@ async function M_P() {
         }
 
         if(events['messages.upsert']) {
-            if(!set_me.bot.verified.includes('DONE')) named({MP:MP})
+            if(!set_me.bot.verified.includes('DONE')) Named({MP:MP})
             Read({MP: MP, typed: await Typed({events: events, client: MP})})
         }
     })

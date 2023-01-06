@@ -6,7 +6,7 @@ const MSG = JSON.parse(readFileSync("./root/messages.json"))
 
 //
 import { commands } from './commands.js'
-import { console_message } from './_functions/_csmg.js'
+import { console_message } from './_functions/_cmds.js'
 
 export const Read = async ({ MP, typed }) => {
 

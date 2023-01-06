@@ -1,40 +1,32 @@
 //import :p
-import { readFileSync } from "fs"
+import { readFileSync } from 'fs'
 
 //constant imports
 const MSG = JSON.parse(readFileSync('./root/messages.json', 'utf8'))
 
-//client functions
-import { sendReaction } from './_functions/_rect.js'
-import { sendMessageQuoted } from './_functions/_smsq.js'
-
 //commands functions
-import { Spam, isSpam, Cooldown, isColling, DownColling, sizeCooldown } from './_functions/_dlay.js'
+import {
+    Spam, 
+    isSpam, 
+    Cooldown, 
+    isColling, 
+    DownColling, 
+    sizeCooldown, 
+    sendReaction, 
+    sendMessageQuoted,
+    sectionMenu
+} from './_functions/_cmds.js'
 
 //classes functions
 import { Provide } from './_commands/_provide.js'
 import { Restrict } from './_commands/_restrict.js'
 import { Owner } from './_commands/_owner.js'
 
-/*
-import { Menu } from './_functions/menus/main.js'
-//
-import { sendMessage } from './_functions/_smss.js'
-import { sendMessageTyping } from './_functions/_smst.js'
-import { sendMessageTypingQuoted } from './_functions/_smtq.js'
-import { sendMessage } from './_functions/_smss.js'
-import { sendMessageTypingQuoted } from './_functions/_smtq.js'
-import { sendCaptionImage } from './_functions/_sqnd.js'
-import { sendCaptionImageQuoted } from './_functions/_send.js'
-import { sendCaptionImageTyping } from './_functions/_senk.js'
-import { sendCaptionImageTypingQuoted } from './_functions/_senp.js'
-*/
-
 //
 export const commands = async ({ MP, typed }) => {
 
-    var getConfigProperties = JSON.parse(readFileSync("./root/config.json"))
-    var getGroupProperties = JSON.parse(readFileSync("./database/commands/distributed.json"))
+    var getConfigProperties = JSON.parse(readFileSync(`./root/config.json`))
+    var getGroupProperties = JSON.parse(readFileSync(`./database/commands/distributed.json`))
 
     const Options = typed ?? ''
     const remoteJid = Options.msg.key.parameters.details[0].messageJid ?? ''
@@ -171,71 +163,22 @@ export const commands = async ({ MP, typed }) => {
 
         switch(_args[0]){
             case '':
-                const buttons = [
-                {buttonId: 'id1', buttonText: {displayText: 'Button 1'}, type: 1},
-                {buttonId: 'id2', buttonText: {displayText: 'Button 2'}, type: 1},
-                {buttonId: 'id3', buttonText: {displayText: 'Button 3'}, type: 1}
-                ]
-                var buttonMessage = {
-                text: "Hi it's button message",
-                footer: 'Hello World',
-                buttons: buttons,
-                headerType: 1
-                }
-                await MP.sendMessage(remoteJid, buttonMessage)
-
-                const sections = [
-                {
-                title: "Section 1",
-                rows: [
-                {title: "Option 1", rowId: "option1"},
-                {title: "Option 2", rowId: "option2", description: "This is a description"}
-                ]
-                },
-                {
-                title: "Section 2",
-                rows: [
-                {title: "Option 3", rowId: "option3"},
-                {title: "Option 4", rowId: "option4", description: "This is a description V2"}
-                ]
-                },
-                ]
-                const listMessage = {
-                text: "This is a list",
-                footer: "nice footer, link: https://google.com",
-                title: "Amazing boldfaced list title",
-                buttonText: "Required, text on the button to view the list",
-                sections
-                }
-                await MP.sendMessage(remoteJid, listMessage)
-
-                let butRun = [
-                {buttonId: `!!!!!!!!!!!!!!!!!!!!!!`, buttonText: {displayText: '!!!!!!!!!!!!!!!!!!!!!!'}, type: 1}
-                ]
-                var buttonMessage = {
-                    image: readFileSync(getConfigProperties.pathimage.menu),
-                    caption: `!!!!!!!!!!!!!!!!!!!!!!`,
-                    footer: `!!!!!!!!!!!!!!!!!!!!!!`,
-                    buttons: butRun,
-                    headerType: 4
-                }
-                await MP.sendMessage(remoteJid, buttonMessage)
-
+                await sectionMenu({ client: MP, param: remoteJid})
             break
             case 'provide':
             case 'unprovide':
                 if(await isOwner()) return
-                await Provide({ MP:MP, message:message, _args:_args })
+                await Provide({ MP:MP, message: message, _args:_args })
             break
             case 'restrict':
             case 'unrestrict':
                 if(await isOwner()) return
-                await Restrict({ MP:MP, message:message, _args:_args })
+                await Restrict({ MP:MP, message: message, _args:_args })
             break
             case 'addowner':
             case 'removeowner':
                 if(await isOwner()) return
-                await Owner({ MP:MP, message:message, _args:_args })
+                await Owner({ MP:MP, message: message, _args:_args })
             break
             default:
                 await sendMessageQuoted({
