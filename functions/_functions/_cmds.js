@@ -100,9 +100,9 @@ export const getGroupData = ({ Type, groupMetadata, message }) => {
 
 //
 export const Provided = ({ Modo, Parametro}) =>{
-    
+
     var getGroupProperties = JSON.parse(readFileSync('./database/commands/distributed.json'))
-    
+
     switch(Modo){
         case 'provide':
             getGroupProperties.off.secure.push(Parametro)
@@ -122,9 +122,9 @@ export const Provided = ({ Modo, Parametro}) =>{
 
 //
 export const Restricted = ({ Modo, Parametro}) =>{
-    
+
     var getGroupProperties = JSON.parse(readFileSync('./database/commands/distributed.json'))
-    
+
     switch(Modo){
         case 'restrict':
             getGroupProperties.commands.only.group.push(Parametro)
@@ -144,9 +144,9 @@ export const Restricted = ({ Modo, Parametro}) =>{
 
 //
 export const Owned = ({ Modo, Parametro}) =>{
-    
+
     var getConfigProperties = JSON.parse(readFileSync("./root/config.json"))
-    
+
     switch(Modo){
         case 'addowner':
             getConfigProperties.bot.owners.push(Parametro)
@@ -370,7 +370,7 @@ export const sectionMenu = async ({ client, param }) => {
                         title: `☆ Removeowner`,
                         rowId: `${getConfigProperties.prefix}removeowner`,
                         description: `☆ Comando para remover os numeros adicionados para uso das funções de dono do bot.`
-                    }   
+                    }
                 ]
             },{
                 title: `🄾🄿🅃🄸🄾🄽🅂 2 COMANDOS DE ADMINISTRADOR`,

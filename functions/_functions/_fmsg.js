@@ -1,4 +1,4 @@
-import { readFileSync } from "fs"
+import { readFileSync, writeFileSync } from "fs"
 
 import pkg from '@adiwajshing/baileys';
 const { getContentType } = pkg;
@@ -10,7 +10,6 @@ import { getGroupData } from './_cmds.js'
 
 import pkg2 from 'node-emoji';
 const { unemojify, hasEmoji } = pkg2;
- 
 
 //
 export const Typed = async ({ events, client }) => {
@@ -21,6 +20,7 @@ export const Typed = async ({ events, client }) => {
     const teste2 = (c) => new RegExp(c).test(String(Events))
 
     var getConfigProperties = JSON.parse(readFileSync("./root/config.json"))
+    var getMetadataProperties = JSON.parse(readFileSync("./root/groupsMetadata.json"))
 
     const Body = events['messages.upsert']?.messages[0] ?? ''
     const Events = Body?.messageStubType ?? ''
@@ -29,25 +29,39 @@ export const Typed = async ({ events, client }) => {
     const MessageType = Content === 'viewOnceMessage'? get(Body.message[Content].message) : Content ?? ''
     const Message = Content === 'viewOnceMessage'? Body.message[Content].message : Body.message ?? ''
 
-    if(Key.fromMe) return 'Mensagem do BOT.'
+    //if(Key.fromMe) return 'Mensagem do BOT.'
     if(Key.remoteJid === 'status@broadcast' || Message[MessageType]?.groupId === 'status@broadcast') return 'Publicação de status detectada.'
     if(Message === undefined || Message === null) return 'Mensagem indefinida.'
 
-    const Text = 
+    const Text =
     MessageType === 'conversation'? Message[MessageType] :
     MessageType === 'extendedTextMessage'? Message[MessageType]?.text :
     MessageType === 'imageMessage'? Message[MessageType]?.caption ?? Message[MessageType]?.message?.imageMessage?.caption :
     MessageType === 'videoMessage'? Message[MessageType]?.caption ?? Message[MessageType]?.message?.videoMessage?.caption :
     MessageType === 'documentWithCaptionMessage'? Message[MessageType]?.message?.documentMessage?.caption :
     MessageType === 'listResponseMessage'? Message[MessageType]?.singleSelectReply?.selectedRowId :
-    MessageType === 'buttonsResponseMessage'? Message[MessageType]?.selectedButtonId : 
-    MessageType === 'templateButtonReplyMessage' ? Message[MessageType]?.selectedId : 
-    MessageType === 'messageContextInfo' ? Message[MessageType]?.selectedButtonId || Message[MessageType]?.singleSelectReply.selectedRowId || Message.text : 
+    MessageType === 'buttonsResponseMessage'? Message[MessageType]?.selectedButtonId :
+    MessageType === 'templateButtonReplyMessage' ? Message[MessageType]?.selectedId :
+    MessageType === 'messageContextInfo' ? Message[MessageType]?.selectedButtonId || Message[MessageType]?.singleSelectReply.selectedRowId || Message.text :
     JSON.stringify(MessageType)
 
-    let usesMeta = Key?.remoteJid?.endsWith('@g.us')? await client.groupMetadata(Key.remoteJid) : false
+    const createdData = async () => {
+        var jsonData = async () => `{"${Key.remoteJid}": ${JSON.stringify(await client.groupMetadata(Key.remoteJid))}}`
+        var a = await jsonData()
+        var jsonObj = JSON.parse(a)
 
-    const Typed = {  
+        getMetadataProperties.remoteJID.push(jsonObj)
+        writeFileSync("./root/groupsMetadata.json", JSON.stringify(getMetadataProperties))
+    }
+
+    const _args = []
+    Object.keys(getMetadataProperties.remoteJID).forEach(word => {
+    _args.push(Object.keys(getMetadataProperties.remoteJID[word]))
+    })
+
+    try{ var usesMeta = Key?.remoteJid?.endsWith('@g.us')? new RegExp(Key.remoteJid).test(_args)? getMetadataProperties.remoteJID[0][Key.remoteJid] : await createdData() : false } catch {}
+
+    const Typed = {
         msg: {
             key: {
                 boolean:{
@@ -96,7 +110,7 @@ export const Typed = async ({ events, client }) => {
                             isCurrentDisappearing: !!Message[MessageType]?.contextInfo?.expiration ?? false,
                             isOnlyAdminMessagesEdited: teste2('26'),
                         },
-                    }],    
+                    }],
                 },
                 parameters:{
                     details: [

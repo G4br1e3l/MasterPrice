@@ -1,7 +1,7 @@
 //
 import Baileys from '@adiwajshing/baileys'
 const { default: makeWASocket, makeInMemoryStore, useMultiFileAuthState, makeCacheableSignalKeyStore, proto, Browsers, fetchLatestBaileysVersion, DisconnectReason } = Baileys
-import { readFileSync, readdirSync, unlink, watchFile, unwatchFile } from "fs"
+import { readFileSync, readdirSync, unlink, watchFile, unwatchFile, writeFileSync } from "fs"
 import P from 'pino'
 import CFonts from 'cfonts'
 const { render } = CFonts
@@ -13,7 +13,7 @@ import { Named } from './functions/_functions/_cmds.js'
 import { Typed } from './functions/_functions/_fmsg.js'
 //
 process.on('uncaughtException', function (err) {
-    console.error(err.stack) 
+    console.error(err.stack)
 })
 
 console.warn = () => {};
@@ -52,7 +52,7 @@ async function M_P() {
         msgRetryCounterMap,
         generateHighQualityLinkPreview: true,
         printQRInTerminal: true,
-        browser: ['MasterPrice', 'Safari', '1.0.0'], 
+        browser: ['MasterPrice', 'Safari', '1.0.0'],
         defaultQueryTimeoutMs: undefined,
         syncFullHistory: true,
         markOnlineOnConnect: true,
@@ -67,13 +67,13 @@ async function M_P() {
         if(events['connection.update']) {
 
             console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.updating))
-            
+
             const { connection, lastDisconnect, receivedPendingNotifications, isOnline, qr } = events['connection.update']
-            
+
             if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.qrscan))
             if(isOnline) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.staging))
             if(receivedPendingNotifications) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.notify))
-            
+
             switch(connection){
                 case 'close':
                     console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.downconnection))
@@ -109,9 +109,9 @@ async function M_P() {
         if(events['creds.update']) {
             await saveCreds()
         }
-        
+
         if(events['contacts.upsert']) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Contatos Salvos.'))
-        
+
         if(events['messages.update']) {
             //console.log('chats update ', events['messages.update'])
         }
@@ -133,21 +133,29 @@ async function M_P() {
         }
 
         if(events['chats.update']) {
-            //console.log('chats update ', events['chats.update']) 
+            //console.log('chats update ', events['chats.update'])
         }
         if(events['chats.delete']) {
-            //console.log('chats deleted ', events['chats.delete']) 
+            //console.log('chats deleted ', events['chats.delete'])
         }
         if(events['chats.upsert']) {
            //console.log('chats upsert ', events['chats.upsert'])
         }
 
         if(events['group-participants.update']){
-            //console.log('group participants update ', events['group-participants.update'])
+            var getMetadataProperties = JSON.parse(readFileSync("./root/groupsMetadata.json"))
+
+            for (let i = 0; i < Object.keys(getMetadataProperties.remoteJID).length; i++) {
+                if (Object.keys(getMetadataProperties.remoteJID[i])[0] === events['group-participants.update'].id){
+                    getMetadataProperties.remoteJID.splice(i, 1)
+                    writeFileSync("./root/groupsMetadata.json", JSON.stringify(getMetadataProperties))
+                    break
+                }
+            }
         }
 
         if(events['messages.upsert']) {
-            if(!set_me.bot.verified.includes('DONE')) Named({MP:MP})
+            if(set_me.bot.verified !== 'DONE') Named({MP:MP})
             Read({MP: MP, typed: await Typed({events: events, client: MP})})
         }
     })
