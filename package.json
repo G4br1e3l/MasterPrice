@@ -5,7 +5,7 @@
   "main": "MP.js",
   "type": "module",
   "scripts": {
-  "start": "node index.js"
+  "start": "node MP.js"
  },
   "author": "Gabriel Henrique de Jesus Silva",
   "license": "ISC",
