@@ -10,19 +10,15 @@ import { getGroupData } from './_cmds.js'
 
 import pkg2 from 'node-emoji';
 const { unemojify, hasEmoji } = pkg2;
-
-const sym = `☠️`
+ 
 
 //
 export const Typed = async ({ events, client }) => {
 
-    const get = (x) => getContentType(x)
-    const buff = (x) => {
-        if(MessageType === Content) return Buffer.from(MessageType).equals(Buffer.from(x))
-        return Buffer.from(Content).equals(Buffer.from(x))
-    }
-    const buff2 = (z) => Buffer.from(String(Events)).equals(Buffer.from(z))
+    const get = (c) => getContentType(c)
     const teste = (c) => !!new RegExp(Array.from(c).join('|')).test(Text)
+    const teste1 = (c) => new RegExp(c).test(MessageType)
+    const teste2 = (c) => new RegExp(c).test(String(Events))
 
     var getConfigProperties = JSON.parse(readFileSync("./root/config.json"))
 
@@ -63,42 +59,42 @@ export const Typed = async ({ events, client }) => {
                     isOwner: !!getConfigProperties.bot.owners.includes((Key.participant ?? Key.remoteJid).split('@')[0]),
                     isQuoted: !!Message[MessageType]?.contextInfo?.quotedMessage ?? false,
                     message: [{
-                        isPollMessage: (buff('pollCreationMessage') ?? false) || (buff('pollUpdateMessage') ?? false),
-                        isListMessage: (buff('listCreationMessage') ?? false) || (buff('listResponseMessage') ?? false),
-                        isDocMessage: (buff('documentMessage') ?? false) || (buff('documentWithCaptionMessage') ?? false),
-                        isButtonMessage: (buff('buttonsCreationMessage') ?? false) || (buff('buttonsResponseMessage') ?? false),
-                        isAudioMessage: buff('audioMessage') ?? false,
-                        isProductMessage: buff('productMessage') ?? false,
-                        isViewOnceMessage: buff('viewOnceMessage') ?? false,
-                        isVideoMessage: buff('videoMessage') ?? false,
-                        isContactMessage: buff('contactMessage') ?? false,
-                        isImageMessage: buff('imageMessage') ?? false,
-                        isStickerMessage: buff('stickerMessage') ?? false,
-                        isLocationMessage: buff('locationMessage') ?? false,
-                        isLiveLocationMessage: buff('liveLocationMessage') ?? false,
-                        isrequestPaymentMessage: (buff('requestPaymentMessage') ?? false) || (buff('declinePaymentRequestMessage') ?? false),
-                        isReactionMessage: buff('reactionMessage') ?? false,
-                        isSymbolsMessage: hasEmoji([unemojify(Text)].join(' ')) || teste(sym) || (/[^A-Za-z 0-9]/g).test(Text),
+                        isPollMessage: teste1('pollCreationMessage') || teste1('pollUpdateMessage'),
+                        isListMessage: teste1('listCreationMessage') || teste1('listResponseMessage'),
+                        isDocMessage: teste1('documentMessage') || teste1('documentWithCaptionMessage'),
+                        isButtonMessage: teste1('buttonsCreationMessage') || teste1('buttonsResponseMessage'),
+                        isAudioMessage: teste1('audioMessage'),
+                        isProductMessage: teste1('productMessage'),
+                        isViewOnceMessage: teste1('viewOnceMessage'),
+                        isVideoMessage: teste1('videoMessage'),
+                        isContactMessage: teste1('contactMessage'),
+                        isImageMessage: teste1('imageMessage'),
+                        isStickerMessage: teste1('stickerMessage'),
+                        isLocationMessage: teste1('locationMessage'),
+                        isLiveLocationMessage: teste1('liveLocationMessage'),
+                        isrequestPaymentMessage: teste1('requestPaymentMessage') || teste1('declinePaymentRequestMessage'),
+                        isReactionMessage: teste1('reactionMessage'),
+                        isSymbolsMessage: hasEmoji([unemojify(Text)].join(' ')) || teste(`☠️`) || (/[^A-Za-z 0-9]/g).test(Text),
                         isQuotedMessage: !!Message[MessageType]?.contextInfo?.quotedMessage ?? false,
                         isLinkMessage: !!find(Text)[0] ?? false,
-                        isForeignerMessage: !!!Buffer.from((Key.participant ?? Key.remoteJid).split('@')[0].substring(0,2)).equals(Buffer.from('55')) ?? false,
-                        isTextMessage: teste('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZàèìòùâãáéíóúÀÈÌÙÀÁÉÍÓÚÃÂäëïöüÄËÏÖÜ') ?? false,
-                        isNumberMessage: teste('0123456789') ?? false,
+                        isForeignerMessage: !new RegExp((Key.participant ?? Key.remoteJid).split('@')[0].substring(0,2)).test('55'),
+                        isTextMessage: teste('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZàèìòùâãáéíóúÀÈÌÙÀÁÉÍÓÚÃÂäëïöüÄËÏÖÜ'),
+                        isNumberMessage: teste('0123456789'),
                     },{
                         chat:{
                             isFirstMessage: false,
                         },
                     },{
                         group:{
-                            isSubjectChange: buff2('21') ?? false,
-                            isSomeoneJoined: buff2('27') ?? false,
-                            isSomeoneExited: buff2('32') ?? false,
-                            isSomeonePromoted: buff2('29') ?? false,
-                            isSomeoneDemoted: buff2('30') ?? false,
-                            isSomeoneBanned: buff2('28') ?? false,
-                            isDisappearingAddeded: !!!Buffer.from(String(Message[MessageType]?.ephemeralExpiration)).equals(Buffer.from('0')) ?? false,
+                            isSubjectChange: teste2('21'),
+                            isSomeoneJoined: teste2('27'),
+                            isSomeoneExited: teste2('32'),
+                            isSomeonePromoted: teste2('29'),
+                            isSomeoneDemoted: teste2('30'),
+                            isSomeoneBanned: teste2('28'),
+                            isDisappearingAddeded: new RegExp(String(Message[MessageType]?.ephemeralExpiration)).test('0'),
                             isCurrentDisappearing: !!Message[MessageType]?.contextInfo?.expiration ?? false,
-                            isOnlyAdminMessagesEdited: buff2('26'),
+                            isOnlyAdminMessagesEdited: teste2('26'),
                         },
                     }],    
                 },
@@ -135,6 +131,8 @@ export const Typed = async ({ events, client }) => {
             },
         },
     }
+
+    console.log(Typed.msg.key.boolean.message[0].isNumberMessage)
 
     return Typed
 }
