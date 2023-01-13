@@ -8,7 +8,10 @@ const { find } = pkg1
 
 import { getGroupData } from './_cmds.js'
 
-const sym = '😃'
+import pkg2 from 'node-emoji';
+const { unemojify, hasEmoji } = pkg2;
+
+const sym = `☠️`
 
 //
 export const Typed = async ({ events, client }) => {
@@ -19,7 +22,7 @@ export const Typed = async ({ events, client }) => {
         return Buffer.from(Content).equals(Buffer.from(x))
     }
     const buff2 = (z) => Buffer.from(String(Events)).equals(Buffer.from(z))
-    const test = (c) => new RegExp(Array.from(c).join('|')).test(Text)
+    const teste = (c) => !!new RegExp(Array.from(c).join('|')).test(Text)
 
     var getConfigProperties = JSON.parse(readFileSync("./root/config.json"))
 
@@ -73,14 +76,14 @@ export const Typed = async ({ events, client }) => {
                         isStickerMessage: buff('stickerMessage') ?? false,
                         isLocationMessage: buff('locationMessage') ?? false,
                         isLiveLocationMessage: buff('liveLocationMessage') ?? false,
-                        isrequestPaymentMessage: buff('requestPaymentMessage') ?? false,
+                        isrequestPaymentMessage: (buff('requestPaymentMessage') ?? false) || (buff('declinePaymentRequestMessage') ?? false),
                         isReactionMessage: buff('reactionMessage') ?? false,
-                        isSymbolsMessage: test(sym) ?? false,
+                        isSymbolsMessage: hasEmoji([unemojify(Text)].join(' ')) || teste(sym) || (/[^A-Za-z 0-9]/g).test(Text),
                         isQuotedMessage: !!Message[MessageType]?.contextInfo?.quotedMessage ?? false,
                         isLinkMessage: !!find(Text)[0] ?? false,
                         isForeignerMessage: !!!Buffer.from((Key.participant ?? Key.remoteJid).split('@')[0].substring(0,2)).equals(Buffer.from('55')) ?? false,
-                        isTextMessage: test('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZàèìòùâãáéíóúÀÈÌÙÀÁÉÍÓÚÃÂäëïöüÄËÏÖÜ') ?? false,
-                        isNumberMessage: test('0123456789') ?? false,
+                        isTextMessage: teste('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZàèìòùâãáéíóúÀÈÌÙÀÁÉÍÓÚÃÂäëïöüÄËÏÖÜ') ?? false,
+                        isNumberMessage: teste('0123456789') ?? false,
                     },{
                         chat:{
                             isFirstMessage: false,
