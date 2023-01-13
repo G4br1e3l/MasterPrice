@@ -14,15 +14,16 @@
         "@adiwajshing/baileys2": "github:QueenAnya/topa",
         "@adiwajshing/keyed-db": "^0.2.4",
         "@adiwajshing/keyed-db2": "github:QueenAnya/topb",
+        "cfonts": "^2.9.0",
         "chalk": "^4.1.2",
         "cheerio": "^1.0.0-rc.10",
-        "cfonts": "^2.9.0",
         "fs": "0.0.1-security",
-        "moment-timezone": "^0.5.34",
-        "pino": "^7.0.5",
-        "qrcode-terminal": "^0.12.0",
         "linkifyjs": "^4.1.0",
-        "pino-pretty": "^9.1.1"
+        "moment-timezone": "^0.5.34",
+        "node-emoji": "^1.11.0",
+        "pino": "^7.0.5",
+        "pino-pretty": "^9.1.1",
+        "qrcode-terminal": "^0.12.0"
     },
     "repository": {
         "type": "git"
