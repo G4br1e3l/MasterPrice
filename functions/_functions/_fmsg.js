@@ -132,7 +132,5 @@ export const Typed = async ({ events, client }) => {
         },
     }
 
-    console.log(Typed.msg.key.boolean.message[0].isNumberMessage)
-
     return Typed
 }
