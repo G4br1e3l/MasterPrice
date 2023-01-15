@@ -1,38 +1,38 @@
 //
 import Baileys from '@adiwajshing/baileys'
-const { default: makeWASocket, makeInMemoryStore, useMultiFileAuthState, makeCacheableSignalKeyStore, proto, Browsers, fetchLatestBaileysVersion, DisconnectReason } = Baileys
-import { readFileSync, readdirSync, unlink, watchFile, unwatchFile, writeFileSync } from "fs"
+
+const {
+    default: makeWASocket,
+    makeInMemoryStore,
+    useMultiFileAuthState,
+    fetchLatestBaileysVersion,
+    DisconnectReason
+} = Baileys
+
+import { readFileSync, readdirSync, unlink, writeFileSync } from "fs"
 import P from 'pino'
-import CFonts from 'cfonts'
-const { render } = CFonts
 import chalk from "chalk"
 
+import CFonts from 'cfonts'
+const { render } = CFonts
 //
 import { Read } from './functions/reader.js'
-import { Named } from './functions/_functions/_cmds.js'
-import { Typed } from './functions/_functions/_fmsg.js'
+import { Named } from './functions/_functions/_functionsMessage.js'
+import { Typed } from './functions/_functions/_contentMessage.js'
+
 //
 process.on('uncaughtException', function (err) {
     console.error(err.stack)
 })
 
-console.warn = () => {};
-
-//
-const MSG = JSON.parse(readFileSync('./root/messages.json', 'utf8'))
-const PACKAGE = JSON.parse(readFileSync('./package.json', 'utf8'))
-const set_me = JSON.parse(readFileSync("./root/config.json"))
-
-//
-const MAIN_LOGGER = P({ timestamp: () => `,"time":"${new Date().toJSON()}"` })
-
-const logger = MAIN_LOGGER.child({ })
-logger.level = 'silent'
-logger.stream = 'store'
-
+console.warn = () => {}
 const msgRetryCounterMap = {}
 
-const history = !process.argv.includes('--no-store')? makeInMemoryStore({ logger: P({ level: 'silent', stream: "store", transport: { target: 'pino-pretty', options: { levelFirst: true, /*ignore: 'pid,hostname,node,browser,helloMsg,path',*/ colorize: true }}})}) : undefined
+//
+var Config = JSON.parse(readFileSync('./root/configurations.json', 'utf8'))
+const PACKAGE = JSON.parse(readFileSync('./package.json', 'utf8'))
+
+const history = !process.argv.includes('--no-store')? makeInMemoryStore({ logger: P({ level: 'silent', stream: "store", transport: { target: 'pino-pretty', options: { levelFirst: true, ignore: 'pid,hostname,node,browser,helloMsg,path', colorize: true }}})}) : undefined
 
 history?.readFromFile('./root/connections/history.json')
 
@@ -43,12 +43,11 @@ async function M_P() {
     const { state, saveCreds } = await useMultiFileAuthState('./root/connections')
     const { version, isLatest } = await fetchLatestBaileysVersion()
 
-    var CFG = JSON.parse(readFileSync('./root/config.json', 'utf8'))
-    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(render((`${CFG.bot.name} Por ${PACKAGE.author.split(' ')[0]} v.${PACKAGE.version}`), { font: 'shade', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 1, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: false, transitionGradient: true, env: 'node' }).string))
+    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(render((`${Config.parameters.bot[0].name} Por ${PACKAGE.author.split(' ')[0]} v.${PACKAGE.version}`), { font: 'shade', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 1, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: false, transitionGradient: true, env: 'node' }).string))
     console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(render((`${PACKAGE.name} - ${PACKAGE.description} |Versao Atual: ${version} Atualizado: ${isLatest}`), { font: 'console', align: 'left', colors: 'redBright', background: 'transparent', letterSpacing: 0, lineHeight: 0, space: true, maxLength: 0, gradient: true, independentGradient: true, transitionGradient: true, env: 'node' }).string))
 
     const MP = makeWASocket({
-        logger: P({ level: 'silent', stream: "store", transport: { target: 'pino-pretty', options: { levelFirst: true, /*ignore: 'pid,hostname,node,browser,helloMsg,path',*/ colorize: true }}}),
+        logger: P({ level: 'silent', stream: "store", transport: { target: 'pino-pretty', options: { levelFirst: true, ignore: 'pid,hostname,node,browser,helloMsg,path', colorize: true }}}),
         msgRetryCounterMap,
         generateHighQualityLinkPreview: true,
         printQRInTerminal: true,
@@ -64,29 +63,31 @@ async function M_P() {
 
     MP.ev.process(async(events) => {
 
+        var Config = JSON.parse(readFileSync('./root/configurations.json', 'utf8'))
+
         if(events['connection.update']) {
 
-            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.updating))
+            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onupdate))
 
             const { connection, lastDisconnect, receivedPendingNotifications, isOnline, qr } = events['connection.update']
 
-            if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.qrscan))
-            if(isOnline) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.staging))
-            if(receivedPendingNotifications) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.notify))
+            if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onqrscan))
+            if(isOnline) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onstaging))
+            if(receivedPendingNotifications) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onnotify))
 
             switch(connection){
                 case 'close':
-                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.downconnection))
+                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.ondownconnection))
 
                     if((lastDisconnect.error)?.output?.statusCode === DisconnectReason.loggedOut) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Ultima sessão desconectada.'))
 
                     switch((lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut){
                         case true:
-                            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.reconecting))
+                            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onreconect))
                             await M_P()
                         break
                         case false:
-                            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.lostconnection))
+                            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onlostconnection))
                             let files = readdirSync('./root/connections')
                             files.forEach(file => { unlink(`./root/connections/${file}`, (() => { })) })
                             await M_P()
@@ -94,10 +95,10 @@ async function M_P() {
                     }
                 break
                 case 'open':
-                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.connected.replaceAll('@botname', CFG.bot.name)))
+                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onconnected.replaceAll('@botname', Config.parameters.bot[0].name)))
                 break
                 case 'connecting':
-                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(MSG.connect.connecting))
+                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onconnect))
                 break
             }
         }
@@ -143,24 +144,28 @@ async function M_P() {
         }
 
         if(events['group-participants.update']){
-            var getMetadataProperties = JSON.parse(readFileSync("./root/groupsMetadata.json"))
 
-            for (let i = 0; i < Object.keys(getMetadataProperties.remoteJID).length; i++) {
-                if (Object.keys(getMetadataProperties.remoteJID[i])[0] === events['group-participants.update'].id){
-                    getMetadataProperties.remoteJID.splice(i, 1)
-                    writeFileSync("./root/groupsMetadata.json", JSON.stringify(getMetadataProperties))
-                    break
-                }
-            }
+            var Config = JSON.parse(readFileSync('./root/configurations.json', 'utf8'))
+
+            var _args = []
+            Object.keys(Config.parameters.metadata.store[0].remoteJid).forEach(word => {
+                _args.push(Object.keys(Config.parameters.metadata.store[0].remoteJid[word]))
+            })
+
+            var _argas = []
+            _args.forEach(word => {
+                _argas.push(word[0])
+            })
+
+            Config.parameters.metadata.store[0].remoteJid.splice(_argas.indexOf(events['group-participants.update'].id), 1)
+            writeFileSync(Config.parameters.commands[1].paths.config_file, JSON.stringify(Config))
         }
 
         if(events['messages.upsert']) {
-            if(set_me.bot.verified !== 'DONE') Named({MP:MP})
+            if(Config.parameters.bot[0].trusted !== 'DONE') Named({MP:MP})
             Read({MP: MP, typed: await Typed({events: events, client: MP})})
         }
     })
-
-    return MP
 }
 
 M_P(), (err) => console.log(`[MASTERPRICE ERROR] `, err)
