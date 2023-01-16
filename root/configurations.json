@@ -1,1 +1,133 @@
-{"parameters":{"bot":[{"name":"MasterPrice","username":"Gabriel Hen.","id":"5511944168937","owners":["5511960986145"],"trusted":"trusted"},{"prefix":{"default":"","set":"!"}}],"commands":[{"execution":[{"onsucess":"👽","onerror":"🥵","ongoing":"🥶"},{"unsafe":["menu","","teste"]},{"local":["menu","","teste"]},{"restricted":["provide","unprovide","restrict","unrestrict"]}]},{"paths":{"main_menu":"./database/images/main_menu.webp","config_file":"./root/configurations.json"}},{"messages":{"startup":{"onqrscan":"Escaneie o QR Code.","onstaging":"Ativando status online.","onnotify":"As notificações pendentes foram recebidas.","onupdate":"Atualizando Conexão.","onconnect":"Conectando.","onreconect":"Reconectando.","onconnected":"@botname ::: ONLINE.","ondownconnection":"Conexão anterior caiu.","onlostconnection":"Não consegui reconectar... Por favor, faça login novamente."},"console":{"onusercommand":"[@date][@hour] @botname > [@user] usou o comando ::: [@entry]","onusermessage":"[@date][@hour] @botname > [@user] disse ::: [@entry]"},"handler":[{"oncooldown":"Espere o comando anterior terminar de ser executado!","onflood":"Sem flood de comandos!","onnotfound":"Comando não encontrado.","onnoprivilege":"Você não é administrador para utilizar este comando.","onnopermission":"Sinto muito, não sou administrador para executar este comando.","onawaitqueue":"Aguarde. No momento há muitas pessoas utilizando comandos.","onnoowner":"Você não é um dos donos para executar este comando!","ononlygroup":"Este comando pode apenas ser utilizado em grupos!"},{"answer":{"provide":{"made":"Este comando já está incluso na lista de comandos permitidos por membros comuns.","unmade":"Este comando já não está incluso na lista de comandos permitidos por membros comuns.","addaction":"O comando @comma foi adicionado a lista de comandos permitidos por usuários comuns.","remaction":"O comando @comma foi removido da lista de comandos permitidos por usuários comuns."},"restrict":{"made":"Este comando já está incluso na lista de comandos permitidos apenas em grupos.","unmade":"Este comando já não está incluso na lista de comandos permitidos apenas em grupos.","addaction":"O comando @comma foi adicionado a lista de comandos permitidos apenas em grupos.","remaction":"O comando @comma foi removido da lista de comandos permitidos apenas em grupos."},"owner":{"made":"Este usuário já está incluso na lista de donos.","unmade":"Este usuário já não está incluso na lista de donos.","addaction":"O usuário @user foi adicionado a lista de donos.","remaction":"O usuário @user foi removido da lista de donos."},"limited":"Opa! não é possível alterar a execução deste comando.","help":"Tente inserindo algum comando. Como \"@prefix@type comando\".","issue":"Os comandos normalmente não possuem muitos parametros. Tente apenas \"@prefix@type @comma\"."}}]}}],"metadata":{"store":[{"remoteJid":[{"120363044782128107@g.us":{"id":"120363044782128107@g.us","subject":"GRUPO DE TESTES 9f","subjectOwner":"5511944168937@s.whatsapp.net","subjectTime":1672882200,"size":5,"creation":1665514091,"owner":"5511960986145@s.whatsapp.net","desc":{"type":"Buffer","data":[97,115,100,102]},"descId":"D6612529A4A8E901","restrict":false,"announce":false,"participants":[{"id":"5511944168937@s.whatsapp.net","admin":"admin"},{"id":"5511960986145@s.whatsapp.net","admin":"superadmin"},{"id":"5516997437587@s.whatsapp.net","admin":"admin"},{"id":"5521989949547@s.whatsapp.net","admin":"admin"},{"id":"5527981261623@s.whatsapp.net","admin":"admin"}]}},{"120363046955134661@g.us":{"id":"120363046955134661@g.us","subject":"hdjdid","subjectOwner":"5511960986145@s.whatsapp.net","subjectTime":1673820327,"size":3,"creation":1673820327,"owner":"5511960986145@s.whatsapp.net","restrict":false,"announce":false,"participants":[{"id":"5511944168937@s.whatsapp.net","admin":null},{"id":"5511960986145@s.whatsapp.net","admin":"superadmin"},{"id":"5527981261623@s.whatsapp.net","admin":null}],"ephemeralDuration":86400}}]},{"count":{"byuserid":[{"receivedmessages":[],"sentmessages":[]}]}}]}}}
+{
+    "parameters": {
+        "bot": [
+            {
+                "name": "MasterPrice",
+                "username": "",
+                "id": "",
+                "owners": [
+                    ""
+                ],
+                "trusted": ""
+            },
+            {
+                "prefix": {
+                    "default": "#",
+                    "set": "!"
+                }
+            }
+        ],
+        "commands": [
+            {
+                "execution": [
+                    {
+                        "onsucess": "👽",
+                        "onerror": "🥵",
+                        "ongoing": "🥶"
+                    },
+                    {
+                        "unsafe": [
+                            ""
+                        ]
+                    },
+                    {
+                        "local": [
+                            ""
+                        ]
+                    },
+                    {
+                        "restricted": [
+                            "provide",
+                            "unprovide",
+                            "restrict",
+                            "unrestrict",
+                            "addowner",
+                            "removeowner"
+                        ]
+                    }
+                ]
+            },
+            {
+                "paths": {
+                    "main_menu": "./database/images/main_menu.webp",
+                    "config_file": "./root/configurations.json"
+                }
+            },
+            {
+                "messages": {
+                    "startup": {
+                        "onqrscan": "Escaneie o QR Code.",
+                        "onstaging": "Ativando status online.",
+                        "onnotify": "As notificações pendentes foram recebidas.",
+                        "onupdate": "Atualizando Conexão.",
+                        "onconnect": "Conectando.",
+                        "onreconect": "Reconectando.",
+                        "onconnected": "@botname ::: ONLINE.",
+                        "ondownconnection": "Conexão anterior caiu.",
+                        "onlostconnection": "Não consegui reconectar... Por favor, faça login novamente."
+                    },
+                    "console": {
+                        "onusercommand": "[@date][@hour] @botname > [@user] usou o comando ::: [@entry]",
+                        "onusermessage": "[@date][@hour] @botname > [@user] disse ::: [@entry]"
+                    },
+                    "handler": [
+                        {
+                            "oncooldown": "Espere o comando anterior terminar de ser executado!",
+                            "onflood": "Sem flood de comandos!",
+                            "onnotfound": "Comando não encontrado.",
+                            "onnoprivilege": "Você não é administrador para utilizar este comando.",
+                            "onnopermission": "Sinto muito, não sou administrador para executar este comando.",
+                            "onawaitqueue": "Aguarde. No momento há muitas pessoas utilizando comandos.",
+                            "onnoowner": "Você não é um dos donos para executar este comando!",
+                            "ononlygroup": "Este comando pode apenas ser utilizado em grupos!",
+                            "onstopp": "Parado aí! Você não tem permissão para executar este comando.",
+                            "ontax": "Ei! Você até pode ser administrador, mas este comando só pode ser executado pelo dono."
+                        },
+                        {
+                            "answer": {
+                                "provide": {
+                                    "made": "Este comando já está incluso na lista de comandos permitidos por membros comuns.",
+                                    "unmade": "Este comando já não está incluso na lista de comandos permitidos por membros comuns.",
+                                    "addaction": "O comando @comma foi adicionado a lista de comandos permitidos por usuários comuns.",
+                                    "remaction": "O comando @comma foi removido da lista de comandos permitidos por usuários comuns."
+                                },
+                                "restrict": {
+                                    "made": "Este comando já está incluso na lista de comandos permitidos apenas em grupos.",
+                                    "unmade": "Este comando já não está incluso na lista de comandos permitidos apenas em grupos.",
+                                    "addaction": "O comando @comma foi adicionado a lista de comandos permitidos apenas em grupos.",
+                                    "remaction": "O comando @comma foi removido da lista de comandos permitidos apenas em grupos."
+                                },
+                                "owner": {
+                                    "made": "Este usuário já está incluso na lista de donos.",
+                                    "unmade": "Este usuário já não está incluso na lista de donos.",
+                                    "addaction": "O usuário @user foi adicionado a lista de donos.",
+                                    "remaction": "O usuário @user foi removido da lista de donos."
+                                },
+                                "limited": "Opa! não é possível alterar a execução deste comando.",
+                                "help": "Tente inserindo algum comando. Como \"@prefix@type comando\".",
+                                "issue": "Os comandos normalmente não possuem muitos parametros. Tente apenas \"@prefix@type @comma\"."
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "metadata": {
+            "store": [
+                {
+                    "remoteJid": []
+                },
+                {
+                    "count": {
+                        "byuserid": [
+                            {
+                                "receivedmessages": [],
+                                "sentmessages": []
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}

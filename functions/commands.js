@@ -35,62 +35,6 @@ export const commands = async ({ MP, typed }) => {
     const message = Options.msg.key.parameters ?? ''
     const Boolean = Options.msg.key.boolean
 
-    const isAdmin = async () => {
-        if(!Boolean.isAdmin) {
-            await sendMessageQuoted({
-                client: MP,
-                param: message,
-                answer: Config.parameters.commands[2].messages.handler[0].onnoprivilege
-            })
-            .then( async () => {
-                await sendReaction({
-                    client: MP,
-                    param: message,
-                    answer: Config.parameters.commands[0].execution[0].onerror
-                })
-            })
-            .finally(() => { return true })
-        }
-        return false
-    }
-
-    const isBotAdmin = async () => {
-        if(!Boolean.isAdmin) {
-            await sendMessageQuoted({
-                client: MP,
-                param: message,
-                answer: Config.parameters.commands[2].messages.handler[0].onnopermission
-            })
-            .then( async () => {
-                await sendReaction({
-                    client: MP,
-                    param: message,
-                    answer: Config.parameters.commands[0].execution[0].onerror
-                })
-            })
-            .finally(() => { return true })
-        }
-        return false
-    }
-
-    const isOwner = async () => {
-        if(!Config.parameters.bot[0].owners.includes(Sender.messageNumber)) {
-            return await sendMessageQuoted({
-                client: MP,
-                param: message,
-                answer: Config.parameters.commands[2].messages.handler[0].onnoowner
-            })
-            .finally( async () => {
-                await sendReaction({
-                    client: MP,
-                    param: message,
-                    answer: Config.parameters.commands[0].execution[0].onerror
-                })
-            })
-        }
-        return false
-    }
-
     if(isSpam(remoteJid)) {
         return await sendMessageQuoted({
             client: MP,
@@ -111,6 +55,57 @@ export const commands = async ({ MP, typed }) => {
     args.forEach(word => { _args.push(word.toLowerCase()) })
 
     async function run ({ _args }){
+
+        const isAdmin = async () => {
+            if(!Boolean.isAdmin) {
+                return await sendMessageQuoted({
+                    client: MP,
+                    param: message,
+                    answer: Config.parameters.commands[2].messages.handler[0].onnoprivilege
+                })
+                .then( async () => {
+                    await sendReaction({
+                        client: MP,
+                        param: message,
+                        answer: Config.parameters.commands[0].execution[0].onerror
+                    })
+                })
+            }
+        }
+
+        const isBotAdmin = async () => {
+            if(!Boolean.isBotAdmin) {
+                return await sendMessageQuoted({
+                    client: MP,
+                    param: message,
+                    answer: Config.parameters.commands[2].messages.handler[0].onnopermission
+                })
+                .then( async () => {
+                    await sendReaction({
+                        client: MP,
+                        param: message,
+                        answer: Config.parameters.commands[0].execution[0].onerror
+                    })
+                })
+            }
+        }
+
+        const isOwner = async () => {
+            if(!Config.parameters.bot[0].owners.includes(Sender.messageNumber)) {
+                return await sendMessageQuoted({
+                    client: MP,
+                    param: message,
+                    answer: Config.parameters.commands[2].messages.handler[0].onnoowner
+                })
+                .finally( async () => {
+                    await sendReaction({
+                        client: MP,
+                        param: message,
+                        answer: Config.parameters.commands[0].execution[0].onerror
+                    })
+                })
+            }
+        }
 
         if(sizeCooldown().size >= 2) {
             return await sendMessageQuoted({
@@ -158,7 +153,34 @@ export const commands = async ({ MP, typed }) => {
         }
 
         if(!Config.parameters.commands[0].execution[1].unsafe.includes(_args[0])){
-            if(await isAdmin() || await isBotAdmin()) return
+            if(!Boolean.isAdmin && !Boolean.isOwner) {
+                return await sendMessageQuoted({
+                    client: MP,
+                    param: message,
+                    answer: Config.parameters.commands[2].messages.handler[0].onstopp
+                })
+                .then( async () => {
+                    await sendReaction({
+                        client: MP,
+                        param: message,
+                        answer: Config.parameters.commands[0].execution[0].onerror
+                    })
+                })
+            }
+            if(Boolean.isAdmin && !Boolean.isOwner){
+                return await sendMessageQuoted({
+                    client: MP,
+                    param: message,
+                    answer: Config.parameters.commands[2].messages.handler[0].ontax
+                })
+                .then( async () => {
+                    await sendReaction({
+                        client: MP,
+                        param: message,
+                        answer: Config.parameters.commands[0].execution[0].onerror
+                    })
+                })
+            }
         }
 
         switch(_args[0]){

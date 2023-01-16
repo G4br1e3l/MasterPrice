@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "fs"
+import { readFileSync } from "fs"
 
 import pkg from '@adiwajshing/baileys';
 const { getContentType } = pkg;
@@ -6,7 +6,11 @@ const { getContentType } = pkg;
 import pkg1 from 'linkifyjs'
 const { find } = pkg1
 
-import { getGroupData, createdData } from './_functionsMessage.js'
+import {
+    getGroupData,
+    createdData,
+    Audition
+} from './_functionsMessage.js'
 
 import pkg2 from 'node-emoji';
 const { unemojify, hasEmoji } = pkg2;
@@ -16,19 +20,12 @@ export const Typed = async ({ events, client }) => {
 
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
 
-    const get = (c) => getContentType(c)
-    const teste = (c) => !!new RegExp(Array.from(c).join('|')).test(Text)
-    const teste1 = (c) => new RegExp(c).test(MessageType)
-    const teste2 = (c) => new RegExp(c).test(String(Events))
-
     const Body = events['messages.upsert']?.messages[0] ?? ''
     const Events = Body?.messageStubType ?? ''
     const Key = Body?.key ?? ''
-    const Content = get(Body.message) ?? ''
-    const MessageType = Content === 'viewOnceMessage'? get(Body.message[Content].message) : Content ?? ''
-    const Message = Content === 'viewOnceMessage'? Body.message[Content].message : Body.message ?? ''
+    const MessageType = getContentType(Body?.message?.viewOnceMessage?.message) ?? getContentType(Body?.message?.viewOnceMessageV2?.message) ?? getContentType(Body?.message) ?? ''
+    const Message = Body?.message?.viewOnceMessage?.message ?? Body?.message?.viewOnceMessageV2?.message ?? Body?.message ?? ''
 
-    //if(Key.fromMe) return 'Mensagem do BOT.'
     if(Key.remoteJid === 'status@broadcast' || Message[MessageType]?.groupId === 'status@broadcast') return 'Publicação de status detectada.'
     if(Message === undefined || Message === null) return 'Mensagem indefinida.'
 
@@ -49,7 +46,14 @@ export const Typed = async ({ events, client }) => {
     _args.push(Object.keys(Config.parameters.metadata.store[0].remoteJid[word]))
     })
 
-    try{ var usesMeta = Key?.remoteJid?.endsWith('@g.us')? new RegExp(Key.remoteJid).test(_args)? Config.parameters.metadata.store[0].remoteJid[0][Key.remoteJid] : await createdData(Key, client) : false } catch {}
+    var _argas = []
+    _args.forEach(word => {
+        _argas.push(word[0])
+    })
+
+    try{
+        var usesMeta = Key?.remoteJid?.endsWith('@g.us')? new RegExp(Key.remoteJid).test(_argas)? Config.parameters.metadata.store[0].remoteJid[_argas.indexOf(Key.remoteJid)] : await createdData(Key, client) : false
+    } catch {}
 
     const Typed = {
         msg: {
@@ -63,42 +67,42 @@ export const Typed = async ({ events, client }) => {
                     isOwner: !!Config.parameters.bot[0].owners.includes((Key.participant ?? Key.remoteJid).split('@')[0]),
                     isQuoted: !!Message[MessageType]?.contextInfo?.quotedMessage ?? false,
                     message: [{
-                        isPollMessage: teste1('pollCreationMessage') || teste1('pollUpdateMessage'),
-                        isListMessage: teste1('listCreationMessage') || teste1('listResponseMessage'),
-                        isDocMessage: teste1('documentMessage') || teste1('documentWithCaptionMessage'),
-                        isButtonMessage: teste1('buttonsCreationMessage') || teste1('buttonsResponseMessage'),
-                        isAudioMessage: teste1('audioMessage'),
-                        isProductMessage: teste1('productMessage'),
-                        isViewOnceMessage: teste1('viewOnceMessage'),
-                        isVideoMessage: teste1('videoMessage'),
-                        isContactMessage: teste1('contactMessage'),
-                        isImageMessage: teste1('imageMessage'),
-                        isStickerMessage: teste1('stickerMessage'),
-                        isLocationMessage: teste1('locationMessage'),
-                        isLiveLocationMessage: teste1('liveLocationMessage'),
-                        isrequestPaymentMessage: teste1('requestPaymentMessage') || teste1('declinePaymentRequestMessage'),
-                        isReactionMessage: teste1('reactionMessage'),
-                        isSymbolsMessage: hasEmoji([unemojify(Text)].join(' ')) || teste(`☠️`) || (/[^A-Za-z 0-9]/g).test(Text),
+                        isPollMessage: Audition({ from: 'pollCreationMessage', where: MessageType }) || Audition({ from: 'pollUpdateMessage', where: MessageType }),
+                        isListMessage: Audition({ from: 'listCreationMessage', where: MessageType }) || Audition({ from: 'listResponseMessage', where: MessageType }),
+                        isDocMessage: Audition({ from: 'documentMessage', where: MessageType }) || Audition({ from: 'documentWithCaptionMessage', where: MessageType }),
+                        isButtonMessage: Audition({ from: 'buttonsCreationMessage', where: MessageType }) || Audition({ from: 'buttonsResponseMessage', where: MessageType }),
+                        isAudioMessage: Audition({ from: 'audioMessage', where: MessageType }),
+                        isProductMessage: Audition({ from: 'productMessage', where: MessageType }),
+                        isViewOnceMessage: !!(Body?.message?.viewOnceMessage ?? Body?.message?.viewOnceMessageV2?.message),
+                        isVideoMessage: Audition({ from: 'videoMessage', where: MessageType }),
+                        isContactMessage: Audition({ from: 'contactMessage', where: MessageType }),
+                        isImageMessage: Audition({ from: 'imageMessage', where: MessageType }),
+                        isStickerMessage: Audition({ from: 'stickerMessage', where: MessageType }),
+                        isLocationMessage: Audition({ from: 'locationMessage', where: MessageType }),
+                        isLiveLocationMessage: Audition({ from: 'liveLocationMessage', where: MessageType }),
+                        isrequestPaymentMessage: Audition({ from: 'requestPaymentMessage', where: MessageType }) || Audition({ from: 'declinePaymentRequestMessage', where: MessageType }),
+                        isReactionMessage: Audition({ from: 'reactionMessage', where: MessageType }),
+                        isSymbolsMessage: hasEmoji([unemojify(Text)].join(' ')) || Audition({ from: Array.from(`☠️`).join('|'), where: Text }) || (/[^A-Za-z 0-9]/g).test(Text),
                         isQuotedMessage: !!Message[MessageType]?.contextInfo?.quotedMessage ?? false,
                         isLinkMessage: !!find(Text)[0] ?? false,
-                        isForeignerMessage: !new RegExp((Key.participant ?? Key.remoteJid).split('@')[0].substring(0,2)).test('55'),
-                        isTextMessage: teste('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZàèìòùâãáéíóúÀÈÌÙÀÁÉÍÓÚÃÂäëïöüÄËÏÖÜ'),
-                        isNumberMessage: teste('0123456789'),
+                        isForeignerMessage: Audition({ from: (Key.participant ?? Key.remoteJid).split('@')[0].substring(0,2), where: '55' }),
+                        isTextMessage: Audition({ from: Array.from('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZàèìòùâãáéíóúÀÈÌÙÀÁÉÍÓÚÃÂäëïöüÄËÏÖÜ').join('|'), where: Text }),
+                        isNumberMessage: Audition({ from: Array.from('0123456789').join('|'), where: Text }),
                     },{
                         chat:{
                             isFirstMessage: false,
                         },
                     },{
                         group:{
-                            isSubjectChange: teste2('21'),
-                            isSomeoneJoined: teste2('27'),
-                            isSomeoneExited: teste2('32'),
-                            isSomeonePromoted: teste2('29'),
-                            isSomeoneDemoted: teste2('30'),
-                            isSomeoneBanned: teste2('28'),
-                            isDisappearingAddeded: new RegExp(String(Message[MessageType]?.ephemeralExpiration)).test('0'),
+                            isSubjectChange: Audition({ from: '21', where: String(Events) }),
+                            isSomeoneJoined: Audition({ from: '27', where: String(Events) }),
+                            isSomeoneExited: Audition({ from: '32', where: String(Events) }),
+                            isSomeonePromoted: Audition({ from: '29', where: String(Events) }),
+                            isSomeoneDemoted: Audition({ from: '30', where: String(Events) }),
+                            isSomeoneBanned: Audition({ from: '28', where: String(Events) }),
+                            isDisappearingAddeded: Audition({ from: String(Message[MessageType]?.ephemeralExpiration), where: '0' }),
                             isCurrentDisappearing: !!Message[MessageType]?.contextInfo?.expiration ?? false,
-                            isOnlyAdminMessagesEdited: teste2('26'),
+                            isOnlyAdminMessagesEdited: Audition({ from: '26', where: String(Events) }),
                         },
                     }],
                 },

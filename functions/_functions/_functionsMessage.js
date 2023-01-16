@@ -12,6 +12,7 @@ export const Date = () => tz("America/Sao_Paulo").format("DD/MM/YY")
 export const Hour = () => tz("America/Sao_Paulo").format("HH:mm:ss")
 export const Save = ({file_path, filename}) =>  writeFileSync(file_path, JSON.stringify(filename))
 export const Key = (a) => a[Object.keys(a).find((key) => !['messageTimestamp', 'pushName', 'message'].includes(key))]
+export const Audition = ({ from, where }) => new RegExp(from).test(where)
 
 //
 const Protect = new Set()
@@ -92,20 +93,21 @@ export const getGroupData = ({ Type, groupMetadata, message }) => {
 
     switch(Type){
         case 'isAdmin':
-            let u = []
-            for (let i of groupMetadata.participants) {
-                if(i.admin === 'admin' || i.admin === 'superadmin') u.push(i.id)
-            }
-            if(u.includes(message.participant)) return true
+            var _argas = []
+            groupMetadata[message.remoteJid].participants.forEach(user => {
+                if(user.admin === 'admin' || user.admin === 'superadmin') _argas.push(user.id)
+            })
+            if(_argas.includes(message.participant)) return true
         break
         case 'isBotAdmin':
-            let us = []
-            for (let i of groupMetadata.participants) {
-                if(i.admin === 'admin' || i.admin === 'superadmin') us.push(i.id)
-            }
-            if(us.includes(`${Config.parameters.bot[0].id}@s.whatsapp.net`)) return true
+            var _argas = []
+            groupMetadata[message.remoteJid].participants.forEach(user => {
+                if(user.admin === 'admin' || user.admin === 'superadmin') _argas.push(user.id)
+            })
+            if(_argas.includes(`${Config.parameters.bot[0].id}@s.whatsapp.net`)) return true
         break
     }
+    return false
 }
 
 //

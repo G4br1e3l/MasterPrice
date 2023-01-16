@@ -27,6 +27,21 @@ export const Owner = async ({ MP, message, _args }) => {
         })
     }
 
+    if(Config.parameters.commands[0].execution[3].restricted.includes(_args[1])) {
+        return await sendMessageQuoted({
+            client: MP,
+            param: message,
+            answer: Config.parameters.commands[2].messages.handler[1].answer.limited
+        })
+        .finally( async () => {
+            await sendReaction({
+                client: MP,
+                param: message,
+                answer: Config.parameters.commands[0].execution[0].onerror
+            })
+        })
+    }
+
     if(Config.parameters.bot[0].owners.includes(_args[1]) && _args[0] === 'addowner') {
         return await sendMessageQuoted({
             client: MP,
