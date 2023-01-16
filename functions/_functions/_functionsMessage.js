@@ -27,17 +27,37 @@ export const isColling = (x) => !!Await.has(x)
 export const sizeCooldown = (x) => Await
 
 //
-export const console_message = ({ message_param, user, entry }) =>{
+export const console_message = ({ message_param, config }) =>{
 
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
+
+    const Text = config?.msg?.key?.parameters?.details[1]?.sender?.messageText ?? ''
+    const Sender = config?.msg?.key?.parameters?.details[1]?.sender?.messageNumber ?? ''
+
+    var Subject = ''
+
+    if(config?.msg?.key?.boolean?.isGroup){
+        var _args = []
+        Object.keys(Config?.parameters?.metadata?.store[0]?.remoteJid).forEach(word => {
+        _args.push(Object.keys(Config?.parameters?.metadata?.store[0]?.remoteJid[word]))
+        })
+
+        var _argas = []
+        _args?.forEach(word => {
+            _argas.push(word[0])
+        })
+
+        var Subject = Config?.parameters?.metadata?.store[0]?.remoteJid[_argas?.indexOf(config?.msg?.key?.parameters?.details[0]?.messageKey?.remoteJid)][config?.msg?.key?.parameters?.details[0]?.messageKey?.remoteJid]?.subject
+    }
 
     console.log(chalk.rgb(123, 45, 67).bold(
         message_param
         .replaceAll('@botname', `${Config.parameters.bot[0].name} ::: ${Config.parameters.bot[0].username}`)
-        .replaceAll('@user', user)
-        .replaceAll('@entry', chalk.hex('#DEADED').bgGreen.bold(entry))
+        .replaceAll('@user', Sender)
+        .replaceAll('@entry', chalk.hex('#DEADED').bgGreen.bold(Text))
         .replaceAll('@hour', Hour())
         .replaceAll('@date', Date())
+        .replaceAll('@group', Subject)
     ))
 }
 
