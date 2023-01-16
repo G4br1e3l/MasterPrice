@@ -11,7 +11,8 @@ export const Read = async ({ MP, typed }) => {
 
     const Options = typed ?? false
 
-    if(Options.msg.key.boolean.isBot) return
+    if(Options?.msg?.key?.boolean?.isBot) return
+    if(!Options?.msg?.key) return
     if(!Options) return
 
     switch(Options?.msg?.key?.parameters?.details[1]?.sender?.messageText.startsWith(Config.parameters.bot[1].prefix.set)){
