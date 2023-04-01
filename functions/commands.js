@@ -17,6 +17,7 @@ import {
 } from './_functions/_sendMessage.js'
 
 import { sectionMenu } from './_functions/menus/_scriptMessage.js'
+import { Configuration, OpenAIApi } from "openai"
 
 //classes functions
 import { Provide } from './_commands/_provide.js'
@@ -50,45 +51,17 @@ export const commands = async ({ MP, typed }) => {
         })
     }
 
-    const _args = []
-    var args = (Message.split(Config.parameters.bot[1].prefix.set)[1]).trim().split(/ +/)
-    args.forEach(word => { _args.push(word.toLowerCase()) })
+    function extractArgs(message, prefix) {
+        const regex = new RegExp(`^${prefix}(.+)$`, 'i')
+        const match = message.match(regex)
+        if (!match) return []
+        const args = match[1].trim().split(/\s+/)
+        return args.map(arg => arg.toLowerCase())
+      }
+      
+    const _args = extractArgs(Message, Config.parameters.bot[1].prefix.set)
 
     async function run ({ _args }){
-
-        const isAdmin = async () => {
-            if(!Boolean.isAdmin) {
-                return await sendMessageQuoted({
-                    client: MP,
-                    param: message,
-                    answer: Config.parameters.commands[2].messages.handler[0].onnoprivilege
-                })
-                .then( async () => {
-                    await sendReaction({
-                        client: MP,
-                        param: message,
-                        answer: Config.parameters.commands[0].execution[0].onerror
-                    })
-                })
-            }
-        }
-
-        const isBotAdmin = async () => {
-            if(!Boolean.isBotAdmin) {
-                return await sendMessageQuoted({
-                    client: MP,
-                    param: message,
-                    answer: Config.parameters.commands[2].messages.handler[0].onnopermission
-                })
-                .then( async () => {
-                    await sendReaction({
-                        client: MP,
-                        param: message,
-                        answer: Config.parameters.commands[0].execution[0].onerror
-                    })
-                })
-            }
-        }
 
         const isOwner = async () => {
             if(!Config.parameters.bot[0].owners.includes(Sender.messageNumber)) {
@@ -187,6 +160,55 @@ export const commands = async ({ MP, typed }) => {
             case '':
                 await sectionMenu({ client: MP, param: remoteJid})
             break
+            case 'gpt':
+                if (!_args[1]) return await sendMessageQuoted({
+                    client: MP,
+                    param: message,
+                    answer: 'Tente inserindo alguma pergunta...'
+                })
+                .then( async () => {
+                    await sendReaction({
+                        client: MP,
+                        param: message,
+                        answer: Config.parameters.commands[0].execution[0].onerror
+                    })
+                })
+                .finally(() => Spam(remoteJid))
+
+                const config = new Configuration({
+                    organization: "",
+                    apiKey: "",
+                    username: '',
+                    password: '',
+                })
+
+                const openai = new OpenAIApi(config)
+
+                console.log(openai)
+
+                const response = async (x) => await openai.createChatCompletion({
+                    model: "gpt-3.5-turbo",
+                    messages: [{role: "user", content: x}],
+                })
+
+                const resposta = await response(typed.msg.key.parameters.details[1].sender.messageText.slice(5))
+
+                return await sendMessageQuoted({
+                    client: MP,
+                    param: message,
+                    answer: resposta
+                })
+                .then( async () => {
+                    await sendReaction({
+                        client: MP,
+                        param: message,
+                        answer: Config.parameters.commands[0].execution[0].onsucess
+                    })
+                })
+                .finally(() => Spam(remoteJid))
+            break
+            // 
+            // 
             case 'provide':
             case 'unprovide':
                 if(await isOwner()) return

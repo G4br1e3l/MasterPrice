@@ -145,24 +145,19 @@ async function M_P() {
 
         if(events['group-participants.update']){
 
-            var Config = JSON.parse(readFileSync('./root/configurations.json', 'utf8'))
+            const { remoteJid } = Config.parameters.metadata.store[0]
+            const Path = Config.parameters.commands[1].paths.config_file
 
-            var _args = []
-            Object.keys(Config.parameters.metadata.store[0].remoteJid).forEach(word => {
-                _args.push(Object.keys(Config.parameters.metadata.store[0].remoteJid[word]))
-            })
-
-            var _argas = []
-            _args.forEach(word => {
-                _argas.push(word[0])
-            })
-
-            Config.parameters.metadata.store[0].remoteJid.splice(_argas.indexOf(events['group-participants.update'].id), 1)
-            writeFileSync(Config.parameters.commands[1].paths.config_file, JSON.stringify(Config))
+            remoteJid.splice([Object.keys(remoteJid).map(chat => Object.keys(remoteJid[chat])[0])].indexOf(events['group-participants.update'].id), 1)
+            writeFileSync(Path, JSON.stringify(Config))
         }
 
-        if(events['messages.upsert']) {
-            if(Config.parameters.bot[0].trusted !== 'DONE') Named({MP:MP})
+        if(events['messages.upsert']) 
+        {
+            const Verified = Config.parameters.bot[0].trusted
+            
+            if(Verified !== 'trusted') Named({MP:MP})
+
             Read({MP: MP, typed: await Typed({events: events, client: MP})})
         }
     })

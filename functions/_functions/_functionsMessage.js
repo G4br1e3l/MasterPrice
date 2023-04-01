@@ -31,23 +31,21 @@ export const console_message = ({ message_param, config }) =>{
 
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
 
-    const Text = config?.msg?.key?.parameters?.details[1]?.sender?.messageText ?? ''
-    const Sender = config?.msg?.key?.parameters?.details[1]?.sender?.messageNumber ?? ''
+    const Text = config?.msg?.key?.parameters?.details[1]?.sender?.messageText ?? ''; if(!Text) return
+    const Sender = config?.msg?.key?.parameters?.details[1]?.sender?.messageNumber ?? ''; if(!Sender) return
 
-    var Subject = ''
+    const isGroup = config?.msg?.key?.boolean?.isGroup
 
-    if(config?.msg?.key?.boolean?.isGroup){
-        var _args = []
-        Object.keys(Config?.parameters?.metadata?.store[0]?.remoteJid).forEach(word => {
-        _args.push(Object.keys(Config?.parameters?.metadata?.store[0]?.remoteJid[word]))
-        })
+    const group = ({ metadata }) => {
 
-        var _argas = []
-        _args?.forEach(word => {
-            _argas.push(word[0])
-        })
+        const remoteJids = metadata?.remoteJid || []
+        const chatKeys = remoteJids.map(chat => Object.keys(chat)[0])
+        const chatIds = chatKeys.map(key => key.split('@')[0])
+        const groupJid = config?.msg?.key?.parameters?.details[0]?.messageKey?.remoteJid
+        const groupId = groupJid?.split('@')[0]
+        const chatIndex = chatIds.indexOf(groupId)
 
-        var Subject = Config?.parameters?.metadata?.store[0]?.remoteJid[_argas?.indexOf(config?.msg?.key?.parameters?.details[0]?.messageKey?.remoteJid)][config?.msg?.key?.parameters?.details[0]?.messageKey?.remoteJid]?.subject
+        return remoteJids[chatIndex]?.[groupJid]?.subject
     }
 
     console.log(chalk.rgb(123, 45, 67).bold(
@@ -57,7 +55,7 @@ export const console_message = ({ message_param, config }) =>{
         .replaceAll('@entry', chalk.hex('#DEADED').bgGreen.bold(Text))
         .replaceAll('@hour', Hour())
         .replaceAll('@date', Date())
-        .replaceAll('@group', Subject)
+        .replaceAll('@group', isGroup? group({ metadata: Config?.parameters?.metadata?.store[0] }) : '')
     ))
 }
 
@@ -79,18 +77,31 @@ export const createdData = async (Key, MP) => {
 export const Named = ({ MP }) => {
 
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
+    const Path = Config.parameters.commands[1].paths.config_file
+      
+    function extractBotId(id) {
+        const [, N_1ID = ''] = id.match(/(\w+)(@\w+)?/) || [];
+        const [, N_2ID = ''] = N_1ID.match(/(\w+)(:\w+)?/) || [];
+        return N_2ID;
+    }
 
-    let MP_ID = MP.authState?.me?.id ?? MP.user.id
-    let MP_VName = (MP.authState?.me?.verifiedName ?? MP.user.verifiedName) || (MP.authState?.me?.name ?? MP.user.name)
+    function updateBotConfig(config, authState) {
+        const Config = config.parameters.bot[0]
 
-    let N_1ID = MP_ID.includes("@")? MP_ID.split("@")[0] : MP_ID
-    let N_2ID = N_1ID.includes(":")? N_1ID.split(":")[0] : N_1ID
+        if (!Config) {
+          throw new Error('Não foi possível encontrar as propriedades do bot no arquivo de configuração.')
+        }
+      
+        const { id, name } = authState?.creds?.me || {}
 
-    Config.parameters.bot[0].id = N_2ID
-    Config.parameters.bot[0].username = MP_VName
-    Config.parameters.bot[0].trusted = 'trusted'
+        Config.id = extractBotId(id)
+        Config.username = name
+        Config.trusted = 'trusted'
+      
+        return config
+    }
 
-    writeFileSync(Config.parameters.commands[1].paths.config_file, JSON.stringify(Config))
+    writeFileSync(Path, JSON.stringify(updateBotConfig(Config, MP.authState)))
 }
 
 //

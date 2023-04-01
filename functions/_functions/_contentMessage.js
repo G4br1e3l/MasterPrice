@@ -20,14 +20,19 @@ export const Typed = async ({ events, client }) => {
 
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
 
+    const { remoteJid } = Config.parameters.metadata.store[0]
+    const metadata = Config.parameters.metadata.store[0]
+
     const Body = events['messages.upsert']?.messages[0] ?? ''
     const Events = Body?.messageStubType ?? ''
     const Key = Body?.key ?? ''
     const MessageType = getContentType(Body?.message?.viewOnceMessage?.message) ?? getContentType(Body?.message?.viewOnceMessageV2?.message) ?? getContentType(Body?.message) ?? ''
     const Message = Body?.message?.viewOnceMessage?.message ?? Body?.message?.viewOnceMessageV2?.message ?? Body?.message ?? ''
+    const isStatusBroadcast = Key.remoteJid === 'status@broadcast' || Message[MessageType]?.groupId === 'status@broadcast'
+    const isMessageUndefined = Message === undefined || Message === null
 
-    if(Key.remoteJid === 'status@broadcast' || Message[MessageType]?.groupId === 'status@broadcast') return 'Publicação de status detectada.'
-    if(Message === undefined || Message === null) return 'Mensagem indefinida.'
+    if (isStatusBroadcast) return 'Publicação de status detectada.'
+    if (isMessageUndefined) return 'Mensagem indefinida.'
 
     const Text =
     MessageType === 'conversation'? Message[MessageType] :
@@ -41,20 +46,16 @@ export const Typed = async ({ events, client }) => {
     MessageType === 'messageContextInfo' ? Message[MessageType]?.selectedButtonId || Message[MessageType]?.singleSelectReply.selectedRowId || Message.text :
     JSON.stringify(MessageType)
 
-    var _args = []
-    Object.keys(Config.parameters.metadata.store[0].remoteJid).forEach(word => {
-    _args.push(Object.keys(Config.parameters.metadata.store[0].remoteJid[word]))
-    })
+    const _argas = Object.keys(remoteJid).map(word => Object.keys(remoteJid[word])).map(word => word[0]);
 
-    var _argas = []
-    _args.forEach(word => {
-        _argas.push(word[0])
-    })
+    const isGroup = Key?.remoteJid?.endsWith('@g.us'); var usesMeta = false
 
-    try{
-        var usesMeta = Key?.remoteJid?.endsWith('@g.us')? new RegExp(Key.remoteJid).test(_argas)? Config.parameters.metadata.store[0].remoteJid[_argas.indexOf(Key.remoteJid)] : await createdData(Key, client) : false
-    } catch {}
-
+    if (isGroup){
+        const argaIndex = isGroup ? _argas.indexOf(Key.remoteJid) : -1
+        const arga = argaIndex >= 0 ? metadata.remoteJid[argaIndex] : await createdData(Key, client)
+        var usesMeta = isGroup && new RegExp(Key.remoteJid).test(_argas) ? arga : false
+    }
+    
     const Typed = {
         msg: {
             key: {
