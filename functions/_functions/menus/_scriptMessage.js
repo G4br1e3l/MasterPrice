@@ -137,26 +137,3 @@ return await client.sendMessage(param, {
     ]
 })
 }
-
-/*
-await MP.sendMessage(remoteJid, {
-    image: readFileSync(getConfigProperties.pathimage.menu),
-    caption: Menu(),
-    footer: getConfigProperties.bot.name,
-    buttons: [
-        {buttonId: `opts`, buttonText: {displayText: 'SLA'}, type: 1},
-    ],
-    headerType: 4
-})*/
-
-/*
-await MP.sendMessage(remoteJid, {
-    text: Menu(),
-    footer: getConfigProperties.bot.name,
-    buttons: [
-        {buttonId: '0', buttonText: {displayText: 'Criador -<'}, type: 1},
-        {buttonId: '1', buttonText: {displayText: 'Doar -<'}, type: 1},
-        {buttonId: '2', buttonText: {displayText: 'Informações -<'}, type: 1},
-        ],
-    headerType: 1
-})*/
