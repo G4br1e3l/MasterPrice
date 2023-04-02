@@ -1,7 +1,7 @@
 import { readFileSync } from "fs"
 
-import pkg from '@adiwajshing/baileys';
-const { getContentType } = pkg;
+import pkg from '@adiwajshing/baileys'
+const { getContentType } = pkg
 
 import pkg1 from 'linkifyjs'
 const { find } = pkg1
@@ -9,45 +9,29 @@ const { find } = pkg1
 import {
     getGroupData,
     createdData,
-    Audition
+    Audition,
+    getMessageText,
+    detectMessageStatus
 } from './_functionsMessage.js'
 
-import pkg2 from 'node-emoji';
-const { unemojify, hasEmoji } = pkg2;
+import pkg2 from 'node-emoji'
+const { unemojify, hasEmoji } = pkg2
 
 //
 export const Typed = async ({ events, client }) => {
 
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
 
-    const { remoteJid } = Config.parameters.metadata.store[0]
     const metadata = Config.parameters.metadata.store[0]
-
+    const { remoteJid } = metadata
     const Body = events['messages.upsert']?.messages[0] ?? ''
     const Events = Body?.messageStubType ?? ''
     const Key = Body?.key ?? ''
     const MessageType = getContentType(Body?.message?.viewOnceMessage?.message) ?? getContentType(Body?.message?.viewOnceMessageV2?.message) ?? getContentType(Body?.message) ?? ''
     const Message = Body?.message?.viewOnceMessage?.message ?? Body?.message?.viewOnceMessageV2?.message ?? Body?.message ?? ''
-    const isStatusBroadcast = Key.remoteJid === 'status@broadcast' || Message[MessageType]?.groupId === 'status@broadcast'
-    const isMessageUndefined = Message === undefined || Message === null
-
-    if (isStatusBroadcast) return 'Publicação de status detectada.'
-    if (isMessageUndefined) return 'Mensagem indefinida.'
-
-    const Text =
-    MessageType === 'conversation'? Message[MessageType] :
-    MessageType === 'extendedTextMessage'? Message[MessageType]?.text :
-    MessageType === 'imageMessage'? Message[MessageType]?.caption ?? Message[MessageType]?.message?.imageMessage?.caption :
-    MessageType === 'videoMessage'? Message[MessageType]?.caption ?? Message[MessageType]?.message?.videoMessage?.caption :
-    MessageType === 'documentWithCaptionMessage'? Message[MessageType]?.message?.documentMessage?.caption :
-    MessageType === 'listResponseMessage'? Message[MessageType]?.singleSelectReply?.selectedRowId :
-    MessageType === 'buttonsResponseMessage'? Message[MessageType]?.selectedButtonId :
-    MessageType === 'templateButtonReplyMessage' ? Message[MessageType]?.selectedId :
-    MessageType === 'messageContextInfo' ? Message[MessageType]?.selectedButtonId || Message[MessageType]?.singleSelectReply.selectedRowId || Message.text :
-    JSON.stringify(MessageType)
-
-    const _argas = Object.keys(remoteJid).map(word => Object.keys(remoteJid[word])).map(word => word[0]);
-
+    if(detectMessageStatus({ Message: Message, MessageType: MessageType }) !== null) return 'Aiin calica!!'
+    const Text = getMessageText({ MessageType: MessageType, Message: Message })
+    const _argas = Object.keys(remoteJid).map(word => Object.keys(remoteJid[word])).map(word => word[0])
     const isGroup = Key?.remoteJid?.endsWith('@g.us'); var usesMeta = false
 
     if (isGroup){
@@ -55,7 +39,7 @@ export const Typed = async ({ events, client }) => {
         const arga = argaIndex >= 0 ? metadata.remoteJid[argaIndex] : await createdData(Key, client)
         var usesMeta = isGroup && new RegExp(Key.remoteJid).test(_argas) ? arga : false
     }
-    
+
     const Typed = {
         msg: {
             key: {

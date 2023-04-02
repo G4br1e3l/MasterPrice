@@ -63,13 +63,14 @@ export const console_message = ({ message_param, config }) =>{
 export const createdData = async (Key, MP) => {
 
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
+    const Path = Config.parameters.commands[1].paths.config_file
+    const { remoteJid } = Config.parameters.metadata.store[0]
 
     var jsonData = async () => `{"${Key.remoteJid}": ${JSON.stringify(await MP.groupMetadata(Key.remoteJid))}}`
-    var a = await jsonData()
-    var jsonObj = JSON.parse(a)
+    var jsonObj = JSON.parse(await jsonData())
 
-    Config.parameters.metadata.store[0].remoteJid.push(jsonObj)
-    writeFileSync(Config.parameters.commands[1].paths.config_file, JSON.stringify(Config))
+    remoteJid.push(jsonObj)
+    writeFileSync(Path, JSON.stringify(Config))
 }
 
 
@@ -80,9 +81,9 @@ export const Named = ({ MP }) => {
     const Path = Config.parameters.commands[1].paths.config_file
       
     function extractBotId(id) {
-        const [, N_1ID = ''] = id.match(/(\w+)(@\w+)?/) || [];
-        const [, N_2ID = ''] = N_1ID.match(/(\w+)(:\w+)?/) || [];
-        return N_2ID;
+        const [, N_1ID = ''] = id.match(/(\w+)(@\w+)?/) || []
+        const [, N_2ID = ''] = N_1ID.match(/(\w+)(:\w+)?/) || []
+        return N_2ID
     }
 
     function updateBotConfig(config, authState) {
@@ -205,4 +206,49 @@ export const Owned = ({ Modo, Parametro}) =>{
         }
         break
     }
+}
+
+export const getMessageText = ({ MessageType, Message }) => {
+    const getConversationText = (MessageType, Message) => { return Message[MessageType] }
+    const getExtendedTextMessageText = (MessageType, Message) => { return Message[MessageType]?.text }
+    const getImageMessageCaption = (MessageType, Message) => { return Message[MessageType]?.caption ?? Message[MessageType]?.message?.imageMessage?.caption }  
+    const getVideoMessageCaption = (MessageType, Message) => { return Message[MessageType]?.caption ?? Message[MessageType]?.message?.videoMessage?.caption }
+    const getDocumentWithCaptionMessageCaption = (MessageType, Message) => { return Message[MessageType]?.message?.documentMessage?.caption }
+    const getListResponseMessageSelectedRowId = (MessageType, Message) => { return Message[MessageType]?.singleSelectReply?.selectedRowId }
+    const getButtonsResponseMessageSelectedButtonId = (MessageType, Message) => { return Message[MessageType]?.selectedButtonId }  
+    const getTemplateButtonReplyMessageSelectedId = (MessageType, Message) => { return Message[MessageType]?.selectedId }
+    const getMessageContextInfoSelectedButtonOrRowIdOrText = (MessageType, Message) => { return Message[MessageType]?.selectedButtonId || Message[MessageType]?.singleSelectReply.selectedRowId || Message.text }
+    const getDefault = (MessageType) => { return JSON.stringify(MessageType) }
+
+    switch (MessageType) {
+        case 'conversation':
+        return getConversationText(MessageType, Message);
+        case 'extendedTextMessage':
+        return getExtendedTextMessageText(MessageType, Message);
+        case 'imageMessage':
+        return getImageMessageCaption(MessageType, Message);
+        case 'videoMessage':
+        return getVideoMessageCaption(MessageType, Message);
+        case 'documentWithCaptionMessage':
+        return getDocumentWithCaptionMessageCaption(MessageType, Message);
+        case 'listResponseMessage':
+        return getListResponseMessageSelectedRowId(MessageType, Message);
+        case 'buttonsResponseMessage':
+        return getButtonsResponseMessageSelectedButtonId(MessageType, Message);
+        case 'templateButtonReplyMessage':
+        return getTemplateButtonReplyMessageSelectedId(MessageType, Message);
+        case 'messageContextInfo':
+        return getMessageContextInfoSelectedButtonOrRowIdOrText(MessageType, Message);
+        default:
+        return getDefault(MessageType);
+    }
+}
+
+export const detectMessageStatus = ({ Message, MessageType }) => {
+    const messageStatus = Message?.[MessageType]?.groupId === 'status@broadcast'
+        ? 'Publicação de status detectada.'
+        : Message != null
+        ? null
+        : 'Mensagem indefinida.'
+    return messageStatus
 }

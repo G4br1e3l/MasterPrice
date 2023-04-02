@@ -57,7 +57,7 @@ export const commands = async ({ MP, typed }) => {
         if (!match) return []
         const args = match[1].trim().split(/\s+/)
         return args.map(arg => arg.toLowerCase())
-      }
+    }
       
     const _args = extractArgs(Message, Config.parameters.bot[1].prefix.set)
 
@@ -90,7 +90,7 @@ export const commands = async ({ MP, typed }) => {
                 await sendReaction({
                     client: MP,
                     param: message,
-                    answer: Config.parameters.commands[0].execution[0].onerror
+                    answer: Config.parameters.commands[0].execution[0].ongoing
                 })
             })
         }
@@ -105,7 +105,7 @@ export const commands = async ({ MP, typed }) => {
                 await sendReaction({
                     client: MP,
                     param: message,
-                    answer: Config.parameters.commands[0].execution[0].onerror
+                    answer: Config.parameters.commands[0].execution[0].ongoing
                 })
             })
         }
