@@ -184,8 +184,6 @@ export const commands = async ({ MP, typed }) => {
 
                 const openai = new OpenAIApi(config)
 
-                console.log(openai)
-
                 const response = async (x) => await openai.createChatCompletion({
                     model: "gpt-3.5-turbo",
                     messages: [{role: "user", content: x}],
