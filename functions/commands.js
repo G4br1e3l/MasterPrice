@@ -58,7 +58,7 @@ export const commands = async ({ MP, typed }) => {
         const args = match[1].trim().split(/\s+/)
         return args.map(arg => arg.toLowerCase())
     }
-      
+
     const _args = extractArgs(Message, Config.parameters.bot[1].prefix.set)
 
     async function run ({ _args }){
@@ -176,10 +176,8 @@ export const commands = async ({ MP, typed }) => {
                 .finally(() => Spam(remoteJid))
 
                 const config = new Configuration({
-                    organization: "",
-                    apiKey: "",
-                    username: '',
-                    password: '',
+                    organization: "org-RhYnp9r8WqhtFIsFXLmd56W3",
+                    apiKey: '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',
                 })
 
                 const openai = new OpenAIApi(config)
@@ -194,7 +192,7 @@ export const commands = async ({ MP, typed }) => {
                 return await sendMessageQuoted({
                     client: MP,
                     param: message,
-                    answer: resposta
+                    answer: resposta.data.choices[0].message.content.trim()
                 })
                 .then( async () => {
                     await sendReaction({
@@ -205,8 +203,8 @@ export const commands = async ({ MP, typed }) => {
                 })
                 .finally(() => Spam(remoteJid))
             break
-            // 
-            // 
+            //
+            //
             case 'provide':
             case 'unprovide':
                 if(await isOwner()) return
