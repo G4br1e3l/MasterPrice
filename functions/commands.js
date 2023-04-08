@@ -157,7 +157,7 @@ export const commands = async ({ MP, typed }) => {
         }
 
         switch(_args[0]){
-            case '':
+            case 'menu':
                 await sectionMenu({ client: MP, param: remoteJid})
             break
             case 'gpt':
