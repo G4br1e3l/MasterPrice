@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from "fs"
 import chalk from "chalk"
 
 import pkg from 'moment-timezone'
+import { fail } from "assert"
 const { tz } = pkg
 
 //
@@ -36,26 +37,20 @@ export const console_message = ({ message_param, config }) =>{
 
     const isGroup = config?.msg?.key?.boolean?.isGroup
 
-    const group = ({ metadata }) => {
-
-        const remoteJids = metadata?.remoteJid || []
-        const chatKeys = remoteJids.map(chat => Object.keys(chat)[0])
-        const chatIds = chatKeys.map(key => key.split('@')[0])
-        const groupJid = config?.msg?.key?.parameters?.details[0]?.messageKey?.remoteJid
-        const groupId = groupJid?.split('@')[0]
-        const chatIndex = chatIds.indexOf(groupId)
-
-        return remoteJids[chatIndex]?.[groupJid]?.subject
+    const group = ({ metadata, config }) => {
+        const groupJid = config?.msg?.key?.parameters?.details[0]?.messageKey?.remoteJid?.split('@')[0]
+        const chatIndex = metadata?.remoteJid?.map(chat => Object.keys(chat)[0].split('@')[0])?.indexOf(groupJid)
+        return metadata?.remoteJid?.[chatIndex]?.[groupJid]?.subject
     }
 
     console.log(chalk.rgb(123, 45, 67).bold(
         message_param
-        .replaceAll('@botname', `${Config.parameters.bot[0].name} ::: ${Config.parameters.bot[0].username}`)
-        .replaceAll('@user', Sender)
-        .replaceAll('@entry', chalk.hex('#DEADED').bgGreen.bold(Text))
-        .replaceAll('@hour', Hour())
-        .replaceAll('@date', Date())
-        .replaceAll('@group', isGroup? group({ metadata: Config?.parameters?.metadata?.store[0] }) : '')
+        .replace(/@botname/g, `${Config.parameters.bot[0].name} ::: ${Config.parameters.bot[0].username}`)
+        .replace(/@user/g, Sender)
+        .replace(/@entry/g, chalk.hex('#DEADED').bgGreen.bold(Text))
+        .replace(/@hour/g, Hour())
+        .replace(/@date/g, Date())
+        .replace(/@group/g, isGroup? group({ metadata: Config?.parameters?.metadata?.store[0], config: config }) : '')
     ))
 }
 
@@ -79,7 +74,7 @@ export const Named = ({ MP }) => {
 
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
     const Path = Config.parameters.commands[1].paths.config_file
-      
+
     function extractBotId(id) {
         const [, N_1ID = ''] = id.match(/(\w+)(@\w+)?/) || []
         const [, N_2ID = ''] = N_1ID.match(/(\w+)(:\w+)?/) || []
@@ -90,15 +85,15 @@ export const Named = ({ MP }) => {
         const Config = config.parameters.bot[0]
 
         if (!Config) {
-          throw new Error('Não foi possível encontrar as propriedades do bot no arquivo de configuração.')
+            throw new Error('Não foi possível encontrar as propriedades do bot no arquivo de configuração.')
         }
-      
+
         const { id, name } = authState?.creds?.me || {}
 
         Config.id = extractBotId(id)
         Config.username = name
         Config.trusted = 'trusted'
-      
+
         return config
     }
 
@@ -107,14 +102,16 @@ export const Named = ({ MP }) => {
 
 //
 export const TenCount = async ({ MP, message }) => {
-    (async function teste(x){
-        const reactions = ['0️⃣','1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟','✅']
+    const reactions = ['0️⃣','1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟','✅']
+    (async function sendReactionLoop(x){
+        if (x >= 12) return
         await sendReaction({
             client: MP,
             param: message,
             answer: reactions[x]
         })
-        if( x <= 10 ) teste( x + 1 )
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        sendReactionLoop( x + 1 )
     })(0)
 }
 
@@ -123,23 +120,19 @@ export const getGroupData = ({ Type, groupMetadata, message }) => {
 
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
 
-    switch(Type){
+    const getAdminUsers = participants => participants.filter(user => user.isAdmin || user.isSuperAdmin).map(user => user.jid)
+
+    const { remoteJid, participant } = message
+    const adminUsers = getAdminUsers(groupMetadata[remoteJid].participants)
+
+    switch (Type) {
         case 'isAdmin':
-            var _argas = []
-            groupMetadata[message.remoteJid].participants.forEach(user => {
-                if(user.admin === 'admin' || user.admin === 'superadmin') _argas.push(user.id)
-            })
-            if(_argas.includes(message.participant)) return true
-        break
+            return adminUsers.includes(participant) || false
         case 'isBotAdmin':
-            var _argas = []
-            groupMetadata[message.remoteJid].participants.forEach(user => {
-                if(user.admin === 'admin' || user.admin === 'superadmin') _argas.push(user.id)
-            })
-            if(_argas.includes(`${Config.parameters.bot[0].id}@s.whatsapp.net`)) return true
-        break
+            return adminUsers.includes(`${Config.parameters.bot[0].id}@s.whatsapp.net`) || false
+        default:
+            return false
     }
-    return false
 }
 
 //
@@ -147,19 +140,20 @@ export const Provided = ({ Modo, Parametro}) =>{
 
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
 
+    const provided = Config.parameters.commands[0].execution[1].unsafe
+    const path = Config.parameters.commands[1].paths.config_file
+
     switch(Modo){
         case 'provide':
-            Config.parameters.commands[0].execution[1].unsafe.push(Parametro)
-            writeFileSync(Config.parameters.commands[1].paths.config_file, JSON.stringify(Config))
+            provided.push(Parametro)
+            writeFileSync(path, JSON.stringify(Config))
         break
         case 'unprovide':
-        for (let i = 0; i < Config.parameters.commands[0].execution[1].unsafe.length; i++) {
-            if (Config.parameters.commands[0].execution[1].unsafe[i] === Parametro){
-                Config.parameters.commands[0].execution[1].unsafe.splice(i, 1)
-                writeFileSync(Config.parameters.commands[1].paths.config_file, JSON.stringify(Config))
-                break
+            const index = provided.findIndex((el) => el === Parametro)
+            if (index !== -1) {
+                provided.splice(index, 1);
+                writeFileSync(path, JSON.stringify(Config));
             }
-        }
         break
     }
 }
@@ -169,19 +163,20 @@ export const Restricted = ({ Modo, Parametro}) =>{
 
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
 
+    const restricted = Config.parameters.commands[0].execution[2].local
+    const path = Config.parameters.commands[1].paths.config_file
+
     switch(Modo){
         case 'restrict':
-            Config.parameters.commands[0].execution[2].local.push(Parametro)
-            writeFileSync(Config.parameters.commands[1].paths.config_file, JSON.stringify(Config))
+            restricted.push(Parametro)
+            writeFileSync(path, JSON.stringify(Config))
         break
         case 'unrestrict':
-        for (let i = 0; i < Config.parameters.commands[0].execution[2].local.length; i++) {
-            if (Config.parameters.commands[0].execution[2].local[i] === Parametro){
-                Config.parameters.commands[0].execution[2].local.splice(i, 1)
-                writeFileSync(Config.parameters.commands[1].paths.config_file, JSON.stringify(Config))
-                break
+            const index = restricted.findIndex((el) => el === Parametro)
+            if (index !== -1) {
+                restricted.splice(index, 1);
+                writeFileSync(path, JSON.stringify(Config));
             }
-        }
         break
     }
 }
@@ -191,19 +186,20 @@ export const Owned = ({ Modo, Parametro}) =>{
 
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
 
+    const owned = Config.parameters.bot[0].owners
+    const path = Config.parameters.commands[1].paths.config_file
+
     switch(Modo){
         case 'addowner':
-            Config.parameters.bot[0].owners.push(Parametro)
-            writeFileSync(Config.parameters.commands[1].paths.config_file, JSON.stringify(Config))
+            owned.push(Parametro)
+            writeFileSync(path, JSON.stringify(Config))
         break
         case 'removeowner':
-        for (let i = 0; i < Config.parameters.bot[0].owners.length; i++) {
-            if (Config.parameters.bot[0].owners[i] === Parametro){
-                Config.parameters.bot[0].owners.splice(i, 1)
-                writeFileSync(Config.parameters.commands[1].paths.config_file, JSON.stringify(Config))
-                break
+            const index = owned.findIndex((el) => el === Parametro)
+            if (index !== -1) {
+                owned.splice(index, 1);
+                writeFileSync(path, JSON.stringify(Config));
             }
-        }
         break
     }
 }
@@ -211,11 +207,11 @@ export const Owned = ({ Modo, Parametro}) =>{
 export const getMessageText = ({ MessageType, Message }) => {
     const getConversationText = (MessageType, Message) => { return Message[MessageType] }
     const getExtendedTextMessageText = (MessageType, Message) => { return Message[MessageType]?.text }
-    const getImageMessageCaption = (MessageType, Message) => { return Message[MessageType]?.caption ?? Message[MessageType]?.message?.imageMessage?.caption }  
+    const getImageMessageCaption = (MessageType, Message) => { return Message[MessageType]?.caption ?? Message[MessageType]?.message?.imageMessage?.caption }
     const getVideoMessageCaption = (MessageType, Message) => { return Message[MessageType]?.caption ?? Message[MessageType]?.message?.videoMessage?.caption }
     const getDocumentWithCaptionMessageCaption = (MessageType, Message) => { return Message[MessageType]?.message?.documentMessage?.caption }
     const getListResponseMessageSelectedRowId = (MessageType, Message) => { return Message[MessageType]?.singleSelectReply?.selectedRowId }
-    const getButtonsResponseMessageSelectedButtonId = (MessageType, Message) => { return Message[MessageType]?.selectedButtonId }  
+    const getButtonsResponseMessageSelectedButtonId = (MessageType, Message) => { return Message[MessageType]?.selectedButtonId }
     const getTemplateButtonReplyMessageSelectedId = (MessageType, Message) => { return Message[MessageType]?.selectedId }
     const getMessageContextInfoSelectedButtonOrRowIdOrText = (MessageType, Message) => { return Message[MessageType]?.selectedButtonId || Message[MessageType]?.singleSelectReply.selectedRowId || Message.text }
     const getDefault = (MessageType) => { return JSON.stringify(MessageType) }
@@ -245,10 +241,13 @@ export const getMessageText = ({ MessageType, Message }) => {
 }
 
 export const detectMessageStatus = ({ Message, MessageType }) => {
-    const messageStatus = Message?.[MessageType]?.groupId === 'status@broadcast'
-        ? 'Publicação de status detectada.'
-        : Message != null
-        ? null
-        : 'Mensagem indefinida.'
-    return messageStatus
+    if (Message?.[MessageType]?.groupId === 'status@broadcast') {
+        return 'Publicação de status detectada.'
+    }
+
+    const detectedStatus = Message == null || Message[MessageType]?.groupId == null
+    ? null
+    : 'Mensagem indefinida.' || 'Mensagem desconhecida.'
+
+    return detectedStatus
 }

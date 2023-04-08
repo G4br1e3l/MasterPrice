@@ -14,22 +14,22 @@ export const Menu = () => {
         ☆ ${Config.parameters.bot[0].name} ☆ ${Config.parameters.bot[0].username}
         ☆ ${Date()} ‥…☆…‥ ${Hour()}
         »»————-　🄾🄿🅃🄸🄾🄽🅂 1　————-««
-    ☆ BLA BLA COISA DE DONO
+    ☆ DONO
 
         »»————-　🄾🄿🅃🄸🄾🄽🅂 2　————-««
-    ☆ BLA BLA COISA DE ADM
+    ☆ ADM
 
         »»————-　🄾🄿🅃🄸🄾🄽🅂 3　————-««
-    ☆ BLA BLA COISA DE MEMBRO COMUM
+    ☆ MEMBRO COMUM
 
         »»————-　🄾🄿🅃🄸🄾🄽🅂 4　————-««
-    ☆ BLA BLA COISA DE BRINCAR
+    ☆ MEME
 
         »»————-　🄾🄿🅃🄸🄾🄽🅂 5　————-««
-    ☆ BLA BLA COISA DE EFEITOS
+    ☆ ZOEIRA
 
         »»————-　🄾🄿🅃🄸🄾🄽🅂 6　————-««
-    ☆ BLA BLA COISA DE ADULTO
+    ☆ +18
 
         …‥——☆𝓔𝓝𝓓 𝓜𝓐𝓘𝓝 𝓜𝓔𝓝𝓤☆——…‥
     `
@@ -39,6 +39,7 @@ export const Menu = () => {
 export const sectionMenu = async ({ client, param }) => {
 
 var Config = JSON.parse(readFileSync("./root/configurations.json"))
+const prefix = Config.parameters.bot[1].prefix.set
 
 return await client.sendMessage(param, {
     text: Menu(),
@@ -49,63 +50,167 @@ return await client.sendMessage(param, {
             title: `🄾🄿🅃🄸🄾🄽🅂 1 COMANDOS DE DONO`,
             rows: [{
                     title: `☆ Provide`,
-                    rowId: `${Config.parameters.bot[1].prefix.set}provide`,
+                    rowId: `${prefix}provide`,
                     description: `☆ Comando para fazer com que comandos de administradores sejam utilizados por membros comuns.`
                 },{
                     title: `☆ Unprovide`,
-                    rowId: `${Config.parameters.bot[1].prefix.set}unprovide`,
+                    rowId: `${prefix}unprovide`,
                     description: `☆ Comando para remover os comandos adicionados para uso dos membros comuns.`
                 },{
                     title: `☆ Restrict`,
-                    rowId: `${Config.parameters.bot[1].prefix.set}restrict`,
+                    rowId: `${prefix}restrict`,
                     description: `☆ Comando para disponibilizar um comando para uso exclusivo em grupos.`
                 },{
                     title: `☆ Unrestrict`,
-                    rowId: `${Config.parameters.bot[1].prefix.set}unrestrict`,
+                    rowId: `${prefix}unrestrict`,
                     description: `☆ Comando para remover os comandos adicionados para uso exclusivo em grupos.`
                 },{
                     title: `☆ Addowner`,
-                    rowId: `${Config.parameters.bot[1].prefix.set}addowner`,
+                    rowId: `${prefix}addowner`,
                     description: `☆ Comando para adicionar numeros para que também usem as funções de dono do bot.`
                 },{
                     title: `☆ Removeowner`,
-                    rowId: `${Config.parameters.bot[1].prefix.set}removeowner`,
+                    rowId: `${prefix}removeowner`,
                     description: `☆ Comando para remover os numeros adicionados para uso das funções de dono do bot.`
+                },{
+                    title: `☆ Silence (Privates/Groups)`,
+                    rowId: `${prefix}silence`,
+                    description: `☆ Comando para bloquear formas de contato com o bot.`
                 }
             ]
         },{
-            title: `🄾🄿🅃🄸🄾🄽🅂 2 COMANDOS DE ADMINISTRADOR`,
+            title: `🄾🄿🅃🄸🄾🄽🅂 2 COMANDOS DE ADMINISTRADOR PARA MEMBROS [GRUPOS]`,
             rows: [{
-                    title: `KKKKKKKKKKKKKKK`,
-                    rowId: `3`,
-                    description: `??????????????????`
+                    title: `☆ Timeout (Quote/Mention/Number) [Time in seconds]`,
+                    rowId: `${prefix}timeout`,
+                    description: `☆ Comando para remover temporariamente um usuário. Tempo padrão de 1 minuto (60 segundos).`
                 },{
-                    title: `KKKKKKKKKKKKKKK`,
-                    rowId: `4`,
-                    description: `??????????????????`
-                }
+                    title: `☆ Untimeout (Quote/Mention/Number)`,
+                    rowId: `${prefix}untimeout`,
+                    description: `☆ Comando para reverter o comando timeout.`
+                },{
+                    title: `☆ Add (Quote/Mention/Number)`,
+                    rowId: `${prefix}add`,
+                    description: `☆ Comando para adicionar um membro ao grupo.`
+                },{
+                    title: `☆ Remove (Quote/Mention/Number)`,
+                    rowId: `${prefix}remove`,
+                    description: `☆ Comando para remover membros do grupo.`
+                },{
+                    title: `☆ Ban (Quote/Mention/Number)`,
+                    rowId: `${prefix}ban`,
+                    description: `☆ Comando para banir permanentemente um usuário.`
+                },{
+                    title: `☆ Unban (Quote/Mention/Number)`,
+                    rowId: `${prefix}unban`,
+                    description: `☆ Comando para remover o banimento de um usuário.`
+                },{
+                    title: `☆ Mute (Quote/Mention/Number) ?[Time in seconds]`,
+                    rowId: `${prefix}mute`,
+                    description: `☆ Comando para mutar um usuário.`
+                },{
+                    title: `☆ Unmute (Quote/Mention/Number)`,
+                    rowId: `${prefix}unmute`,
+                    description: `☆ Comando para desmutar um usuário.`
+                },{
+                    title: `☆ Promote (Quote/Mention/Number)`,
+                    rowId: `${prefix}promote`,
+                    description: `☆ Comando para promover um usuário a administrador.`
+                },{
+                    title: `☆ Demote (Quote/Mention/Number)`,
+                    rowId: `${prefix}demote`,
+                    description: `☆ Comando para rebaixar um administrador a membro comum.`
+                },{
+                    title: `☆ Presence (ON/OFF)`,
+                    rowId: `${prefix}presence`,
+                    description: `☆ Comando para bloquear mudança de presença dos membros, banindo-os automaticamente permanentemente.`
+                },{
+                    title: `☆ Protect (Quote/Mention/Number)`,
+                    rowId: `${prefix}protec`,
+                    description: `☆ Comando para proteger um usuário, onde quando banido quem baniu será punido.`
+                },
             ]
         },{
-            title: `🄾🄿🅃🄸🄾🄽🅂 3 COMANDOS DE MEMBRO`,
+            title: `🄾🄿🅃🄸🄾🄽🅂 2 COMANDOS DE ADMINISTRADOR PARA GRUPOS [GRUPOS]`,
             rows: [{
-                    title: `KKKKKKKKKKKKKKK`,
-                    rowId: `5`,
-                    description: `??????????????????`
+                    title: `☆ Chat (Close/Open)`,
+                    rowId: `${prefix}chat`,
+                    description: `☆ Comando para fechar ou abrir o grupo.`
                 },{
-                    title: `KKKKKKKKKKKKKKK`,
-                    rowId: `6`,
-                    description: `??????????????????`
+                    title: `☆ Block [Subcommand] (ON/OFF)`,
+                    rowId: `${prefix}block`,
+                    description: `☆ Comando para bloquear outros comandos para uso por membros comuns.`
+                },{
+                    title: `☆ Change [Subject/Description/Photo] (Quote/Comment)`,
+                    rowId: `${prefix}change`,
+                    description: `☆ Comando para altear foto, nome ou descrição do grupo.`
+                },{
+                    title: `☆ Info`,
+                    rowId: `${prefix}iinfo`,
+                    description: `☆ Comando para receber informações do grupo.`
+                },{
+                    title: `☆ Members`,
+                    rowId: `${prefix}members`,
+                    description: `☆ Comando para receber informações dos membros do grupo.`
+                },{
+                    title: `☆ Tag [All/Hide/WA] ?[Message]`,
+                    rowId: `${prefix}tag`,
+                    description: `☆ Comando para evidenciar os membros do grupo.`
+                },{
+                    title: `☆ Nuke [BR/All/Admins/Members/DDD]`,
+                    rowId: `${prefix}nuke`,
+                    description: `☆ Comando para remover em massa uma categoria de membros.`
+                },{
+                    title: `☆ Hard [Type] (ON/OFF)`,
+                    rowId: `${prefix}hard`,
+                    description: `☆ Comando para bloquear o envio de certos tipos de mensagens. Saiba mais em "!hard help"`
+                },{
+                    title: `☆ Run (ON/OFF)`,
+                    rowId: `${prefix}run`,
+                    description: `☆ Comando para evitar que usuários saiam do grupo, onde serão adicionados novamente.`
+                },
+            ]
+        },{
+            title: `🄾🄿🅃🄸🄾🄽🅂 3 COMANDOS DE MEMBRO [GRUPOS]`,
+            rows: [{
+                    title: `☆ GPT (Question)`,
+                    rowId: `${prefix}gpt`,
+                    description: `☆ IA (Assistente Virtual) que te ajuda em suas dúvidas.`
+                },{
+                    title: `☆ Google (Search)`,
+                    rowId: `${prefix}google`,
+                    description: `☆ Busca algo no Google.`
+                },{
+                    title: `☆ Youtube (Search)`,
+                    rowId: `${prefix}youtube`,
+                    description: `☆ Busca algo no Youtube.`
+                },{
+                    title: `☆ Tiktok (Search)`,
+                    rowId: `${prefix}tiktok`,
+                    description: `☆ Busca algo no Tiktok.`
+                },{
+                    title: `☆ Instagram (Username)`,
+                    rowId: `${prefix}instagram`,
+                    description: `☆ Pesquisa alguém no Instagram.`
+                },{
+                    title: `☆ Facebook (Username)`,
+                    rowId: `${prefix}facebook`,
+                    description: `☆ Pesquisa alguém no Facebook.`
+                },{
+                    title: `☆ Twitter (Username)`,
+                    rowId: `${prefix}twitter`,
+                    description: `☆ Pesquisa alguém no Twitter.`
                 }
             ]
         },{
             title: `🄾🄿🅃🄸🄾🄽🅂 4 BRINCADEIRAS`,
             rows: [{
                     title: `KKKKKKKKKKKKKKK`,
-                    rowId: `7`,
+                    rowId: `${prefix}aaaa`,
                     description: `??????????????????`
                 },{
                     title: `KKKKKKKKKKKKKKK`,
-                    rowId: `8`,
+                    rowId: `${prefix}aaaa`,
                     description: `??????????????????`
                 }
             ]
@@ -113,11 +218,11 @@ return await client.sendMessage(param, {
             title: `🄾🄿🅃🄸🄾🄽🅂 5 EFEITOS`,
             rows: [{
                     title: `KKKKKKKKKKKKKKK`,
-                    rowId: `9`,
+                    rowId: `${prefix}aaaa`,
                     description: `??????????????????`
                 },{
                     title: `KKKKKKKKKKKKKKK`,
-                    rowId: `10`,
+                    rowId: `${prefix}aaaa`,
                     description: `??????????????????`
                 }
             ]
@@ -125,11 +230,11 @@ return await client.sendMessage(param, {
             title: `🄾🄿🅃🄸🄾🄽🅂 6 ADULTO`,
             rows: [{
                     title: `KKKKKKKKKKKKKKK`,
-                    rowId: `11`,
+                    rowId: `${prefix}aaaa`,
                     description: `??????????????????`
                 },{
                     title: `KKKKKKKKKKKKKKK`,
-                    rowId: `12`,
+                    rowId: `${prefix}aaaa`,
                     description: `??????????????????`
                 }
             ]

@@ -31,13 +31,15 @@ export const Typed = async ({ events, client }) => {
     const Message = Body?.message?.viewOnceMessage?.message ?? Body?.message?.viewOnceMessageV2?.message ?? Body?.message ?? ''
     if(detectMessageStatus({ Message: Message, MessageType: MessageType }) !== null) return 'Aiin calica!!'
     const Text = getMessageText({ MessageType: MessageType, Message: Message })
-    const _argas = Object.keys(remoteJid).map(word => Object.keys(remoteJid[word])).map(word => word[0])
-    const isGroup = Key?.remoteJid?.endsWith('@g.us'); var usesMeta = false
+    const _argas = [...new Set(Object.keys(remoteJid)?.flatMap(key => Object.keys(remoteJid[key])?.[0]))]
+    const isGroup = Key?.remoteJid?.endsWith('@g.us')
+
+    let usesMeta = false
 
     if (isGroup){
-        const argaIndex = isGroup ? _argas.indexOf(Key.remoteJid) : -1
+        const argaIndex = _argas.indexOf(Key.remoteJid)
         const arga = argaIndex >= 0 ? metadata.remoteJid[argaIndex] : await createdData(Key, client)
-        var usesMeta = isGroup && new RegExp(Key.remoteJid).test(_argas) ? arga : false
+        usesMeta = new RegExp(Key.remoteJid).test(_argas) ? arga : false
     }
 
     const Typed = {
