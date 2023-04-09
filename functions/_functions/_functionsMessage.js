@@ -34,7 +34,7 @@ export const Audition = ({ from, where }) => new RegExp(from).test(where)
 const Protect = new Set()
 
 // Função que recebe um valor e adiciona-o ao conjunto de valores protegidos por um período de 8 segundos
-export const Spam = (x) => { Protect.add(x); setTimeout(() => Protect.delete(x), 8000) }
+export const Spam = (x) => { Protect.add(x); setTimeout(() => Protect.delete(x), 4000) }
 
 // Função que recebe um valor e verifica se ele está atualmente protegido pelo conjunto de valores protegidos
 export const isSpam = (x) => !!Protect.has(x)
@@ -43,7 +43,7 @@ export const isSpam = (x) => !!Protect.has(x)
 const Await = new Set()
 
 // Função que recebe um valor e adiciona-o ao conjunto de valores aguardando processamento por um período de 4 segundos
-export const Cooldown = (x) => { Await.add(x); setTimeout(() => Await.delete(x), 8000) }
+export const Cooldown = (x) => { Await.add(x); setTimeout(() => Await.delete(x), 6000) }
 
 // Função que recebe um valor e remove-o do conjunto de valores aguardando processamento
 export const DownColling = (x) => Await.delete(x)
@@ -58,7 +58,7 @@ export const sizeCooldown = (x) => Await
 const Ignore = new Set()
 
 // Função que recebe um valor e adiciona-o ao conjunto de valores aguardando processamento por um período de 4 segundos
-export const doIgnore = (x) => { Ignore.add(x); setTimeout(() => Ignore.delete(x), 12000) }
+export const doIgnore = (x) => { Ignore.add(x); setTimeout(() => Ignore.delete(x), 8000) }
 
 // Função que recebe um valor e verifica se ele está atualmente aguardando processamento pelo conjunto de valores aguardando processamento
 export const IsIgnoring = (x) => !!Ignore.has(x)
