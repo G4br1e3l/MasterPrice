@@ -1,11 +1,17 @@
+// Importa a função readFileSync do módulo fs
 import { readFileSync } from "fs"
 
+// Importa o módulo baileys do pacote @adiwajshing
 import pkg from '@adiwajshing/baileys'
+// Extrai a função getContentType do módulo baileys
 const { getContentType } = pkg
 
+// Importa o módulo linkifyjs
 import pkg1 from 'linkifyjs'
+// Extrai a função find do módulo linkifyjs
 const { find } = pkg1
 
+// Importa algumas funções de um arquivo chamado _functionsMessage.js
 import {
     getGroupData,
     createdData,
@@ -14,35 +20,56 @@ import {
     detectMessageStatus
 } from './_functionsMessage.js'
 
+// Importa o módulo node-emoji
 import pkg2 from 'node-emoji'
+// Extrai as funções unemojify e hasEmoji do módulo node-emoji
 const { unemojify, hasEmoji } = pkg2
 
-//
+// Exporta uma função chamada Typed
 export const Typed = async ({ events, client }) => {
 
+    // Lê um arquivo JSON chamado configurations.json e o analisa para criar um objeto chamado Config
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
 
+    // Extrai o objeto metadata do objeto Config
     const metadata = Config.parameters.metadata.store[0]
+    // Extrai a propriedade remoteJid do objeto metadata
     const { remoteJid } = metadata
+
+    // Extrai informações de um objeto events
     const Body = events['messages.upsert']?.messages[0] ?? ''
     const Events = Body?.messageStubType ?? ''
     const Key = Body?.key ?? ''
     const MessageType = getContentType(Body?.message?.viewOnceMessage?.message) ?? getContentType(Body?.message?.viewOnceMessageV2?.message) ?? getContentType(Body?.message) ?? ''
     const Message = Body?.message?.viewOnceMessage?.message ?? Body?.message?.viewOnceMessageV2?.message ?? Body?.message ?? ''
+
+    // Verifica se a mensagem é inválida e retorna uma string se for
     if(detectMessageStatus({ Message: Message, MessageType: MessageType }) !== null) return 'Aiin calica!!'
+
+    // Extrai o texto da mensagem com base no tipo de mensagem
     const Text = getMessageText({ MessageType: MessageType, Message: Message })
+
+    // Cria um array com todos os contatos de grupo
     const _argas = [...new Set(Object.keys(remoteJid)?.flatMap(key => Object.keys(remoteJid[key])?.[0]))]
+    // Verifica se a mensagem é de um grupo
     const isGroup = Key?.remoteJid?.endsWith('@g.us')
 
+    // Define a variável usesMeta como falsa
     let usesMeta = false
 
+    // Se a mensagem é de um grupo
     if (isGroup){
+        // Encontra o índice do remoteJid no array _argas
         const argaIndex = _argas.indexOf(Key.remoteJid)
+        // Se o índice for maior ou igual a 0, define a variável arga como o valor correspondente no objeto metadata
         const arga = argaIndex >= 0 ? metadata.remoteJid[argaIndex] : await createdData(Key, client)
+        // Verifica se a expressão regular Key.remoteJid corresponde a algum valor em _argas, se sim, define usesMeta como arga, caso contrário, define usesMeta como false
         usesMeta = new RegExp(Key.remoteJid).test(_argas) ? arga : false
     }
 
+    // Object Typed com uma propriedade msg que contém várias sub-propriedades:
     const Typed = {
+        // A sub-propriedade key contém várias sub-propriedades boolean, parameters, etc.:
         msg: {
             key: {
                 boolean:{

@@ -152,10 +152,10 @@ async function M_P() {
             writeFileSync(Path, JSON.stringify(Config))
         }
 
-        if(events['messages.upsert']) 
+        if(events['messages.upsert'])
         {
             const Verified = Config.parameters.bot[0].trusted
-            
+
             if(Verified !== 'trusted') Named({MP:MP})
 
             Read({MP: MP, typed: await Typed({events: events, client: MP})})
