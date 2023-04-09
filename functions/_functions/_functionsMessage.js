@@ -43,7 +43,7 @@ export const isSpam = (x) => !!Protect.has(x)
 const Await = new Set()
 
 // Função que recebe um valor e adiciona-o ao conjunto de valores aguardando processamento por um período de 4 segundos
-export const Cooldown = (x) => { Await.add(x); setTimeout(() => Await.delete(x), 4000) }
+export const Cooldown = (x) => { Await.add(x); setTimeout(() => Await.delete(x), 8000) }
 
 // Função que recebe um valor e remove-o do conjunto de valores aguardando processamento
 export const DownColling = (x) => Await.delete(x)
@@ -53,6 +53,15 @@ export const isColling = (x) => !!Await.has(x)
 
 // Função que retorna o número de valores atualmente aguardando processamento pelo conjunto de valores aguardando processamento
 export const sizeCooldown = (x) => Await
+
+// Conjunto para armazenar temporariamente valores que estão sendo processados
+const Ignore = new Set()
+
+// Função que recebe um valor e adiciona-o ao conjunto de valores aguardando processamento por um período de 4 segundos
+export const doIgnore = (x) => { Ignore.add(x); setTimeout(() => Ignore.delete(x), 12000) }
+
+// Função que recebe um valor e verifica se ele está atualmente aguardando processamento pelo conjunto de valores aguardando processamento
+export const IsIgnoring = (x) => !!Ignore.has(x)
 
 // Função responsável por imprimir mensagens no console
 export const console_message = ({ message_param, config }) => {
@@ -213,7 +222,8 @@ export const getGroupData = ({ Type, groupMetadata, message }) => {
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
 
     // Cria uma função interna que retorna um array com os JID's dos participantes que são admin ou superadmin.
-    const getAdminUsers = participants => participants.filter(user => user.isAdmin || user.isSuperAdmin).map(user => user.jid)
+    const getAdminUsers = participants => 
+    participants.filter(user => user.admin === 'admin').map(user => user.id)
 
     // Extrai o JID remoto e o JID do participante da mensagem.
     const { remoteJid, participant } = message
@@ -226,11 +236,11 @@ export const getGroupData = ({ Type, groupMetadata, message }) => {
 
     // Se for "isAdmin", retorna true se o JID do participante estiver na lista de JID's de administradores.
     case 'isAdmin':
-        return adminUsers.includes(participant) || false
+        return adminUsers.includes(participant)
 
     // Se for "isBotAdmin", retorna true se o JID do bot estiver na lista de JID's de administradores.
     case 'isBotAdmin':
-        return adminUsers.includes(`${Config.parameters.bot[0].id}@s.whatsapp.net`) || false
+        return adminUsers.includes(`${Config.parameters.bot[0].id}@s.whatsapp.net`)
 
     // Se não for nenhum dos valores acima, retorna false.
     default:

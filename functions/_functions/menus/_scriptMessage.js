@@ -238,9 +238,8 @@ return await client.sendMessage(param, {
                     description: `??????????????????`
                 }
             ]
-        },
-    ]
-})
+        },]
+    })
 }
 
 /*

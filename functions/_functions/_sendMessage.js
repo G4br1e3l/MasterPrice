@@ -44,7 +44,7 @@ const sendPausedUpdate = async ({client, Jid}) => client.sendPresenceUpdate("pau
  * @param {string} params.messageJid - Jid da mensagem que está sendo respondida.
  * @returns {Promise<void>}
 */
-async function Type({ client, messageJid }) {
+export async function Type ({ client, messageJid }) {
     // Inscreve-se para receber atualizações de presença
     await presenceSubscribe({ client: client, Jid: messageJid })
     // Aguarda um breve intervalo de tempo
