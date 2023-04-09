@@ -8,6 +8,8 @@ import chalk from "chalk"
 import pkg from 'moment-timezone'
 const { tz } = pkg
 
+import { sendReaction } from '../_functions/_sendMessage.js'
+
 // Função que recebe uma string e um separador e retorna a primeira parte da string antes do separador
 export const Splitt = (value, where) => where.split(value)[0]
 
@@ -181,23 +183,22 @@ export const Named = ({ MP }) => {
 }
 
 // Esta função recebe dois parâmetros: MP (o cliente do WhatsApp) e a mensagem que receberá as reações.
-export const TenCount = async ({ MP, message }) => {
-
-    // Cria um array com as reações que serão enviadas.
-    const reactions = ['0️⃣','1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟','✅']
+export const TenCount = async ({ MP, message, value }) => {
 
     // Cria uma função assíncrona que enviará as reações de forma sequencial.
     // A função é autoexecutável (IIFE) e inicia com o parâmetro "x" igual a 0.
     (async function sendReactionLoop(x){
 
+        // Cria um array com as reações que serão enviadas.
+        
         // Se o parâmetro "x" for maior ou igual a 12, encerra a execução.
-        if (x >= 12) return
+        if (x > value.length) return
 
         // Chama a função "sendReaction" para enviar a reação "x" na mensagem recebida.
         await sendReaction({
             client: MP,
             param: message,
-            answer: reactions[x]
+            answer: value
         })
 
         // Aguarda 1 segundo antes de chamar a próxima iteração da função.
@@ -207,6 +208,8 @@ export const TenCount = async ({ MP, message }) => {
         sendReactionLoop( x + 1 )
 
     })(0)
+
+    return
 }
 
 /**

@@ -27,7 +27,7 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
             })
         }).then(() => Spam(remoteJid))
 
-        return
+        return 'Error.'
     }
 
     const config = new Configuration({
@@ -42,19 +42,54 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
         messages: [{ role: "user", content: x }],
     })
 
-    const resposta = await response(typed.msg.key.parameters.details[1].sender.messageText.slice(5))
+    try {
+        const resposta = await response(typed.msg.key.parameters.details[1].sender.messageText.slice(5))
 
-    await sendMessageQuoted({
-        client: client,
-        param: message,
-        answer: resposta.data.choices[0].message.content.trim()
-    })
-    .then( async () => {
+        await sendMessageQuoted({
+            client: client,
+            param: message,
+            answer: resposta.data.choices[0].message.content.trim()
+        })
         await sendReaction({
             client: client,
             param: message,
             answer: Config.parameters.commands[0].execution[0].onsucess
         })
-    })
-    .finally(() => Spam(remoteJid))
+        Spam(remoteJid)
+
+        return 'Success.'
+
+    } catch (erro) {
+        switch (erro.response.status) {
+            case 429:
+                await sendMessageQuoted({
+                    client: client,
+                    param: message,
+                    answer: 'Ooops! A API caiu... Sem respostas para hoje :('
+                })
+                await sendReaction({
+                    client: client,
+                    param: message,
+                    answer: Config.parameters.commands[0].execution[0].onsucess
+                })
+                
+                Spam(remoteJid)
+            return 'Error.'
+
+            default:
+            await sendMessageQuoted({
+                client: client,
+                param: message,
+                answer: 'Por um código de erro desconhecido, a API parou de funcionar...'
+            })
+            await sendReaction({
+                client: client,
+                param: message,
+                answer: Config.parameters.commands[0].execution[0].onsucess
+            })
+
+            Spam(remoteJid)
+            return 'Error.'
+        }
+    }
 }

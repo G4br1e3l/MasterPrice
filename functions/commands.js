@@ -11,6 +11,7 @@ import {
     sizeCooldown,
     doIgnore,
     IsIgnoring,
+    TenCount
 } from './_functions/_functionsMessage.js'
 
 import {
@@ -199,6 +200,12 @@ export const commands = async ({ MP, typed }) => {
                 .then(() => Spam(remoteJid))
             break
             case 'gpt':
+                await sendMessageQuoted({
+                    client: MP,
+                    param: message,
+                    answer: 'Aguarde. Resposta sendo pesquisada.'
+                })
+
                 await GPT({ client: MP, message: message, _args: _args, remoteJid: remoteJid, typed: typed })
             break
             case 'provide':
