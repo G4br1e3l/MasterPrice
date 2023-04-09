@@ -3,12 +3,12 @@
         "bot": [
             {
                 "name": "MasterPrice",
-                "username": "",
-                "id": "",
+                "username": "ㅤ",
+                "id": "5511944168937",
                 "owners": [
                     "5516997437587"
                 ],
-                "trusted": ""
+                "trusted": "trusted"
             },
             {
                 "prefix": {
@@ -27,8 +27,8 @@
                     },
                     {
                         "unsafe": [
-                            "menu",
                             "",
+                            "menu",
                             "gpt"
                         ]
                     },
