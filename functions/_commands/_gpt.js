@@ -9,15 +9,33 @@ import {
     sendMessageQuoted
 } from '../_functions/_sendMessage.js'
 
+const config = new Configuration({
+    organization: "org-RhYnp9r8WqhtFIsFXLmd56W3",
+    apiKey: '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',
+})
+
+const openai = new OpenAIApi(config)
+
+const response = async (x) => await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [{ role: "user", content: x }],
+})
+
 export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
+
+    let Input = typed.msg.key.parameters.details[1].sender.messageText.slice(5)
+
+    if (typed.msg.key.boolean.message[0].isQuotedMessage){
+        Input = (typed.msg.key.parameters.details[0].messageQuotedText + ". " + Input)
+    }
 
     var Config = JSON.parse(readFileSync('./root/configurations.json', 'utf8'))
 
-    if (!_args[1]){
+    if (!Input){
         await sendMessageQuoted({
-            client: client, 
+            client: client,
             param: message,
-            answer: 'Tente inserindo alguma pergunta...'
+            answer: 'Tente inserindo alguma pergunta... com (!GPT (pergunta?)) ou marcando a mensagem ou ambas juntas :)'
         })
         .then( async () => {
             await sendReaction({
@@ -30,20 +48,8 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
         return 'Error.'
     }
 
-    const config = new Configuration({
-        organization: "org-RhYnp9r8WqhtFIsFXLmd56W3",
-        apiKey: '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',
-    })
-
-    const openai = new OpenAIApi(config)
-
-    const response = async (x) => await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: x }],
-    })
-
     try {
-        const resposta = await response(typed.msg.key.parameters.details[1].sender.messageText.slice(5))
+        const resposta = await response(Input)
 
         await sendMessageQuoted({
             client: client,
@@ -60,19 +66,19 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
         return 'Success.'
 
     } catch (erro) {
-        switch (erro.response.status) {
+        switch (erro?.response?.status) {
             case 429:
                 await sendMessageQuoted({
                     client: client,
                     param: message,
-                    answer: 'Ooops! A API caiu... Sem respostas para hoje :('
+                    answer: 'Ooops! Muitas solicitações de resposta, aguarde um momento e tente novamente mais tarde.'
                 })
                 await sendReaction({
                     client: client,
                     param: message,
                     answer: Config.parameters.commands[0].execution[0].onsucess
                 })
-                
+
                 Spam(remoteJid)
             return 'Error.'
 
@@ -80,7 +86,7 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
             await sendMessageQuoted({
                 client: client,
                 param: message,
-                answer: 'Por um código de erro desconhecido, a API parou de funcionar...'
+                answer: 'Por um código de erro desconhecido, a API parou de funcionar.'
             })
             await sendReaction({
                 client: client,
