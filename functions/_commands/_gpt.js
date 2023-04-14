@@ -26,7 +26,7 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
     let Input = typed.msg.key.parameters.details[1].sender.messageText.slice(5)
 
     if (typed.msg.key.boolean.message[0].isQuotedMessage){
-        Input = (typed.msg.key.parameters.details[0].messageQuotedText + ". " + Input)
+        Input = typed.msg.key.parameters.details[0].messageQuotedText + ". " + Input
     }
 
     var Config = JSON.parse(readFileSync('./root/configurations.json', 'utf8'))
