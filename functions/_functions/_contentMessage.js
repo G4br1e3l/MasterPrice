@@ -132,7 +132,7 @@ export const Typed = async ({ events, client }) => {
                             messageType: MessageType ?? null,
                             messageContent: Message,
                             messageBody: Body,
-                            messageQuotedText: Message[MessageType]?.contextInfo?.quotedMessage ?? Message[MessageType] ?? null,
+                            messageQuotedText: Message[MessageType]?.contextInfo?.quotedMessage?.conversation ?? Message[MessageType]?.contextInfo?.quotedMessage ?? Message[MessageType] ?? null,
                             messageQuoted: Body.quoted ?? Body ?? null,
                             messageMentionedJids: Message[MessageType]?.contextInfo?.mentionedJid ?? null,
                             messageGroupMetadata: usesMeta? usesMeta : null,
