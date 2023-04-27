@@ -10,8 +10,8 @@ import {
 } from '../_functions/_sendMessage.js'
 
 const config = new Configuration({
-    organization: "org-RhYnp9r8WqhtFIsFXLmd56W3",
-    apiKey: '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',
+    organization: "org-YKs4uuLUdHi1h2nayJZcnhzd",
+    apiKey: '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',
 })
 
 const openai = new OpenAIApi(config)
