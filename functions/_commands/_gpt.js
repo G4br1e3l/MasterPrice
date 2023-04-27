@@ -17,7 +17,7 @@ const config = new Configuration({
 const openai = new OpenAIApi(config)
 
 const response = async (x) => await openai.createChatCompletion({
-    model: "gpt-4",
+    model: "gpt-4-0314",
     messages: [{ role: "user", content: x }],
 })
 
