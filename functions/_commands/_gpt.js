@@ -17,7 +17,7 @@ const config = new Configuration({
 const openai = new OpenAIApi(config)
 
 const response = async (x) => await openai.createChatCompletion({
-    model: "gpt-3.5-turbo",
+    model: "gpt-4",
     messages: [{ role: "user", content: x }],
 })
 
