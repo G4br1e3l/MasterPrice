@@ -1,32 +1,25 @@
 {
-    "name": "whatsbot",
-    "version": "1.4.3",
-    "description": "Bot para gerenciamento de grupos, com o melhor desempenho.",
-    "main": "MP.js",
-    "type": "module",
-    "scripts": {
-        "start": "node MP.js"
-    },
-    "author": "Gabriel Henrique de Jesus Silva",
-    "license": "ISC",
-    "dependencies": {
-        "@adiwajshing/baileys": "^4.4.0",
-        "@adiwajshing/baileys2": "github:QueenAnya/topa",
-        "@adiwajshing/keyed-db": "^0.2.4",
-        "@adiwajshing/keyed-db2": "github:QueenAnya/topb",
-        "cfonts": "^2.9.0",
-        "chalk": "^4.1.2",
-        "cheerio": "^1.0.0-rc.10",
-        "fs": "0.0.1-security",
-        "linkifyjs": "^4.1.0",
-        "moment-timezone": "^0.5.34",
-        "node-emoji": "^1.11.0",
-        "openai": "^3.2.1",
-        "pino": "^7.0.5",
-        "pino-pretty": "^9.1.1",
-        "qrcode-terminal": "^0.12.0"
-    },
-    "repository": {
-        "type": "git"
-    }
+  "name": "masterprice-bot",
+  "version": "2.0.0",
+  "description": "",
+  "main": "MP.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@adiwajshing/baileys": "github:WhiskeySockets/Baileys",
+    "@adiwajshing/keyed-db": "^0.2.4",
+    "cfonts": "^3.2.0",
+    "chalk": "^5.2.0",
+    "linkifyjs": "^4.1.1",
+    "moment-timezone": "^0.5.43",
+    "node-emoji": "^1.11.0",
+    "openai": "^3.2.1",
+    "pino-pretty": "^10.0.0",
+    "qrcode-terminal": "^0.12.0"
+  }
 }
