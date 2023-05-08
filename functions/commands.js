@@ -50,12 +50,11 @@ export const commands = async ({ MP, typed }) => {
 
     var Config = JSON.parse(readFileSync('./root/configurations.json', 'utf8'))
 
-    const Options = typed ?? ''
-    const remoteJid = Options.msg.key.parameters.details[0].messageJid ?? ''
-    const Sender = Options.msg.key.parameters.details[1].sender ?? ''
-    const Message = Sender.messageText ?? ''
-    const message = Options.msg.key.parameters ?? ''
-    const Boolean = Options.msg.key.boolean
+    const { ...Boolean } = typed.boolean || {}
+    const { ...message } = typed.parameters || {}
+    const { messageText: Message, ...Sender } = typed.parameters.details[1].sender || {}
+    const { messageJid: remoteJid } = typed.parameters.details[0] || {}
+
     const Prefix = Config.parameters.bot[1].prefix.set
 
     const _args = (function extractArgs({ m, prefix }) {

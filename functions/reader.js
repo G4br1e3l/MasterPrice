@@ -9,31 +9,35 @@ export const Read = async ({ MP, typed }) => {
 
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
 
-    const Message = Config.parameters.commands[2].messages.console
+    const {
+        onusercommand: cmdUser = undefined,
+        onusermessage: msgUser = undefined,
+    } = Config.parameters.commands[2].messages.console || {}
 
-    const Options = typed ?? false
+    const { key: Options = undefined } = typed?.msg || {}
 
-    if (!Options || !Options?.msg || !Options?.msg?.key) return
-    if (Options?.msg?.key?.boolean?.isBot) return
+    if (!Options) {
+        return console.log('Undefined message was sented. Message: ', typed)
+    }
 
-    switch(Options?.msg?.key?.parameters?.details[1]?.sender?.messageText?.startsWith(Config.parameters.bot[1].prefix.set)){
+    if (Options?.boolean?.isBot) return
+
+    const { isGroup: grupo = undefined } = Options?.boolean || {}
+
+    switch(Options.boolean?.isCommand){
         case true:
             await commands({
                 MP: MP,
                 typed: Options,
             })
             console_message({
-                message_param: Options.msg.key.boolean.isGroup? 
-                `${Message.onusercommand} no grupo [@group]` : 
-                Message.onusercommand,
+                message_param: grupo? `${cmdUser} no grupo [@group]` : cmdUser,
                 config: Options
             })
         break
         case false:
             console_message({
-                message_param: Options.msg.key.boolean.isGroup? 
-                `${Message.onusermessage} no grupo [@group]` : 
-                Message.onusermessage,
+                message_param: grupo? `${msgUser} no grupo [@group]` : msgUser,
                 config: Options
             })
         break

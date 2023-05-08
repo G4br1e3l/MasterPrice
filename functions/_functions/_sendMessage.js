@@ -88,7 +88,7 @@ export async function sendCaptionImageQuoted({
   path_image,
 }) {
   // Extrai as informações da mensagem citada
-  const { messageJid, messageQuoted } = param.details[0];
+  const { messageJid, messageAll } = param.details[0];
 
   /**
    * Envia uma mensagem para um JID.
@@ -120,7 +120,7 @@ export async function sendCaptionImageQuoted({
     Jid: messageJid,
     answer: answer,
     client: client,
-    quoted: messageQuoted,
+    quoted: messageAll,
     path_image: path_image,
   });
 }
@@ -195,7 +195,7 @@ export async function sendCaptionImageTypingQuoted({
   path_image,
 }) {
   // Extrai as informações do remetente e da mensagem citada
-  const { messageJid, messageQuoted } = param.details[0];
+  const { messageJid, messageAll } = param.details[0];
 
   /**
    * Envia uma mensagem para um JID.
@@ -230,7 +230,7 @@ export async function sendCaptionImageTypingQuoted({
     Jid: messageJid,
     answer: answer,
     client: client,
-    quoted: messageQuoted,
+    quoted: messageAll,
     path_image: path_image,
   });
 }
@@ -247,8 +247,18 @@ export async function sendCaptionImageTypingQuoted({
  *  * @returns {Promise<void>}
  */
 export async function sendMessageQuoted({ client, param, answer }) {
+
   // Extrai as informações do remetente e da mensagem citada
-  const { messageJid, messageQuoted } = param.details[0];
+  const { messageJid, messageAll, messageQuoted } = param.details[0];
+
+  const replayQuoted = {
+    key: {
+      remoteJid: messageQuoted?.participant || {},
+      fromMe: false,
+      id: messageQuoted?.stanzaId || {},
+    },
+    message: {}
+  }
 
   /**
    * Envia uma mensagem para um JID.
@@ -279,7 +289,7 @@ export async function sendMessageQuoted({ client, param, answer }) {
     Jid: messageJid,
     answer: answer,
     client: client,
-    quoted: messageQuoted,
+    quoted: messageAll,
   });
 }
 
@@ -368,7 +378,7 @@ export async function sendMessageTyping({ client, param, answer }) {
  */
 export async function sendMessageTypingQuoted({ client, param, answer }) {
   // Extrai as informações do remetente e da mensagem citada
-  const { messageJid, messageQuoted } = param.details[0];
+  const { messageJid, messageAll } = param.details[0];
 
   /**
    * Envia uma mensagem de texto com uma mensagem citada para um JID.
@@ -401,7 +411,7 @@ export async function sendMessageTypingQuoted({ client, param, answer }) {
     Jid: messageJid,
     answer: answer,
     client: client,
-    quoted: messageQuoted,
+    quoted: messageAll,
   });
 }
 

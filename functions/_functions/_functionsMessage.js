@@ -72,22 +72,19 @@ export const console_message = ({ message_param, config }) => {
     var Config = JSON.parse(readFileSync("./root/configurations.json"))
 
     // Extrai a mensagem de texto e o número do remetente da mensagem a partir do objeto de configuração
-    const Text = config?.msg?.key?.parameters?.details[1]?.sender?.messageText ?? ''; if(!Text) return
-    const Sender = config?.msg?.key?.parameters?.details[1]?.sender?.messageNumber ?? ''; if(!Sender) return
-
-    // Verifica se a mensagem é proveniente de um grupo
-    const isGroup = config?.msg?.key?.boolean?.isGroup
+    const {
+        messageText: Text = undefined,
+        messageNumber: Sender = undefined,
+    } = config.parameters?.details[1]?.sender || {}
 
     // Função que retorna o nome do grupo a partir do objeto de configuração
-    const group = ({ metadata, config }) => {
-        // Extrai o ID do grupo a partir do objeto de configuração
-        const groupJid = config?.msg?.key?.parameters?.details[0]?.messageKey?.remoteJid?.split('@')[0]
-        // Procura o índice do grupo no objeto 'metadata'
-        const chatIndex = metadata?.remoteJid?.map(chat => Object.keys(chat)[0].split('@')[0])?.indexOf(groupJid)
-
-        // Retorna o nome do grupo
-        return metadata.remoteJid[chatIndex][`${groupJid}@g.us`].subject
-    }
+    // Extrai o ID do grupo a partir do objeto de configuração
+    // Procura o índice do grupo no objeto 'metadata'
+    // Retorna o nome do grupo
+    const group = ({
+        metadata,
+        config
+    }) => metadata.remoteJid[metadata?.remoteJid?.map(chat => Object.keys(chat)[0].split('@')[0])?.indexOf(config.parameters?.details[0]?.messageJid.split('@')[0])][config.parameters?.details[0]?.messageJid].subject
 
     // Imprime a mensagem formatada no console
     console.log(
@@ -100,7 +97,7 @@ export const console_message = ({ message_param, config }) => {
             .replace(/@entry/g, chalk.hex('#DEADED').bgGreen.bold(Text))
             .replace(/@hour/g, Hour()) // Não foi declarada a função 'Hour', deve ser definida em outro lugar
             .replace(/@date/g, Date())
-            .replace(/@group/g, isGroup? group({ metadata: Config?.parameters?.metadata?.store[0], config: config }) : '')
+            .replace(/@group/g, config.boolean?.isGroup? group({ metadata: Config?.parameters?.metadata?.store[0], config: config }) : '')
         )
     );
 }

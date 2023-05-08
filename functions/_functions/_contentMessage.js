@@ -34,23 +34,39 @@ export const Typed = async ({ events, client }) => {
     // Extrai o objeto metadata do objeto Config
     const metadata = Config.parameters.metadata.store[0]
     // Extrai a propriedade remoteJid do objeto metadata
-    const { remoteJid } = metadata
+    const { remoteJid = null } = metadata
 
     // Extrai informações de um objeto events
-    const Body = events['messages.upsert']?.messages[0] ?? ''
-    const Events = Body?.messageStubType ?? ''
-    const Key = Body?.key ?? ''
-    const MessageType = getContentType(Body?.message?.viewOnceMessage?.message) ?? getContentType(Body?.message?.viewOnceMessageV2?.message) ?? getContentType(Body?.message) ?? ''
-    const Message = Body?.message?.viewOnceMessage?.message ?? Body?.message?.viewOnceMessageV2?.message ?? Body?.message ?? ''
+    const {
+        messageStubType: Events = undefined,
+        messageTimestamp: Time = undefined,
+        key: Key = undefined,
+        message: Mssge = undefined,
+        status: Status = undefined,
+        quoted: Quoted = undefined,
+        pushName: getName = undefined,
+        broadcast: BC = undefined,
+        ...Body
+    } = events['messages.upsert']?.messages[0] || {}
+
+    if (Events) return `Event was detected! Code: ${Events}`
+    
+    const {
+        viewOnceMessage: vom1 = undefined,
+        viewOnceMessageV2: vom2 = undefined,
+        ...m
+    } = Mssge || {}
+
+    const Message = vom1?.message ?? vom2?.message ?? m ?? {}
+
+    const MessageType = getContentType(Message)
 
     // Verifica se a mensagem é inválida e retorna uma string se for
-    if(detectMessageStatus({ Message: Message, MessageType: MessageType }) !== null) return 'Aiin calica!!'
+    if(detectMessageStatus({ Message: Message, MessageType: MessageType }) !== null) return 'Status published.'
 
     // Extrai o texto da mensagem com base no tipo de mensagem
     const Text = getMessageText({ MessageType: MessageType, Message: Message })
 
-    // Cria um array com todos os contatos de grupo
-    const _argas = [...new Set(Object.keys(remoteJid)?.flatMap(key => Object.keys(remoteJid[key])?.[0]))]
     // Verifica se a mensagem é de um grupo
     const isGroup = Key?.remoteJid?.endsWith('@g.us')
 
@@ -58,7 +74,9 @@ export const Typed = async ({ events, client }) => {
     let usesMeta = false
 
     // Se a mensagem é de um grupo
-    if (isGroup){
+    if (isGroup) {
+        // Cria um array com todos os contatos de grupo
+        const _argas = [...new Set(Object.keys(remoteJid)?.flatMap(key => Object.keys(remoteJid[key])?.[0]))]
         // Encontra o índice do remoteJid no array _argas
         const argaIndex = _argas.indexOf(Key.remoteJid)
         // Se o índice for maior ou igual a 0, define a variável arga como o valor correspondente no objeto metadata
@@ -74,8 +92,8 @@ export const Typed = async ({ events, client }) => {
             key: {
                 boolean:{
                     isBot: !!Key.fromMe ?? false,
-                    isCommand: !!Text?.startsWith('!') ??  false,
-                    isGroup: usesMeta? true : false,
+                    isCommand: !!Text?.startsWith(Config.parameters.bot[1].prefix.set) ??  false,
+                    isGroup: isGroup,
                     isAdmin: usesMeta? !!getGroupData({ Type: 'isAdmin', groupMetadata: usesMeta, message: Key}) : false,
                     isBotAdmin: usesMeta? !!getGroupData({ Type: 'isBotAdmin', groupMetadata: usesMeta, message: Key}) : false,
                     isOwner: !!Config.parameters.bot[0].owners.includes((Key.participant ?? Key.remoteJid).split('@')[0]),
@@ -87,7 +105,7 @@ export const Typed = async ({ events, client }) => {
                         isButtonMessage: Audition({ from: 'buttonsCreationMessage', where: MessageType }) || Audition({ from: 'buttonsResponseMessage', where: MessageType }),
                         isAudioMessage: Audition({ from: 'audioMessage', where: MessageType }),
                         isProductMessage: Audition({ from: 'productMessage', where: MessageType }),
-                        isViewOnceMessage: !!(Body?.message?.viewOnceMessage ?? Body?.message?.viewOnceMessageV2?.message),
+                        isViewOnceMessage: !!(Mssge.viewOnceMessage ?? Mssge.viewOnceMessageV2?.message),
                         isVideoMessage: Audition({ from: 'videoMessage', where: MessageType }),
                         isContactMessage: Audition({ from: 'contactMessage', where: MessageType }),
                         isImageMessage: Audition({ from: 'imageMessage', where: MessageType }),
@@ -123,17 +141,19 @@ export const Typed = async ({ events, client }) => {
                 parameters:{
                     details: [
                         {
+                            messageAll: events['messages.upsert']?.messages[0],
                             messageKey: Key ?? null,
                             messageId: Key?.id ?? null,
-                            messageStatus: Body?.status ?? null,
+                            messageStatus: Status ?? null,
                             messageJid: Key?.remoteJid ?? null,
-                            messageTimeStamp: Body?.messageTimestamp ?? null,
+                            messageTimeStamp: Time ?? null,
                             messageContextinfo: Message[MessageType]?.contextInfo ?? null,
                             messageType: MessageType ?? null,
-                            messageContent: Message,
-                            messageBody: Body,
-                            messageQuotedText: Message[MessageType]?.contextInfo?.quotedMessage?.conversation ?? Message[MessageType]?.contextInfo?.quotedMessage ?? Message[MessageType] ?? null,
-                            messageQuoted: Body.quoted ?? Body ?? null,
+                            messageContent: Message ?? null,
+                            messageContext: Message[MessageType] ?? null,
+                            messageBody: Body ?? null,
+                            messageQuotedText: Message[MessageType]?.contextInfo?.quotedMessage? Message[MessageType]?.contextInfo?.quotedMessage?.conversation ?? Message[MessageType]?.contextInfo?.quotedMessage ?? Message[MessageType] : null,
+                            messageQuoted: Message[MessageType]?.contextInfo?.quotedMessage? Message[MessageType]?.contextInfo ?? Quoted ?? Body : null,
                             messageMentionedJids: Message[MessageType]?.contextInfo?.mentionedJid ?? null,
                             messageGroupMetadata: usesMeta? usesMeta : null,
                             messageButtonId: Message[MessageType]?.selectedButtonId ?? null,
@@ -144,9 +164,9 @@ export const Typed = async ({ events, client }) => {
                             messagePollOptions: Message[MessageType]?.options ?? null
                         },{
                         sender: {
-                            messageName: Body.pushName ?? (Key.participant ?? Key.remoteJid).split('@')[0] ?? false,
+                            messageName: getName ?? (Key.participant ?? Key.remoteJid).split('@')[0] ?? false,
                             messageNumber: (Key.participant ?? Key.remoteJid).split('@')[0] ?? false,
-                            messageText: Text,
+                            messageText: Text ?? null,
                         },
                     }],
                 },

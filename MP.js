@@ -51,7 +51,7 @@ async function M_P() {
         msgRetryCounterMap,
         generateHighQualityLinkPreview: true,
         printQRInTerminal: true,
-        browser: ['MasterPrice', 'Safari', '1.0.0'],
+        browser: ['Chrome', 'Safari', '1.0.0'],
         defaultQueryTimeoutMs: undefined,
         syncFullHistory: true,
         markOnlineOnConnect: true,
