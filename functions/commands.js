@@ -10,8 +10,7 @@ import {
     DownColling,
     sizeCooldown,
     doIgnore,
-    IsIgnoring,
-    TenCount
+    IsIgnoring
 } from './_functions/_functionsMessage.js'
 
 import {
@@ -27,6 +26,7 @@ import { Provide } from './_commands/_provide.js'
 import { Restrict } from './_commands/_restrict.js'
 import { Owner } from './_commands/_owner.js'
 import { GPT } from './_commands/_gpt.js'
+import { CreateSticker } from "./_commands/_fig.js";
 
 const isOwner = async ({ MP, message, Config, Sender }) => {
     if(!Config.parameters.bot[0].owners.includes(Sender.messageNumber)) {
@@ -186,56 +186,103 @@ export const commands = async ({ MP, typed }) => {
 
         Cooldown(remoteJid)
 
-        switch(_args[0]){
-            case 'menu':
-                await sectionMenu({ client: MP, param: remoteJid})
-                .then( async () => {
-                    await sendReaction({
-                        client: MP,
-                        param: message,
-                        answer: Config.parameters.commands[0].execution[0].onsucess
-                    })
-                })
-                .then(() => Spam(remoteJid))
-            break
-            case 'gpt':
-                await sendMessageQuoted({
-                    client: MP,
-                    param: message,
-                    answer: 'Aguarde. Resposta sendo pesquisada.'
-                })
+        switch (_args[0]) {
+          case "menu":
+            await sectionMenu({ client: MP, param: remoteJid })
+              .then(async () => {
+                await sendReaction({
+                  client: MP,
+                  param: message,
+                  answer: Config.parameters.commands[0].execution[0].onsucess
+                });
+              })
+              .then(() => Spam(remoteJid));
+            break;
+          case "gpt":
+            await sendMessageQuoted({
+              client: MP,
+              param: message,
+              answer: "⏰ Aguarde..."
+            });
 
-                await GPT({ client: MP, message: message, _args: _args, remoteJid: remoteJid, typed: typed })
-            break
-            case 'provide':
-            case 'unprovide':
-                if(await isOwner ({ MP: MP, message: message, Config: Config, Sender: Sender })) return
-                await Provide({ MP:MP, message: message, _args:_args })
-            break
-            case 'restrict':
-            case 'unrestrict':
-                if(await isOwner ({ MP: MP, message: message, Config: Config, Sender: Sender })) return
-                await Restrict({ MP:MP, message: message, _args:_args })
-            break
-            case 'addowner':
-            case 'removeowner':
-                if(await isOwner ({ MP: MP, message: message, Config: Config, Sender: Sender })) return
-                await Owner({ MP:MP, message: message, _args:_args })
-            break
-            default:
-                await sendMessageQuoted({
-                    client: MP,
-                    param: message,
-                    answer: Config.parameters.commands[2].messages.handler[0].onnotfound
-                }).then( async () => {
-                    await sendReaction({
-                        client: MP,
-                        param: message,
-                        answer: Config.parameters.commands[0].execution[0].onerror
-                    })
-                })
-                .then(() => Spam(remoteJid))
-            return
+            await GPT({
+              client: MP,
+              message: message,
+              _args: _args,
+              remoteJid: remoteJid,
+              typed: typed
+            });
+            break;
+          case "provide":
+          case "unprovide":
+            if (
+              await isOwner({
+                MP: MP,
+                message: message,
+                Config: Config,
+                Sender: Sender
+              })
+            )
+              return;
+            await Provide({ MP: MP, message: message, _args: _args });
+            break;
+          case "restrict":
+          case "unrestrict":
+            if (
+              await isOwner({
+                MP: MP,
+                message: message,
+                Config: Config,
+                Sender: Sender
+              })
+            )
+              return;
+            await Restrict({ MP: MP, message: message, _args: _args });
+            break;
+          case "addowner":
+          case "removeowner":
+            if (
+              await isOwner({
+                MP: MP,
+                message: message,
+                Config: Config,
+                Sender: Sender
+              })
+            )
+              return;
+            await Owner({ MP: MP, message: message, _args: _args });
+            break;
+          case "figurinha":
+          case "figurinh":
+          case "figurin":
+          case "figuri":
+          case "figur":
+          case "figu":
+          case "fig":
+          case "fi":
+          case "f":
+            await CreateSticker({
+              message: message,
+              Jid: remoteJid,
+              cc: MP
+            });
+            break;
+          default:
+            await sendMessageQuoted({
+              client: MP,
+              param: message,
+              answer:
+                Config.parameters.commands[2].messages.handler[0].onnotfound
+            })
+              .then(async () => {
+                await sendReaction({
+                  client: MP,
+                  param: message,
+                  answer: Config.parameters.commands[0].execution[0].onerror
+                });
+              })
+              .then(() => Spam(remoteJid));
+            return;
         }
 
         DownColling(remoteJid)
