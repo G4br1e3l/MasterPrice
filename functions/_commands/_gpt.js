@@ -34,7 +34,9 @@ const response = async (x) =>
     model: "gpt-4",
     messages: [{ role: "user", content: x }],
     max_tokens: 1000,
-    temperature: 0
+    temperature: 0,
+    best_of: 2,
+    stop: "\n"
   });
 
 const resp = async (x) =>
