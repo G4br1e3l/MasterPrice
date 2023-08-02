@@ -32,8 +32,8 @@ const openai = new OpenAIApi(config);
 const response = async (x) =>
   await openai.createChatCompletion({
     model: "gpt-4",
-    messages: [{ role: "user", content: x }],
-    max_tokens: 4000,
+    messages: [{ role: "user", content: `${x}. Simplifique.` }],
+    max_tokens: 1000,
     temperature: 0,
   });
 
