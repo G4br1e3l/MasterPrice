@@ -33,7 +33,7 @@ const response = async (x) =>
   await openai.createChatCompletion({
     model: "gpt-4",
     messages: [{ role: "user", content: x }],
-    max_tokens: 8198,
+    max_tokens: 8000,
     temperature: 0,
   });
 
