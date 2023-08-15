@@ -22,6 +22,9 @@ const getRandom = (v) => {
 	return `${Math.floor(Math.random() * 10000)}${v}`
 }
 
+const c = (v) => console.log(v)
+
+
 const config = new Configuration({
   organization: "org-VKh6dAMHl83oAzaDrjctqTwU",
   apiKey: "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"
@@ -33,12 +36,11 @@ const response = async (x) =>
   await openai.createChatCompletion({
     model: "gpt-4",
     messages: [{ role: "user", content: x }],
-    max_tokens: 8000,
+    max_tokens: 2000,
     temperature: 0,
   });
 
-const resp = async (x) =>
-  await openai.createTranscription(createReadStream(x), "whisper-1");
+const resp = async (x) => await openai.createTranscription(createReadStream(x), "whisper-1");
 
 const response1 = async (x) =>
   await openai.createImage({
@@ -48,20 +50,37 @@ const response1 = async (x) =>
   });
 
 export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
-  let Input = typed.parameters.details[1].sender.messageText.slice(5);
 
-  if (typed.boolean.message[0].isQuotedMessage) {
-    Input = typed.parameters.details[0]?.messageQuotedText || "";
-    const quotedMessage =
-      typed.parameters.details[0].messageContextinfo?.quotedMessage;
-    if (quotedMessage?.imageMessage?.caption !== undefined) {
-      Input += ` ${quotedMessage.imageMessage.caption}`;
-    }
-    if (quotedMessage?.videoMessage?.caption !== undefined) {
-      Input += ` ${quotedMessage.videoMessage.caption}`;
-    }
-    Input += ". ";
-    Input += typed.parameters.details[0].text || "";
+  const {
+    parameters: {
+    details: [{
+      messageQuotedText,
+      messageQuoted,
+      messageType,
+      messageContextinfo,
+      text,
+      ...More
+    } = {},
+    {
+      sender: { messageText: Message } = {}
+    } = {}
+    ] = []
+    },
+    boolean: {
+      message: [
+        { isQuotedMessage: iQtdMss } = {}
+      ] = []
+    } = {}
+  } = typed || {}
+
+  let Input = Message?.slice(5) || "";
+
+  if (iQtdMss) {
+    Input += messageQuotedText || ""
+    Input += messageQuoted?.quotedMessage[messageType]?.text || ""
+    Input += messageContextinfo?.quotedMessage?.imageMessage?.caption || ""
+    Input += messageContextinfo?.quotedMessage?.videoMessage?.caption || ""
+    Input += text || ""
   }
 
   var Config = JSON.parse(readFileSync("./root/configurations.json", "utf8"));
