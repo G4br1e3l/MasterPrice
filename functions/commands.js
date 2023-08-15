@@ -60,12 +60,11 @@ export const commands = async ({ MP, typed }) => {
     const Prefix = Config.parameters.bot[1].prefix.set
 
     const _args = (function extractArgs({ m, prefix }) {
-        const regex = new RegExp(`^${prefix}(.+)$`, 'i')
-        const match = m.match(regex)
-        if (!match) return []
-        const args = match[1].trim().split(/\s+/)
-        return args.map(arg => arg.toLowerCase())
-    })({ m: Message, prefix: Prefix })
+      const match = m.replace(/\n/g, ' ').match(new RegExp(`^${prefix}(.+)$`, 'i'));
+      if (!match) return [];
+      const args = match[1].trim().split(/\s+/);
+      return args.map(arg => arg.toLowerCase());
+  })({ m: Message, prefix: Prefix });
 
     async function run ({ _args }){
 
