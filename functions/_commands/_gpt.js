@@ -35,9 +35,15 @@ const openai = new OpenAIApi(config);
 const response = async (x) =>
   await openai.createChatCompletion({
     model: "gpt-4",
-    messages: [{ role: "user", content: x }],
-    max_tokens: 2000,
+    messages: [
+	    { role: "system", content: "Responda em português brasileiro sempre. Responda como se fossemos amigos de longa data. Responda da forma humana. Use preferencialmente emojis ou uma linguagem mais simples de entendimento. Responda de forma que seu texto seja coerente e com detalhes." },
+	    { role: "user", content: x }
+    ],
     temperature: 0,
+    max_tokens: 2407,
+    top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0
   });
 
 const resp = async (x) => await openai.createTranscription(createReadStream(x), "whisper-1");
