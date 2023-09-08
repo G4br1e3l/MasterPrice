@@ -41,7 +41,7 @@ const response = async (x) =>
 	    { role: "user", content: x }
     ],
     temperature: 0,
-    max_tokens: 2407,
+    max_tokens: 2000,
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0
@@ -200,8 +200,12 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
 
           await sendMessages('Leitura finalizada! Trazendo informações do PDF...')
           Spam(remoteJid);
+          
+          const concatenado = responses.join(' ');
+          const respondido = await response(`Resuma o máximo que puder: ${concatenado}.`);
+          const respostaFinal = respondido.data.choices[0].message.content.trim();
         
-          await sendMessages('O seu documento fala de:\n\n', (await response(`Resuma: ${(responses.join(' '))}.`)).data.choices[0].message.content.trim())
+          await sendMessages(`O seu documento fala de:\n\n ${respostaFinal}`)
           Spam(remoteJid);
         
           return "Success.";
