@@ -205,7 +205,7 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
           const respondido = await response(`Resuma o máximo que puder: ${concatenado}.`);
           const respostaFinal = respondido.data.choices[0].message.content.trim();
         
-          await sendMessages(`O seu documento fala de:\n\n ${respostaFinal}`)
+          await sendMessages(`O seu documento fala de:\n\n${respostaFinal}`)
           Spam(remoteJid);
         
           return "Success.";
