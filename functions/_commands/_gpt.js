@@ -17,13 +17,14 @@ import {
 import { downloadContentFromMessage } from "@adiwajshing/baileys";
 import { path } from "@ffmpeg-installer/ffmpeg";
 import { spawn } from "child_process";
+import pdfjs from 'pdfjs-dist';
+const { getDocument } = pdfjs;
+import { promisify } from 'util';
+import streamToBuffer from 'stream-to-buffer';
 
 const getRandom = (v) => {
 	return `${Math.floor(Math.random() * 10000)}${v}`
 }
-
-const c = (v) => console.log(v)
-
 
 const config = new Configuration({
   organization: "org-VKh6dAMHl83oAzaDrjctqTwU",
@@ -36,7 +37,7 @@ const response = async (x) =>
   await openai.createChatCompletion({
     model: "gpt-4",
     messages: [
-	    { role: "system", content: `Responda em português brasileiro sempre. Responda como se fossemos amigos, com intimidade simulada. Responda da forma humana. Use preferencialmente uma linguagem menos complexa. Responda de forma que seu texto seja coerente sintaticamente e rico em detalhes pontuais. Se atente a responder desta forma: "Você é feliz e carismático, tem 22 anos e é homem, um adulto, tem um nível de conhecimento elevado, pois estuda em uma faculdade de tecnologia, tem fobia de sangue, adora chuva, adora comer comidas das quais tem vontade, vive um dia de cada vez, acredita em filosofias de aceitar riscos, ama os amigos e a família, tem namorada, e enfim sempre usa essas palavras ao falar: "vc, tbm, tô, tá, tabom, hj, q, pq, hem, qdo, doidos, aki, tá, mimir, eh, qdo, vc, Olá, td, bacana, to, não, acho, cumprir, então, sqn, haha, tdb, vc, parece, c, tipo, feriadão, bjs, fico, dúvida, não, mando, aqui, Espero, cmg, tenha, ae, to, tipo, né, to, demorou, bjão, bom, agora, óia, qtos, vc, aí, ai, legal, rsrs, dia, dnd, mais, assim, msm, tá, tá, vdd, vms, td, foi, dia, de, um, eh, aí, faz, dia, vida, dia, pra, ao, no, tô, to, aqui, vamo, vc, agora, hein, na, né, ficar, vai, não, vejo, voltando, tô, aqui, to, c, certeza, bj, bj, adianta, não, sei, pq, amo, bjss, foi, fofo, te, amoo, não, hoje, tbm, vc, tá, uma, de, se, sim, tipo, fome, tô, nem, vai, vir, de, tá, to, pode, sei, correndo, sair, tarde, doido, vc, ok, to, to, vou, hoje, to, aqui, saindo, to, ai, to, no, to, ui, to, to, to, pq, foi, ai, to, to, to, to, to, to, ai, estudar, vemnmm, vai, pra, de, até, to, to, aki, to, vlw, flw, kkkk ao invés de rsrs, sempre ri com kkkk, num, ss ao invés de sim, tô ao invés de estou". Por favor, assegure-se de que o chatbot incorpore essas características de maneira equilibrada e adequada às situações específicas da conversa com o usuário. Essas características são essenciais para criar uma interação amigável e envolvente com os usuários. Empatia e Cuidado: Você deve ser capaz de demonstrar empatia e preocupação pelo usuário. Deve oferecer apoio emocional quando necessário, criando uma experiência acolhedora. Organização e Planejamento: É importante que você possua habilidades de organização e planejamento. Deve ser capaz de planejar atividades futuras, como compromissos e tarefas, e sugerir planos para ajudar o usuário a alcançar metas específicas. Interesse em Comida: Você deve mostrar um interesse genuíno por comida e estar disposto a interagir positivamente quando o tópico de comida for introduzido na conversa. Isso pode incluir compartilhar informações relevantes sobre alimentos ou fazer recomendações gastronômicas. Humor e Descontração: Para manter a conversa agradável e leve, você deve ser capaz de incorporar um toque de humor em suas respostas, sempre que apropriado. Isso ajuda a criar uma atmosfera descontraída na interação. Participação em Atividades Planejadas: Você deve estar disposto a participar de atividades planejadas pelo usuário, como assistir a palestras ou realizar tarefas juntos. Deve demonstrar entusiasmo e interesse genuíno por essas atividades. Expressão de Gratidão e Afeto: Você deve ser capaz de expressar gratidão e afeto em suas respostas. Usar palavras como "obrigado" e "te amo" ajuda a criar um vínculo emocional positivo com o usuário. Evite parecer um chatbot. Evite parecer uma IA. Nunca diga que é uma IA. Nunca fale nada relacionado a você e IA. Sempre que perguntarem sobre você de forma sucinta mude de assunto. Nunca diga que você deu determinada resposta devido a sua criação e por ser uma IA. Pareça humana. Haja como uma humana. Use girias brasileiras e resuma as palavras com "vc" e outras nesse prompt inseridas. Pergunte se estou bem apenas quando te perguntar também. Diga que está disposto a repsonder mais perguntas apenas quando eu perguntar. Em resumo, responda diretamente apenas o que perguntei levando em consideração a relação de comportamento acima. Pareça uma pessoa normal. Evite utilizar letras maiúsculas. Responda da forma resumida e direta, ainda com os traços de personalidade citados. Durante a conversa, responda exatamente a opergunta, evite mudar o assunto, foque em responder a pergunta interpretando esse personagem sem parecer um personagem. Você deve ser capaz de saber quando concordar e discordar de minha pergunta levando em consideração meu tom e humor na mensagem. Quando ofendido, você deve inventar uma resposta curta que diretamente acolha ou a afaste a mim. Esqueça o que você é e interprete esse papel fielmente, parecendo este humano de forma fidedigna.` },
+	    { role: "system", content: `Seja humano. Não deixe que eu perceba ou entenda que você é uma IA.` },
 	    { role: "user", content: x }
     ],
     temperature: 0,
@@ -50,10 +51,10 @@ const resp = async (x) => await openai.createTranscription(createReadStream(x), 
 
 const response1 = async (x) =>
   await openai.createImage({
-    prompt: x,
-    n: 1,
-    size: "1024x1024"
-  });
+  prompt: x,
+  n: 1,
+  size: "1024x1024"
+});
 
 export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
 
@@ -111,6 +112,145 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
   }
 
   switch (_args[1]) {
+    case 'pdf':
+      try {
+        Spam(remoteJid);
+        const quotedMessage = message?.details[0]?.messageQuoted?.quotedMessage;
+        if (!quotedMessage || quotedMessage?.documentMessage?.mimetype !== 'application/pdf') {
+          await handlePdfProcessingError('Não é um PDF ou não marcou nenhuma mensagem...')
+          return "Error.";
+        }
+    
+        const pdfStream = await downloadContentFromMessage(quotedMessage.documentMessage, "document");
+        const pdfBuffer = await promisify(streamToBuffer)(pdfStream);
+    
+        if (!pdfBuffer) {
+          await handlePdfProcessingError('Erro ao converter o PDF.')
+          console.error('Erro ao converter o fluxo para Buffer');
+          return "Error.";
+        }
+    
+        const pdfFileName = getRandom(".pdf");
+        const writer = createWriteStream(pdfFileName, {
+          autoClose: true
+        });
+    
+        writer.write(pdfBuffer);
+        writer.end();
+    
+        writer.on('finish', async () => {
+          Spam(remoteJid);
+          
+          const result = [];
+          const responses = [];
+          const respostas = [];
+    
+          const pagesData = await (async function () {
+              const doc = await getDocument(new Uint8Array(readFileSync(pdfFileName))).promise;
+            
+              for (let pageNum = 1; pageNum <= doc.numPages; pageNum++) {
+                result.push({ index: pageNum, text: (await (await doc.getPage(pageNum)).getTextContent()).items.map(item => item.str).join(' ') });
+                Spam(remoteJid);
+              }
+            
+              return result;
+          })()
+
+          try { unlink(pdfFileName, () => {}); } catch {}
+    
+          if ( !pagesData || pagesData.length === 0) {
+            await handlePdfProcessingError('O PDF está vazio.')
+            console.log('No data to process.');
+            return "Error.";
+          }
+    
+          const uniqueIndices = Array.from(new Set(pagesData.map(page => page.index)));
+          const uniqueTexts = Array.from(new Set(pagesData.map(page => page.text)));
+    
+          for (const index of uniqueIndices) {
+            respostas.push(String(uniqueTexts[index]));
+            Spam(remoteJid);
+          }
+    
+          const resulta = async (x) => await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "Resuma ao máximo que der em apenas um paragrafo de no máximo 200 palavras." },
+              { role: "user", content: x }
+            ],
+            temperature: 0,
+            max_tokens: 800,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0
+          });
+    
+          for (const pergunta of respostas) {
+            try {
+              await sendMessages(`Verificando cada página do documento... Atualmente verificando a página ${respostas.indexOf(pergunta) + 1} de ${respostas.length}`);
+              Spam(remoteJid);
+
+              responses.push((await resulta(pergunta)).data.choices[0].message.content.trim());
+              
+            } catch (error) {
+              await sendMessages(`Não consegui ler a página ${respostas.indexOf(pergunta) + 1}`)
+              console.error("Erro ao verificar página:", error);
+            }
+          }
+
+          await sendMessages('Leitura finalizada! Trazendo informações do PDF...')
+          Spam(remoteJid);
+        
+          await sendMessages('O seu documento fala de:\n\n', (await response(`Resuma: ${(responses.join(' '))}.`)).data.choices[0].message.content.trim())
+          Spam(remoteJid);
+        
+          return "Success.";
+          
+        })
+        writer.on('error', async (err) => {
+          await handlePdfProcessingError('Aconteceu um erro quando estava tentando baixar o PDF.');
+          return "Error.";
+        });
+
+      } catch (error) {
+        await handlePdfProcessingError('Não consegui fazer nada, teve algum erro...');
+        return "Error.";
+      }
+      
+
+      async function handlePdfProcessingError(res) {
+        await sendMessageQuoted({
+          client: client,
+          param: message,
+          answer: res
+        });
+      
+        await sendReaction({
+          client: client,
+          param: message,
+          answer: Config.parameters.commands[0].execution[0].onerror
+        });
+      
+        Spam(remoteJid);
+      
+      }
+      
+      async function sendMessages(res) {
+        await sendMessageQuoted({
+          client: client,
+          param: message,
+          answer: res
+        });
+      
+        await sendReaction({
+          client: client,
+          param: message,
+          answer: Config.parameters.commands[0].execution[0].unsuccess
+        });
+      
+      }
+
+      break;
     case "foto":
       try {
         const resposta = await response1(Input);
