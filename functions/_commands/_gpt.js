@@ -37,7 +37,7 @@ const response = async (x) =>
   await openai.createChatCompletion({
     model: "gpt-4",
     messages: [
-	    { role: "system", content: `Seja humano. Não deixe que eu perceba ou entenda que você é uma IA.` },
+	    { role: "system", content: `` },
 	    { role: "user", content: x }
     ],
     temperature: 0,
@@ -175,8 +175,8 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
           const resulta = async (x) => await openai.createChatCompletion({
             model: "gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "Resuma ao máximo que der em apenas um paragrafo de no máximo 200 palavras." },
-              { role: "user", content: x }
+              { role: "system", content: "" },
+              { role: "user", content: `Resuma ao máximo que der em apenas um paragrafo de no máximo 200 palavras e caso não tenha um texto após o ":", deixe apenas um "." : ${x}` }
             ],
             temperature: 0,
             max_tokens: 800,
