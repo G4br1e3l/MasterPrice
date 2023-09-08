@@ -20,7 +20,7 @@
     "moment-timezone": "^0.5.43",
     "node-emoji": "^1.11.0",
     "openai": "^3.2.1",
-    "pdfjs-dist": "@2.16.105",
+    "pdfjs-dist": "@3.6.172",
     "pino-pretty": "^10.0.0",
     "qrcode-terminal": "^0.12.0",
     "stream-to-buffer": "^0.1.0"
