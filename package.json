@@ -9,6 +9,7 @@
   },
   "keywords": [],
   "author": "",
+  "engines.node": "18",
   "license": "ISC",
   "dependencies": {
     "@adiwajshing/baileys": "github:WhiskeySockets/Baileys",
