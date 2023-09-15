@@ -13,6 +13,7 @@ import {
     render,
     Typed,
     Read,
+    ora,
     Config
 } from './exports.js'
 
@@ -154,4 +155,6 @@ async function M_P() {
         }
     })
 }
+
+ora({ text: '...', spinner: 'dots12', color: 'red'}).start();
 M_P(), (err) => console.log(`[MASTERPRICE ERROR] `, err)
