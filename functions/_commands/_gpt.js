@@ -1,26 +1,26 @@
-//import :p
 import {
   readFileSync,
   createWriteStream,
   unlink,
-  createReadStream
-} from "fs";
-import ax from "axios";
-const { get } = ax;
-import { Configuration, OpenAIApi } from "openai";
-import { Spam } from "../_functions/_functionsMessage.js";
-import {
+  createReadStream,
+  Spam,
   sendReaction,
   sendMessageQuoted,
-  sendCaptionImageQuoted
-} from "../_functions/_sendMessage.js";
-import { downloadContentFromMessage } from "@adiwajshing/baileys";
-import { path } from "@ffmpeg-installer/ffmpeg";
-import { spawn } from "child_process";
-import pdfjs from 'pdfjs-dist';
-const { getDocument } = pdfjs;
-import { promisify } from 'util';
-import streamToBuffer from 'stream-to-buffer';
+  sendCaptionImageQuoted,
+  spawn,
+  path,
+  promisify,
+  getDocument,
+  get,
+  Config,
+  Buffer,
+  downloadContentFromMessage,
+}  from '../../exports.js'
+
+import {
+  Configuration,
+  OpenAIApi
+} from "openai";
 
 const getRandom = (v) => {
 	return `${Math.floor(Math.random() * 10000)}${v}`
@@ -37,7 +37,7 @@ const response = async (x) =>
   await openai.createChatCompletion({
     model: "gpt-4",
     messages: [
-	    { role: "system", content: `` },
+	    { role: "system", content: `Seja humano. Não deixe que eu perceba ou entenda que você é uma IA.` },
 	    { role: "user", content: x }
     ],
     temperature: 0,
@@ -90,8 +90,6 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
     Input += text || ""
   }
 
-  var Config = JSON.parse(readFileSync("./root/configurations.json", "utf8"));
-
   if (!Input) {
     await sendMessageQuoted({
       client: client,
@@ -114,6 +112,7 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
   switch (_args[1]) {
     case 'pdf':
       try {
+
         Spam(remoteJid);
         const quotedMessage = message?.details[0]?.messageQuoted?.quotedMessage;
         if (!quotedMessage || quotedMessage?.documentMessage?.mimetype !== 'application/pdf') {
@@ -122,7 +121,7 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
         }
     
         const pdfStream = await downloadContentFromMessage(quotedMessage.documentMessage, "document");
-        const pdfBuffer = await promisify(streamToBuffer)(pdfStream);
+        const pdfBuffer = await promisify(Buffer)(pdfStream);
     
         if (!pdfBuffer) {
           await handlePdfProcessingError('Erro ao converter o PDF.')
@@ -144,7 +143,7 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
           const result = [];
           const responses = [];
           const respostas = [];
-    
+
           const pagesData = await (async function () {
               const doc = await getDocument(new Uint8Array(readFileSync(pdfFileName))).promise;
             
@@ -175,8 +174,8 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
           const resulta = async (x) => await openai.createChatCompletion({
             model: "gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "" },
-              { role: "user", content: `Resuma ao máximo que der em apenas um paragrafo de no máximo 200 palavras e caso não tenha um texto após o ":", deixe apenas um "." : ${x}` }
+              { role: "system", content: "Resuma ao máximo que der em apenas um paragrafo de no máximo 200 palavras." },
+              { role: "user", content: x }
             ],
             temperature: 0,
             max_tokens: 800,

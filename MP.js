@@ -1,24 +1,21 @@
-//
-import Baileys from '@adiwajshing/baileys'
-
-const {
-    default: makeWASocket,
+import {
+    makeWASocket,
     makeInMemoryStore,
     useMultiFileAuthState,
     fetchLatestBaileysVersion,
-    DisconnectReason
-} = Baileys
-
-import { readFileSync, readdirSync, unlink, writeFileSync } from "fs"
-import P from 'pino'
-import chalk from "chalk"
-
-import CFonts from 'cfonts'
-const { render } = CFonts
-//
-import { Read } from './functions/reader.js'
-import { Named } from './functions/_functions/_functionsMessage.js'
-import { Typed } from './functions/_functions/_contentMessage.js'
+    DisconnectReason,
+    readFileSync,
+    readdirSync,
+    unlink,
+    writeFileSync,
+    chalk,
+    P,
+    render,
+    Typed,
+    Read,
+    ora,
+    Config
+} from './exports.js'
 
 //
 process.on('uncaughtException', function (err) {
@@ -28,8 +25,6 @@ process.on('uncaughtException', function (err) {
 console.warn = () => {}
 const msgRetryCounterMap = {}
 
-//
-var Config = JSON.parse(readFileSync('./root/configurations.json', 'utf8'))
 const PACKAGE = JSON.parse(readFileSync('./package.json', 'utf8'))
 
 const history = !process.argv.includes('--no-store')? makeInMemoryStore({ logger: P({ level: 'silent', stream: "store", transport: { target: 'pino-pretty', options: { levelFirst: true, ignore: 'pid,hostname,node,browser,helloMsg,path', colorize: true }}})}) : undefined
@@ -62,8 +57,6 @@ async function M_P() {
     history?.bind(MP.ev)
 
     MP.ev.process(async(events) => {
-
-        var Config = JSON.parse(readFileSync('./root/configurations.json', 'utf8'))
 
         if(events['connection.update']) {
 
@@ -163,4 +156,5 @@ async function M_P() {
     })
 }
 
+ora({ text: '...', spinner: 'dots12', color: 'red'}).start();
 M_P(), (err) => console.log(`[MASTERPRICE ERROR] `, err)

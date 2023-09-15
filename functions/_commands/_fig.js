@@ -1,11 +1,16 @@
-import { spawn } from "child_process";
-import { path } from "@ffmpeg-installer/ffmpeg";
-import { writeFile, readFileSync, unlinkSync } from "fs";
+import {
+  Spam,
+  path,
+  spawn,
+  downloadContentFromMessage,
+  sendReaction,
+  sendMessageQuoted,
+  writeFile,
+  Config,
+  unlinkSync,
+  readFileSync
+} from '../../exports.js'
 
-import { downloadContentFromMessage } from "@adiwajshing/baileys";
-
-import { Spam } from "../_functions/_functionsMessage.js";
-import { sendReaction, sendMessageQuoted } from "../_functions/_sendMessage.js";
 
 const getRandom = (v) => {
 return `${Math.floor(Math.random() * 10000)}${v}`;
@@ -16,8 +21,6 @@ message: typed,
 Jid: remoteJid,
   cc: client
 }) => {
-
-  var Config = JSON.parse(readFileSync("./root/configurations.json", "utf8"));
 
 const {
   details: [

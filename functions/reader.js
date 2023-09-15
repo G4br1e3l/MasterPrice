@@ -1,13 +1,11 @@
-//
-import { readFileSync } from "fs"
-
-//
-import { commands } from './commands.js'
-import { console_message } from './_functions/_functionsMessage.js'
+//import :p
+import {
+    console_message,
+    Config,
+    commands
+  } from '../exports.js'
 
 export const Read = async ({ MP, typed }) => {
-
-    var Config = JSON.parse(readFileSync("./root/configurations.json"))
 
     const {
         onusercommand: cmdUser = undefined,
@@ -20,7 +18,7 @@ export const Read = async ({ MP, typed }) => {
         return console.log('Undefined message was sented. Message: ', typed)
     }
 
-    if (Options?.boolean?.isBot) return
+    if (Options?.boolean?.isBot) return console.log('The bot sended a message.')
 
     const { isGroup: grupo = undefined } = Options?.boolean || {}
 

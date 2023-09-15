@@ -1,14 +1,11 @@
-import { readFileSync } from "fs"
-
-import { Restricted } from '../_functions/_functionsMessage.js'
 import {
     sendReaction,
-    sendMessageQuoted
-} from '../_functions/_sendMessage.js'
+    sendMessageQuoted,
+    Restricted,
+    Config
+} from '../../exports.js'
 
 export const Restrict = async ({ MP, message, _args }) => {
-
-    var Config = JSON.parse(readFileSync('./root/configurations.json', 'utf8'))
 
     if(!_args[1]) {
         return await sendMessageQuoted({

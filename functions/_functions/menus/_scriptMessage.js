@@ -1,14 +1,13 @@
-//
-import { readFileSync } from "fs"
-
-//
-import { Date, Hour } from '../_functionsMessage.js'
+import {
+    readFileSync,
+    Date,
+    Hour,
+    Config
+} from '../../../exports.js'
 
 //
 export const Menu = () => {
-
-    var Config = JSON.parse(readFileSync("./root/configurations.json"))
-
+    
     return `
         ‥…━━━☆𝐌𝐀𝐈𝐍 𝐌𝐄𝐍𝐔☆━━━…‥
         ☆ ${Config.parameters.bot[0].name} ☆ ${Config.parameters.bot[0].username}

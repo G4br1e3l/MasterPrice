@@ -1,9 +1,13 @@
-import { writeFile, readFileSync, unlinkSync } from "fs";
-
-import { downloadContentFromMessage } from "@adiwajshing/baileys";
-
-import { Spam } from "../_functions/_functionsMessage.js";
-import { sendReaction, sendMessageQuoted, sendCaptionImageTyping } from "../_functions/_sendMessage.js";
+import {
+    downloadContentFromMessage,
+    sendReaction,
+    sendMessageQuoted,
+    sendCaptionImageTyping,
+    Spam,
+    unlinkSync,
+    Config,
+    writeFile
+} from '../../exports.js'
 
 const getRandom = (v) => {
 return `${Math.floor(Math.random() * 10000)}${v}`;
@@ -14,8 +18,6 @@ export const GetImage = async ({
         Jid: remoteJid,
         cc: client
     }) => {
-
-    var Config = JSON.parse(readFileSync("./root/configurations.json", "utf8"));
 
     const {
         details: [

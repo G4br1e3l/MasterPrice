@@ -1,34 +1,25 @@
 //import :p
-import { readFileSync } from 'fs'
-
-//commands functions
 import {
-    Spam,
-    isSpam,
-    Cooldown,
-    isColling,
-    DownColling,
-    sizeCooldown,
-    doIgnore,
-    IsIgnoring
-} from './_functions/_functionsMessage.js'
-
-import {
-    sendReaction,
+  sectionMenu,
+  Config,
+  Spam,
+  isSpam,
+  Cooldown,
+  isColling,
+  DownColling,
+  sizeCooldown,
+  doIgnore,
+  IsIgnoring,
+  CreateSticker,
+  GPT,
+  Owner,
+  Restrict,
+  Provide,
+  sendReaction,
   sendMessageQuoted,
-    sendMessageTypingQuoted,
-    Type,
-} from './_functions/_sendMessage.js'
-
-import { sectionMenu } from './_functions/menus/_scriptMessage.js'
-
-//classes functions
-import { Provide } from './_commands/_provide.js'
-import { Restrict } from './_commands/_restrict.js'
-import { Owner } from './_commands/_owner.js'
-import { GPT } from './_commands/_gpt.js'
-import { CreateSticker } from "./_commands/_fig.js";
-import { GetImage } from "./_commands/_dfig.js";
+  sendMessageTypingQuoted,
+  Type,
+} from '../exports.js'
 
 const isOwner = async ({ MP, message, Config, Sender }) => {
     if(!Config.parameters.bot[0].owners.includes(Sender.messageNumber)) {
@@ -49,8 +40,6 @@ const isOwner = async ({ MP, message, Config, Sender }) => {
 
 //
 export const commands = async ({ MP, typed }) => {
-
-    var Config = JSON.parse(readFileSync('./root/configurations.json', 'utf8'))
 
     const { ...Boolean } = typed.boolean || {}
     const { ...message } = typed.parameters || {}
@@ -193,7 +182,6 @@ export const commands = async ({ MP, typed }) => {
         answer: "⏰ Aguarde..."
       });
 
-      // Aguarda um breve intervalo para simular a digitação do usuário
       if (_args[0]) await Type({ client: MP, messageJid: remoteJid });
 
       switch (_args[0]) {
