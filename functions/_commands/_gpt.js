@@ -113,8 +113,23 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
     case 'pdf':
       try {
 
+        const requisitado = _args[2]? (_args.slice(2)).join(' ') : 'Resumir o máximo que puder.'
+
+        if (_args[2]){
+          await sendMessages(`Pesquisando em seu arquivo algo relacionado a: "${requisitado}"`)
+          Spam(remoteJid);
+        } else {
+          await sendMessages(`Nenhuma pergunta foi inserida, resumindo conteúdo do PDF...`)
+          Spam(remoteJid);
+        }
+
+        await sendMessages(`*Para arquivos em PDF grandes, talvez erros ocorram! Avise o DEV.*`)
         Spam(remoteJid);
-        const quotedMessage = message?.details[0]?.messageQuoted?.quotedMessage;
+
+        const quotedMessage =
+        message?.details[0]?.messageQuoted?.quotedMessage?.documentWithCaptionMessage?.message
+        message?.details[0]?.messageQuoted?.quotedMessage;
+
         if (!quotedMessage || quotedMessage?.documentMessage?.mimetype !== 'application/pdf') {
           await handlePdfProcessingError('Não é um PDF ou não marcou nenhuma mensagem...')
           return "Error.";
@@ -146,12 +161,12 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
 
           const pagesData = await (async function () {
               const doc = await getDocument(new Uint8Array(readFileSync(pdfFileName))).promise;
-            
+
               for (let pageNum = 1; pageNum <= doc.numPages; pageNum++) {
                 result.push({ index: pageNum, text: (await (await doc.getPage(pageNum)).getTextContent()).items.map(item => item.str).join(' ') });
                 Spam(remoteJid);
               }
-            
+
               return result;
           })()
 
@@ -167,18 +182,17 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
           const uniqueTexts = Array.from(new Set(pagesData.map(page => page.text)));
     
           for (const index of uniqueIndices) {
-            respostas.push(String(uniqueTexts[index]));
+            respostas.push(String(uniqueTexts[index-1]));
             Spam(remoteJid);
           }
     
           const resulta = async (x) => await openai.createChatCompletion({
             model: "gpt-3.5-turbo",
             messages: [
-              { role: "system", content: "Resuma ao máximo que der em apenas um paragrafo de no máximo 200 palavras." },
-              { role: "user", content: x }
+              { role: "user", content: `Organize as informações: ${x}.` }
             ],
             temperature: 0,
-            max_tokens: 800,
+            max_tokens: 1000,
             top_p: 1,
             frequency_penalty: 0,
             presence_penalty: 0
@@ -201,10 +215,10 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
           Spam(remoteJid);
           
           const concatenado = responses.join(' ');
-          const respondido = await response(`Resuma o máximo que puder: ${concatenado}.`);
+          const respondido = await response(`${requisitado}. Responda diretamente. Resuma: ${concatenado}.`);
           const respostaFinal = respondido.data.choices[0].message.content.trim();
         
-          await sendMessages(`O seu documento fala de:\n\n${respostaFinal}`)
+          await sendMessages(`Resultado da leitura para "${concatenado}":\n\n${respostaFinal}`)
           Spam(remoteJid);
         
           return "Success.";
