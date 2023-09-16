@@ -215,10 +215,10 @@ export const GPT = async ({ client, message, _args, remoteJid, typed }) => {
           Spam(remoteJid);
           
           const concatenado = responses.join(' ');
-          const respondido = await response(`${requisitado}. Responda diretamente. Resuma: ${concatenado}.`);
+          const respondido = await response(`${requisitado}. Responda diretamente. Organize a resposta de modo visual. Resuma: ${concatenado}.`);
           const respostaFinal = respondido.data.choices[0].message.content.trim();
         
-          await sendMessages(`Resultado da leitura para "${concatenado}":\n\n${respostaFinal}`)
+          await sendMessages(`Resultado da leitura para "${requisitado}":\n\n${respostaFinal}`)
           Spam(remoteJid);
         
           return "Success.";
