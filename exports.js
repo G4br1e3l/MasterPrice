@@ -35,6 +35,7 @@ const {
     useMultiFileAuthState,
     fetchLatestBaileysVersion,
     DisconnectReason,
+    Browsers,
     downloadContentFromMessage
 } = baileys
 
@@ -173,6 +174,7 @@ export {
     writeFileSync,
     makeWASocket,
     makeInMemoryStore,
+    Browsers,
     useMultiFileAuthState,
     fetchLatestBaileysVersion,
     DisconnectReason,

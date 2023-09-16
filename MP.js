@@ -7,6 +7,7 @@ import {
     readFileSync,
     readdirSync,
     unlink,
+    Browsers,
     writeFileSync,
     chalk,
     P,
@@ -46,7 +47,7 @@ async function M_P() {
         msgRetryCounterMap,
         generateHighQualityLinkPreview: true,
         printQRInTerminal: true,
-        browser: ['Chrome', 'Safari', '1.0.0'],
+        browser: Browsers.macOS('Desktop'),
         defaultQueryTimeoutMs: undefined,
         syncFullHistory: true,
         markOnlineOnConnect: true,
@@ -64,7 +65,7 @@ async function M_P() {
 
             const { connection, lastDisconnect, receivedPendingNotifications, isOnline, qr } = events['connection.update']
 
-            if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onqrscan))
+            if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(`${Config.parameters.commands[2].messages.startup.onqrscan} ::: ${qr || ''}`))
             if(isOnline) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onstaging))
             if(receivedPendingNotifications) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onnotify))
 
