@@ -12,222 +12,140 @@ import {
 //   message: {}
 // };
 
-const presenceSubscribe = async ({ client, Jid }) =>
-  client.presenceSubscribe(Jid);
+/**
+ * Message options for sending a reaction.
+ */
+const messageOptions = [
+  // Reação [0]
+  { react: { key: { remoteJid: '', fromMe: false, id: '', participant: [''] }, text: '', } },
+  // Texto [1]
+  { text: '', fromMe: false },
+  // Quoted [2]
+  { quoted: '' },
+  //Image [3]
+  { image: '', caption: '', },
+  //Sticker [4]
+  { sticker: '', },
+];
 
-const sendComposingUpdate = async ({ client, Jid }) =>
-  client.sendPresenceUpdate("composing", Jid);
-
-const sendPausedUpdate = async ({ client, Jid }) =>
-  client.sendPresenceUpdate("paused", Jid);
-
-async function Type({ client, messageJid }) {
-  await presenceSubscribe({ client, Jid: messageJid });
-  await Delay(1000);
-  await sendComposingUpdate({ client, Jid: messageJid });
-  await Delay(500);
-  await sendPausedUpdate({ client, Jid: messageJid });
-  return;
-}
-
-async function sendMessageToJid(client, Jid, messageOptions, msgopt1) {
+async function sendMessageToJid(client, Jid, mgOPT1, mgOPT2) {
   try {
-    const result = await client.sendMessage(Jid, messageOptions, msgopt1);
-    return result;
-  } catch (error) {
-    console.error(`Erro ao enviar mensagem para ${Jid}: ${error}`);
-    throw error;
+    return (await client.sendMessage(Jid, mgOPT1, mgOPT2));
+  } catch (err) {
+    console.error(`Erro ao enviar mensagem para ${Jid} ::: ${err}`);
   }
 }
 
-async function sendCaptionImage({ client, param, answer, path_image }) {
-  const {
-    details: [{ messageJid }]
-  } = param;
+async function sendCaptionImage({ Cliente, ClienteJid, ClienteResposta, CaminhoImagem }) {
 
-  const messageOptions = {
-    image: readFileSync(path_image),
-    caption: answer,
-  };
+  messageOptions[3].image = readFileSync(CaminhoImagem)
+  messageOptions[3].caption = ClienteResposta
 
-  await Type({ client, messageJid });
-  return await sendMessageToJid(client, messageJid, messageOptions);
-}
-
-async function sendMessageTyping({ client, param, answer }) {
-  const {
-    details: [{ messageJid }]
-  } = param;
-
-  const messageOptions = {
-    text: answer,
-  };
-
-  await Type({ client, messageJid });
-  return await sendMessageToJid(client, messageJid, messageOptions);
-}
-
-async function sendMessageTypingQuoted({ client, param, answer }) {
-  const {
-    details: [{ messageJid, messageAll }]
-  } = param;
-
-  const messageOptions = { text: answer, fromMe: false };
-  const messageOptions1 = { quoted: messageAll };
-
-  await presenceSubscribe({ client, Jid: messageJid });
+  await Cliente.presenceSubscribe(ClienteJid);
 
   do {
-    for (let index = 0; index < (answer?.split(" ") || answer).length; index++) {
-      await client.sendPresenceUpdate("composing", messageJid);
+    for (let index = 0; index < (ClienteResposta?.split(" ") || ClienteResposta).length; index++) {
+      await Cliente.sendPresenceUpdate("composing", ClienteJid);
       await Delay(100);
     }
-    await sendPausedUpdate({ client, Jid: messageJid });
-  } while (!await sendMessageToJid(client, messageJid, messageOptions, messageOptions1));
+    await Cliente.sendPresenceUpdate("paused", ClienteJid);
+  } while (!await sendMessageToJid(Cliente, ClienteJid, messageOptions[3]));
+}
+
+async function sendCaptionImageQuoted({ Cliente, ClienteJid, ClienteTopo, ClienteResposta, CaminhoImagem }) {
+
+  messageOptions[3].image = readFileSync(CaminhoImagem)
+  messageOptions[3].caption = ClienteResposta
+  messageOptions[2].quoted = ClienteTopo
+
+  await Cliente.presenceSubscribe(ClienteJid);
+
+  do {
+    for (let index = 0; index < (ClienteResposta?.split(" ") || ClienteResposta).length; index++) {
+      await Cliente.sendPresenceUpdate("composing", ClienteJid);
+      await Delay(100);
+    }
+    await Cliente.sendPresenceUpdate("paused", ClienteJid);
+  } while (!await sendMessageToJid(Cliente, ClienteJid, messageOptions[3], messageOptions[2]));
+
+}
+
+async function sendMessage({ Cliente, ClienteJid, ClienteResposta }) {
+
+  messageOptions[1].text = ClienteResposta
+
+  await Cliente.presenceSubscribe(ClienteJid);
+
+  do {
+    for (let index = 0; index < (ClienteResposta?.split(" ") || ClienteResposta).length; index++) {
+      await Cliente.sendPresenceUpdate("composing", ClienteJid);
+      await Delay(100);
+    }
+    await Cliente.sendPresenceUpdate("paused", ClienteJid);
+  } while (!await sendMessageToJid(Cliente, ClienteJid, messageOptions[1]));
+
+  return await sendMessageToJid(Cliente, messageJid, messageOptions);
+}
+
+async function sendMessageQuoted({ Cliente, ClienteJid, ClienteTopo, ClienteResposta }) {
+
+  messageOptions[1].text = ClienteResposta;
+  messageOptions[2].quoted = ClienteTopo;
+
+  await Cliente.presenceSubscribe(ClienteJid);
+
+  do {
+    for (let index = 0; index < (ClienteResposta?.split(" ") || ClienteResposta).length; index++) {
+      await Cliente.sendPresenceUpdate("composing", ClienteJid);
+      await Delay(100);
+    }
+    await Cliente.sendPresenceUpdate("paused", ClienteJid);
+  } while (!await sendMessageToJid(Cliente, ClienteJid, messageOptions[1], messageOptions[2]));
 
   return;
 }
 
-async function sendMessageQuoted({ client, param, answer }) {
-  const {
-    details: [{ messageJid, messageAll }]
-  } = param;
+// async function sendEdition({ client, mJid, answer }) {
+//   const a = await client.relayMessage(mJid, {
+//     protocolMessage: {
+//       key: {
+//         remoteJid: mJid,
+//         fromMe: true,
+//         id: '3A9EA3E6BA6F50EBD803',
+//       },
+//       type: 14,
+//       editedMessage: {
+//         conversation: 'answer'
+//       }
+//     }
+//   }, {})
+// }
 
-  const messageOptions = { text: answer, fromMe: false };
-  const messageOptions1 = { quoted: messageAll };
+async function sendReaction({ Cliente, ClienteJid, ClienteId, ClienteNumero, ClienteResposta }) {
 
-  await presenceSubscribe({ client, Jid: messageJid });
+  messageOptions[0].react.key.remoteJid = ClienteJid
+  messageOptions[0].react.key.id = ClienteId
+  messageOptions[0].react.text = ClienteResposta
+  messageOptions[0].react.key.participant = [`${ClienteNumero}@s.whatsapp.net`]
 
-  do {
-    for (let index = 0; index < (answer?.split(" ") || answer).length; index++) {
-      await client.sendPresenceUpdate("composing", messageJid);
-      await Delay(100);
-    }
-    await sendPausedUpdate({ client, Jid: messageJid });
-  } while (!await sendMessageToJid(client, messageJid, messageOptions, messageOptions1));
-
-  return;
+  return await sendMessageToJid(Cliente, ClienteJid, messageOptions[0]);
 }
 
-async function sendReaction({ client, param, answer }) {
-  const {
-    details: [
-      { messageJid, messageId },
-      {
-        sender: { messageNumber: number }
-      }
-    ]
-  } = param;
+async function sendSticker({ Cliente, ClienteJid, ClienteTopo, CaminhoFigurinha }) {
+  
+  messageOptions[4].sticker = CaminhoFigurinha
+  messageOptions[2].quoted = ClienteTopo
 
-  const messageOptions = {
-    react: {
-      key: {
-        remoteJid: messageJid,
-        fromMe: false,
-        id: messageId,
-        participant: [`${number ?? 0}@s.whatsapp.net`]
-      },
-      text: answer,
-    }
-  };
+  console.log(messageOptions[4], messageOptions[2])
 
-  return await sendMessageToJid(client, messageJid, messageOptions);
-}
-
-async function sendCaptionImageTyping({ client, param, answer, path_image }) {
-  const {
-    details: [{ messageJid }]
-  } = param;
-
-  const messageOptions = {
-    image: readFileSync(path_image),
-    caption: answer,
-  };
-
-  await presenceSubscribe({ client, Jid: messageJid });
-
-  do {
-    for (let index = 0; index < (answer?.split(" ") || answer).length; index++) {
-      await client.sendPresenceUpdate("composing", messageJid);
-      await Delay(100);
-    }
-    await sendPausedUpdate({ client, Jid: messageJid });
-  } while (!await sendMessageToJid(client, messageJid, messageOptions));
-
-  return;
-}
-
-async function sendCaptionImageTypingQuoted({ client, param, answer, path_image }) {
-  const {
-    details: [{ messageJid, messageAll }]
-  } = param;
-
-  const messageOptions = {
-    image: readFileSync(path_image),
-    caption: answer,
-  };
-
-  const messageOptions1 = { quoted: messageAll };
-
-  await presenceSubscribe({ client, Jid: messageJid });
-
-  do {
-    for (let index = 0; index < (answer?.split(" ") || answer).length; index++) {
-      await client.sendPresenceUpdate("composing", messageJid);
-      await Delay(100);
-    }
-    await sendPausedUpdate({ client, Jid: messageJid });
-  } while (!await sendMessageToJid(client, messageJid, messageOptions, messageOptions1));
-
-  return;
-}
-
-async function sendMessage({ client, param, answer }) {
-  const {
-    details: [{ messageJid }]
-  } = param;
-
-  const messageOptions = {
-    text: answer,
-    contextInfo: {
-      mentionedJid: [messageJid]
-    }
-  };
-
-  await Type({ client, messageJid });
-  return await sendMessageToJid(client, messageJid, messageOptions);
-}
-
-async function sendCaptionImageQuoted({
-  client,
-  param,
-  answer,
-  path_image
-}) {
-  const {
-    details: [{ messageJid, messageAll }]
-  } = param;
-
-  const messageOptions = {
-    image: readFileSync(path_image),
-    caption: answer,
-  };
-
-  const messageOptions1 = { quoted: messageAll };
-
-  await Type({ client, messageJid });
-  return await sendMessageToJid(client, messageJid, messageOptions, messageOptions1);
+  return await sendMessageToJid(Cliente, ClienteJid, messageOptions[4], messageOptions[2]);
 }
 
 export {
-  Type,
+  sendSticker,
   sendCaptionImage,
-  sendMessageTyping,
-  sendMessageTypingQuoted,
   sendMessageQuoted,
   sendReaction,
-  sendCaptionImageTyping,
-  sendCaptionImageTypingQuoted,
   sendMessage,
   sendCaptionImageQuoted
 };

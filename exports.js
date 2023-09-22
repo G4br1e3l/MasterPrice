@@ -27,7 +27,7 @@ const { unemojify, hasEmoji } = emoji
 import pkg1 from 'linkifyjs'
 const { find } = pkg1
 
-import baileys from '@adiwajshing/baileys'
+import baileys from '@whiskeysockets/baileys'
 const {
     getContentType,
     default: makeWASocket,
@@ -90,6 +90,7 @@ import {
     sizeCooldown,
     doIgnore,
     IsIgnoring,
+    getRandom,
     console_message,
     createdData,
     Named,
@@ -108,16 +109,12 @@ import {
 } from './functions/commands.js'
 
 import {
-    sendReaction,
-    sendMessageQuoted,
-    Type,
-    sendCaptionImageQuoted,
-    sendCaptionImageTyping,
-    sendCaptionImageTypingQuoted,
-    sendMessageTyping,
-    sendMessage,
     sendCaptionImage,
-    sendMessageTypingQuoted,
+    sendMessageQuoted,
+    sendReaction,
+    sendMessage,
+    sendSticker,
+    sendCaptionImageQuoted
 } from './functions/_functions/_sendMessage.js';
 
 import ax from "axios";
@@ -147,6 +144,7 @@ export {
     streamToBuffer as Buffer,
     promisify,
     getDocument,
+    sendSticker,
     spawn,
     path,
     writeFile,
@@ -207,16 +205,12 @@ export {
     detectMessageStatus,
     sendReaction,
     sendMessageQuoted,
-    Type,
     sendCaptionImageQuoted,
-    sendCaptionImageTyping,
-    sendCaptionImageTypingQuoted,
-    sendMessageTyping,
     sendMessage,
     sendCaptionImage,
-    sendMessageTypingQuoted,
     P,
     render,
     ora,
+    getRandom,
     downloadContentFromMessage
 };

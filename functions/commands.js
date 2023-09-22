@@ -15,235 +15,176 @@ import {
   Owner,
   Restrict,
   Provide,
+  Delay,
+  GetImage,
   sendReaction,
   sendMessageQuoted,
-  sendMessageTypingQuoted,
-  Type,
 } from '../exports.js'
-
-const isOwner = async ({ MP, message, Config, Sender }) => {
-    if(!Config.parameters.bot[0].owners.includes(Sender.messageNumber)) {
-        return await sendMessageQuoted({
-            client: MP,
-            param: message,
-            answer: Config.parameters.commands[2].messages.handler[0].onnoowner
-        })
-        .finally( async () => {
-            await sendReaction({
-                client: MP,
-                param: message,
-                answer: Config.parameters.commands[0].execution[0].onerror
-            })
-        })
-    }
-}
 
 //
 export const commands = async ({ MP, typed }) => {
 
-    const { ...Boolean } = typed.boolean || {}
-    const { ...message } = typed.parameters || {}
-    const { messageText: Message, ...Sender } = typed.parameters.details[1].sender || {}
-    const { messageJid: remoteJid } = typed.parameters.details[0] || {}
+    const { ...Boolean } = typed?.boolean || {}
+    const { ...message } = typed?.parameters || {}
+    const { messageText: Message = {}, ...Sender } = message?.details[1]?.sender || {}
 
-    const Prefix = Config.parameters.bot[1].prefix.set
+    const {
+      isGroup: ehGrupo = {},
+      isOwner: ehDono = {},
+      isAdmin: ehAdmin = {},
+      message: [
+        { isQuotedMessage: iQtdMss } = {}
+      ] = []
+    } = Boolean || {}
 
-    const _args = (function extractArgs({ m, prefix }) {
-      const match = m.replace(/\n/g, ' ').match(new RegExp(`^${prefix}(.+)$`, 'i'));
-      if (!match) return [];
-      const args = match[1].trim().split(/\s+/);
-      return args.map(arg => arg.toLowerCase());
-  })({ m: Message, prefix: Prefix });
+    const {
+      messageNumber: ClienteNumero = {}
+    } = Sender || {}
+
+    const {
+      details: [
+        { messageJid: remoteJid = {}, messageId = {}, messageAll = {}, messageKey = {}, messageContent: { stickerMessage: sticker = {}, imageMessage: image = {}, videoMessage: video = {} } = {}, messageQuoted = {}, messageType = {}, messageContextinfo = {}, messageQuotedText = {}, text = {} } = {},
+        { sender: { messageNumber: number = {}, messageText = {} } = {} } = {}
+      ] = []
+    } = message || {};
+
+    const { quotedMessage: { stickerMessage: qsticker, imageMessage: Qimage, videoMessage: Qvideo } = {} } = messageQuoted || {};
+
+    const {
+      parameters: {
+        bot: [
+          {
+            prefix:{
+              set: Prefixo = '!'
+            } = {},
+            owners: Donos = []
+          } = {}
+        ],
+        commands: [
+          {
+            execution: [
+              {
+                onerror: ComandoDeErro = {},
+                ongoing: ComandoEmEspera = {},
+                onsucess: ComandoDeOK = {}
+              } = {},
+              {
+                unsafe: ehInseguro = {}
+              } = {},
+              {
+                local: ehGrupoOUPV  ={}
+              } = {}
+            ] = []
+          } = {},
+          {} = {},
+          {
+            messages: {
+              handler: [
+                {
+                  oncooldown: MensagemDeEmEspera = {},
+                  onstopp: MensagemDeParada = {},
+                  onflood: MensagemDeOcupado = {},
+                  ononlygroup: MensagemDeGrupo = {},
+                  onawaitqueue: MensagemDePendente = {},
+                  onnoowner: MensagemNaoDono = {},
+                  onnotfound: MensagemNaoEncontrado = {},
+                  ontax: MensagemDeTaxa = {}
+                } = {}
+              ] = []
+            } = {}
+          } = {}
+        ] = [],
+      } = {}
+    } = Config || {}
+
+    const _args = ((Message?.replace(/\n/g, ' ')?.match(new RegExp(`^${Prefixo}(.+)$`, 'i')))[1]?.trim()?.split(/\s+/))?.map(arg => arg?.toLowerCase()) || [];
+
+    let Checker = ''
+    if(await (async () => {
+      if (ehGrupoOUPV.includes(_args[0]) && !ehGrupo) return Checker = 'Cammon user using group only command on private chat.'
+      if (!ehInseguro.includes(_args[0])) {
+        if (!ehAdmin && !ehDono) return Checker = 'Cammon member using owner commands.'
+        if (ehAdmin && !ehDono) return Checker = 'Administrator trying to use owner commands.'
+      }
+      if(IsIgnoring(remoteJid)) return Checker = 'Spamming!'
+      if (isColling(remoteJid)) return Checker = 'Awaiting the queue!'
+      if (isSpam(remoteJid)) return Checker = 'Spamming?'
+      if (sizeCooldown().size >= 2) return Checker = 'Await other users queue!'
+
+      Spam(remoteJid)
+      return 'Clear.'
+
+    })() !== 'Clear.') {
+      console.log(`The user from ${remoteJid} was blocked. Code: "${Checker}"`)
+      switch (Checker) {
+        case 'Cammon user using group only command on private chat.':
+          await sendMessageQuoted({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: MensagemDeGrupo });
+        break;
+        case 'Cammon member using owner commands.':
+          await sendMessageQuoted({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: MensagemDeParada });
+        break
+        case 'Administrator trying to use owner commands.':
+          await sendMessageQuoted({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: MensagemDeTaxa });
+        break
+        case 'Spamming!':
+          await sendMessageQuoted({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Sem spam!' });
+        break
+        case 'Awaiting the queue!':
+          await sendMessageQuoted({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: MensagemDeEmEspera });
+          doIgnore(remoteJid)
+        break
+        case 'Spamming?':
+          await sendMessageQuoted({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: MensagemDeOcupado });
+          doIgnore(remoteJid)
+        break
+        case 'Await other users queue!':
+          await sendMessageQuoted({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: MensagemDePendente });
+          doIgnore(remoteJid)
+        break
+        default:
+          await sendMessageQuoted({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Este comando não pôde ser executado.' });
+        break;
+      }
+      await sendReaction({ Cliente: MP, ClienteJid: remoteJid, ClienteId: messageId, ClienteNumero: ClienteNumero, ClienteResposta: ComandoDeErro })
+      return
+    }
+
+    const isOwner = async () => {
+      if(!Donos.includes(ClienteNumero)) {
+        await sendMessageQuoted({ client: MP, mJid: remoteJid, mAll: messageAll, answer: MensagemNaoDono });
+        await sendReaction({ client: MP, mJid: remoteJid, mId: messageId, mAll: number, answer: ComandoDeErro })
+        return 'Lascou'
+      }
+    }
 
     async function run ({ _args }){
 
-      const NoBreak = (function sendMessageWithCooldownCheck ({ MP, message, remoteJid }) {
-          if(IsIgnoring(remoteJid)) {
-              return 'Spamming!'
-          } else if (isColling(remoteJid)) {
-              sendMessageQuoted({
-                  client: MP,
-                  param: message,
-                  answer: Config.parameters.commands[2].messages.handler[0].oncooldown,
-              }).then(async () => {
-                  await sendReaction({
-                      client: MP,
-                      param: message,
-                      answer: Config.parameters.commands[0].execution[0].ongoing,
-                  });
-              }).then( async () => doIgnore(remoteJid))
-
-              return 'Awaiting the queue!'
-
-          } else if (isSpam(remoteJid)) {
-              sendMessageQuoted({
-                  client: MP,
-                  param: message,
-                  answer: Config.parameters.commands[2].messages.handler[0].onflood
-              }).then( async () => {
-                  await sendReaction({
-                      client: MP,
-                      param: message,
-                      answer: Config.parameters.commands[0].execution[0].onerror
-                  })
-              }).then( async () => doIgnore(remoteJid))
-
-              return 'Spamming?'
-
-          } else if (sizeCooldown().size >= 2) {
-              sendMessageQuoted({
-                  client: MP,
-                  param: message,
-                  answer: Config.parameters.commands[2].messages.handler[0].onawaitqueue,
-              }).then(async () => {
-                  await sendReaction({
-                      client: MP,
-                      param: message,
-                      answer: Config.parameters.commands[0].execution[0].ongoing,
-                  });
-              }).then( async () => doIgnore(remoteJid))
-
-              return 'More than 1 Jid Spamming!'
-
-          } else {
-              Type({ client: MP, messageJid: remoteJid })
-              Spam(remoteJid)
-              return 'Clear.'
-          }
-      })({ MP: MP, message: message, remoteJid: remoteJid })
-
-      if(NoBreak !== 'Clear.') return console.log(`The user from ${remoteJid} was spamming! Blocking commands.`)
-
-      const Permission = (function checkCommandPermissions ({ client, message, _args, Boolean, Config })  {
-          if (Config.parameters.commands[0].execution[2].local.includes(_args[0]) && !Boolean.isGroup) {
-              sendMessageQuoted({
-                  client: client,
-                  param: message,
-                  answer: Config.parameters.commands[2].messages.handler[0].ononlygroup,
-              }).then(async () => {
-                  await sendReaction({
-                      client: client,
-                      param: message,
-                      answer: Config.parameters.commands[0].execution[0].onerror,
-                  })
-              })
-
-              return 'Cammon user using group only command on private chat.'
-
-          } else if (!Config.parameters.commands[0].execution[1].unsafe.includes(_args[0])) {
-
-              if (!Boolean.isAdmin && !Boolean.isOwner) {
-                  sendMessageQuoted({
-                      client: client,
-                      param: message,
-                      answer: Config.parameters.commands[2].messages.handler[0].onstopp,
-                  }).then(async () => {
-                      await sendReaction({
-                          client: client,
-                          param: message,
-                          answer: Config.parameters.commands[0].execution[0].onerror,
-                      })
-                  })
-
-                  return 'Cammon member using owner commands.'
-
-              } else if (Boolean.isAdmin && !Boolean.isOwner) {
-                  sendMessageQuoted({
-                      client: client,
-                      param: message,
-                      answer: Config.parameters.commands[2].messages.handler[0].ontax,
-                  }).then(async () => {
-                      await sendReaction({
-                          client: client,
-                          param: message,
-                          answer: Config.parameters.commands[0].execution[0].onerror,
-                      })
-                  })
-
-                  return 'Administrator trying to use owner commands.'
-
-              } else {
-                  Type({ client: MP, messageJid: remoteJid })
-                  return 'Clear.'
-              }
-          } else {
-              Type({ client: MP, messageJid: remoteJid })
-              return 'Clear.'
-          }
-      })({ client: MP, message: message, _args: _args, Boolean: Boolean, Config: Config})
-
-      if(Permission !== 'Clear.') return console.log(`The user from ${remoteJid} was trying to use a command without permission. Code: "${Permission}"`)
-
       Cooldown(remoteJid)
-
-      await sendMessageTypingQuoted({
-        client: MP,
-        param: message,
-        answer: "⏰ Aguarde..."
-      });
-
-      if (_args[0]) await Type({ client: MP, messageJid: remoteJid });
+      await sendMessageQuoted({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: "⏰ Aguarde..." });
+      await sendReaction({ Cliente: MP, ClienteJid: remoteJid, ClienteId: messageId, ClienteNumero: ClienteNumero, ClienteResposta: ComandoEmEspera })
 
       switch (_args[0]) {
-        case "menu":
-          await sectionMenu({ client: MP, param: remoteJid })
-            .then(async () => {
-              await sendReaction({
-                client: MP,
-                param: message,
-                answer: Config.parameters.commands[0].execution[0].onsucess
-              });
-            })
-            .then(() => Spam(remoteJid));
-          break;
+        // case "menu":
+        //   //await sectionMenu({ client: MP, param: remoteJid })
+        //   break;
         case "gpt":
-          await GPT({
-            client: MP,
-            message: message,
-            _args: _args,
-            remoteJid: remoteJid,
-            typed: typed
-          });
+          await GPT({ client: MP, _args: _args, remoteJid: remoteJid, isQuotedMessage: iQtdMss, messageType: messageType, messageAll: messageAll, messageText: messageText, messageQuoted: messageQuoted, messageQuotedText: messageQuotedText, messageContextinfo: messageContextinfo, text: text });
           break;
-        case "provide":
-        case "unprovide":
-          if (
-            await isOwner({
-              MP: MP,
-              message: message,
-              Config: Config,
-              Sender: Sender
-            })
-          )
-            return;
-          await Provide({ MP: MP, message: message, _args: _args });
-          break;
-        case "restrict":
-        case "unrestrict":
-          if (
-            await isOwner({
-              MP: MP,
-              message: message,
-              Config: Config,
-              Sender: Sender
-            })
-          )
-            return;
-          await Restrict({ MP: MP, message: message, _args: _args });
-          break;
-        case "addowner":
-        case "removeowner":
-          if (
-            await isOwner({
-              MP: MP,
-              message: message,
-              Config: Config,
-              Sender: Sender
-            })
-          )
-            return;
-          await Owner({ MP: MP, message: message, _args: _args });
-          break;
+        // case "provide":
+        // case "unprovide":
+        //   if (isOwner) break
+        //   //await Provide({ MP: MP, message: message, _args: _args });
+        //   break;
+        // case "restrict":
+        // case "unrestrict":
+        //   if (isOwner) break
+        //   //await Restrict({ MP: MP, message: message, _args: _args });
+        //   break;
+        // case "addowner":
+        // case "removeowner":
+        //   if (isOwner) break
+        //   //await Owner({ MP: MP, message: message, _args: _args });
+        //   break;
         case "figurinha":
         case "figurinh":
         case "figurin":
@@ -253,39 +194,24 @@ export const commands = async ({ MP, typed }) => {
         case "fig":
         case "fi":
         case "f":
-          await CreateSticker({
-            message: message,
-            Jid: remoteJid,
-            cc: MP
-          });
+          await CreateSticker({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, image: image, video: video, Qimage: Qimage, Qvideo: Qvideo });
           break;
         case "df":
-          await GetImage({
-            message: message,
-            Jid: remoteJid,
-            cc: MP
-            })
+          await GetImage({ client: MP, mStick: sticker, qStick: qsticker, mJid: remoteJid, mAll: messageAll })
         break
         default:
-          await sendMessageQuoted({
-            client: MP,
-            param: message,
-            answer:
-              Config.parameters.commands[2].messages.handler[0].onnotfound
-          }).then(async () => {
-            await sendReaction({
-              client: MP,
-              param: message,
-              answer: Config.parameters.commands[0].execution[0].onerror
-            });
-          }).then(() => Spam(remoteJid));
-          
-        return;
+          await sendMessageQuoted({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: MensagemNaoEncontrado });
+          await sendReaction({ Cliente: MP, ClienteJid: remoteJid, ClienteId: messageId, ClienteNumero: ClienteNumero, ClienteResposta: ComandoDeErro })
+          Spam(remoteJid);
+          DownColling(remoteJid)
+        return
       }
 
+      await new Promise(resolve => setTimeout(resolve, 1000)).then( async () => await sendReaction({ Cliente: MP, ClienteJid: remoteJid, ClienteId: messageId, ClienteNumero: ClienteNumero, ClienteResposta: ComandoDeOK }))
+
+      Spam(remoteJid);
       DownColling(remoteJid)
     }
-
     await run({ _args: _args })
     return
 }

@@ -6,6 +6,8 @@ import {
     Config
 } from '../../exports.js'
 
+export const getRandom = (v) => `${Math.floor(Math.random() * 10000)}${v}`;
+
 export const Audition = ({ from, where }) => new RegExp(from).test(where)
 export const Splitt = (value, where) => where.split(value)[0]
 export const Delay = (x) => new Promise(resolve => setTimeout(resolve, x))
@@ -19,7 +21,7 @@ export const Spam = (x) => { Protect.add(x); setTimeout(() => Protect.delete(x),
 export const isSpam = (x) => !!Protect.has(x)
 
 const Await = new Set()
-export const Cooldown = (x) => { Await.add(x); setTimeout(() => Await.delete(x), 6000) }
+export const Cooldown = (x) => { Await.add(x); setTimeout(() => Await.delete(x), 10000) }
 export const DownColling = (x) => Await.delete(x)
 export const isColling = (x) => !!Await.has(x)
 export const sizeCooldown = (x) => Await

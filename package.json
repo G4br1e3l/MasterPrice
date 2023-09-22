@@ -1,25 +1,25 @@
 {
   "name": "masterprice-bot",
   "version": "2.0.0",
-  "description": "",
+  "description": "whatsapp-bot",
   "main": "MP.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node MP.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["bot"],
+  "author": "Gabriel Henrique",
   "engines": {
     "node": "18.x"
   },
   "license": "ISC",
   "dependencies": {
-    "@adiwajshing/baileys": "github:WhiskeySockets/Baileys",
     "@adiwajshing/keyed-db": "^0.2.4",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@whiskeysockets/baileys": "^6.4.1",
     "cfonts": "^3.2.0",
     "chalk": "^5.2.0",
+    "link-preview-js": "^3.0.5",
     "linkifyjs": "^4.1.1",
     "moment-timezone": "^0.5.43",
     "node-emoji": "^1.11.0",
