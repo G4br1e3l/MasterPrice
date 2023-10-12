@@ -30,8 +30,8 @@ const messageOptions = [
 
 async function sendMessageToJid(client, Jid, mgOPT1, mgOPT2) {
 
-  console.log(Jid, mgOPT1, mgOPT2)
-  
+  //console.log(Jid, mgOPT1, mgOPT2)
+
   try {
     return (await client.sendMessage(Jid, mgOPT1, mgOPT2));
   } catch (err) {
