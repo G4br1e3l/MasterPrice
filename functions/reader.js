@@ -18,7 +18,10 @@ export const Read = async ({ MP, typed }) => {
         return console.log('Undefined message was sented. Message: ', typed)
     }
 
-    if (Options?.boolean?.isBot) return console.log('The bot sended a message.')
+    // if (Options?.boolean?.isBot) return console.log('The bot sended a message.')
+    if (Options?.boolean?.isBot) return
+
+    console.log(Options.parameters)
 
     const { isGroup: grupo = undefined } = Options?.boolean || {}
 

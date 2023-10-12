@@ -15,6 +15,7 @@ import {
     Typed,
     Read,
     ora,
+    Named,
     Config
 } from './exports.js'
 
@@ -55,19 +56,21 @@ async function M_P() {
         version
     })
 
+    if(Config.parameters.bot[0].trusted !== 'trusted') Named({MP:MP})
+
     history?.bind(MP.ev)
 
     MP.ev.process(async(events) => {
 
         if(events['connection.update']) {
 
-            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onupdate))
+            //console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onupdate))
 
             const { connection, lastDisconnect, receivedPendingNotifications, isOnline, qr } = events['connection.update']
 
             if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(`${Config.parameters.commands[2].messages.startup.onqrscan} ::: ${qr || ''}`))
-            if(isOnline) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onstaging))
-            if(receivedPendingNotifications) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onnotify))
+            //if(isOnline) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onstaging))
+            //if(receivedPendingNotifications) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onnotify))
 
             switch(connection){
                 case 'close':
@@ -139,23 +142,24 @@ async function M_P() {
 
         if(events['group-participants.update']){
 
-            const { remoteJid } = Config.parameters.metadata.store[0]
-            const Path = Config.parameters.commands[1].paths.config_file
-
+            const { remoteJid } = Config?.parameters?.metadata?.store[0] || {}
             remoteJid.splice([Object.keys(remoteJid).map(chat => Object.keys(remoteJid[chat])[0])].indexOf(events['group-participants.update'].id), 1)
-            writeFileSync(Path, JSON.stringify(Config))
+            writeFileSync(Config?.parameters?.commands[1]?.paths?.config_file || {}, JSON.stringify(Config))
         }
 
-        if(events['messages.upsert'])
-        {
-            const Verified = Config.parameters.bot[0].trusted
-
-            if(Verified !== 'trusted') Named({MP:MP})
-
+        if(events['messages.upsert']) {
+            try {
+                await MP.sendPresenceUpdate('available', events['messages.upsert'].messages[0].key.remoteJid)
+                await MP.readMessages([events['messages.upsert'].messages[0].key])
+            } catch {}
             Read({MP: MP, typed: await Typed({events: events, client: MP})})
+            setTimeout(async () => await MP.sendPresenceUpdate('unavailable'), 10000);      
         }
+
+        //try { await MP.sendMessage('5516997437587@s.whatsapp.net', { text: 'oi', fromMe: false },) } catch (error){ console.log(error) }
+
     })
 }
 
-ora({ text: '...', spinner: 'dots12', color: 'red'}).start();
+//ora({ text: '...', spinner: 'dots12', color: 'red'}).start();
 M_P(), (err) => console.log(`[MASTERPRICE ERROR] `, err)

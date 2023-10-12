@@ -29,6 +29,9 @@ const messageOptions = [
 ];
 
 async function sendMessageToJid(client, Jid, mgOPT1, mgOPT2) {
+
+  console.log(Jid, mgOPT1, mgOPT2)
+  
   try {
     return (await client.sendMessage(Jid, mgOPT1, mgOPT2));
   } catch (err) {
@@ -95,9 +98,9 @@ async function sendMessageQuoted({ Cliente, ClienteJid, ClienteTopo, ClienteResp
   await Cliente.presenceSubscribe(ClienteJid);
 
   do {
-    for (let index = 0; index < (ClienteResposta?.split(" ") || ClienteResposta).length; index++) {
+    for (let index = 0; index < ((ClienteResposta?.split(""))?.length || 1 ); index++) {
       await Cliente.sendPresenceUpdate("composing", ClienteJid);
-      await Delay(100);
+      await Delay(Math.floor(Math.random() * 201));
     }
     await Cliente.sendPresenceUpdate("paused", ClienteJid);
   } while (!await sendMessageToJid(Cliente, ClienteJid, messageOptions[1], messageOptions[2]));
@@ -135,8 +138,6 @@ async function sendSticker({ Cliente, ClienteJid, ClienteTopo, CaminhoFigurinha 
   
   messageOptions[4].sticker = CaminhoFigurinha
   messageOptions[2].quoted = ClienteTopo
-
-  console.log(messageOptions[4], messageOptions[2])
 
   return await sendMessageToJid(Cliente, ClienteJid, messageOptions[4], messageOptions[2]);
 }

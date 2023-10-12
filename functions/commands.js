@@ -109,11 +109,10 @@ export const commands = async ({ MP, typed }) => {
       if(IsIgnoring(remoteJid)) return Checker = 'Spamming!'
       if (isColling(remoteJid)) return Checker = 'Awaiting the queue!'
       if (isSpam(remoteJid)) return Checker = 'Spamming?'
-      if (sizeCooldown().size >= 2) return Checker = 'Await other users queue!'
-
+      console.log(sizeCooldown())
+      if (sizeCooldown().size >= 1) return Checker = 'Await other users queue!'
       Spam(remoteJid)
       return 'Clear.'
-
     })() !== 'Clear.') {
       console.log(`The user from ${remoteJid} was blocked. Code: "${Checker}"`)
       switch (Checker) {
@@ -145,8 +144,7 @@ export const commands = async ({ MP, typed }) => {
           await sendMessageQuoted({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Este comando não pôde ser executado.' });
         break;
       }
-      await sendReaction({ Cliente: MP, ClienteJid: remoteJid, ClienteId: messageId, ClienteNumero: ClienteNumero, ClienteResposta: ComandoDeErro })
-      return
+      return await sendReaction({ Cliente: MP, ClienteJid: remoteJid, ClienteId: messageId, ClienteNumero: ClienteNumero, ClienteResposta: ComandoDeErro })
     }
 
     const isOwner = async () => {
@@ -160,8 +158,6 @@ export const commands = async ({ MP, typed }) => {
     async function run ({ _args }){
 
       Cooldown(remoteJid)
-      await sendMessageQuoted({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: "⏰ Aguarde..." });
-      await sendReaction({ Cliente: MP, ClienteJid: remoteJid, ClienteId: messageId, ClienteNumero: ClienteNumero, ClienteResposta: ComandoEmEspera })
 
       switch (_args[0]) {
         // case "menu":
@@ -202,16 +198,17 @@ export const commands = async ({ MP, typed }) => {
         default:
           await sendMessageQuoted({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: MensagemNaoEncontrado });
           await sendReaction({ Cliente: MP, ClienteJid: remoteJid, ClienteId: messageId, ClienteNumero: ClienteNumero, ClienteResposta: ComandoDeErro })
-          Spam(remoteJid);
-          DownColling(remoteJid)
-        return
+        break
       }
 
-      await new Promise(resolve => setTimeout(resolve, 1000)).then( async () => await sendReaction({ Cliente: MP, ClienteJid: remoteJid, ClienteId: messageId, ClienteNumero: ClienteNumero, ClienteResposta: ComandoDeOK }))
-
-      Spam(remoteJid);
-      DownColling(remoteJid)
+      // await new Promise(resolve => setTimeout(resolve, 1000)).then( async () => await sendReaction({ Cliente: MP, ClienteJid: remoteJid, ClienteId: messageId, ClienteNumero: ClienteNumero, ClienteResposta: ComandoDeOK }))
     }
+
+    await sendReaction({ Cliente: MP, ClienteJid: remoteJid, ClienteId: messageId, ClienteNumero: ClienteNumero, ClienteResposta: ComandoEmEspera })
     await run({ _args: _args })
+    await sendReaction({ Cliente: MP, ClienteJid: remoteJid, ClienteId: messageId, ClienteNumero: ClienteNumero, ClienteResposta: ComandoDeOK })
+    Spam(remoteJid);
+    DownColling(remoteJid)
+
     return
 }

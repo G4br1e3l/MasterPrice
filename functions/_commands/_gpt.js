@@ -27,9 +27,11 @@ const Whisper = async (x) => await openai.createTranscription(createReadStream(x
 const DallE = async (x) => await openai.createImage({ prompt: x, n: 1, size: "1024x1024" });
 const GPT3_5 = async (x) => await openai.createChatCompletion({ model: "gpt-3.5-turbo", messages: [ { role: "user", content: `Organize as informações: ${x}.` } ], temperature: 0, max_tokens: 2000, top_p: 1, frequency_penalty: 0, presence_penalty: 0 });
 
+/**
+ * 
+ * Função pra usar o GPT
+ */
 export const GPT = async ({ client, _args, remoteJid, isQuotedMessage, messageText, messageType, messageAll, messageQuoted, messageQuotedText, messageContextinfo, text }) => {
-
-  Spam(remoteJid)
 
   let Input = messageText?.slice(5) || "";
 
@@ -41,10 +43,7 @@ export const GPT = async ({ client, _args, remoteJid, isQuotedMessage, messageTe
     Input += text || ""
   }
 
-  if (!Input) {
-    await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: "Tente inserindo alguma pergunta... com (!GPT (pergunta?)) ou marcando a mensagem ou ambas juntas :)" });
-    return "Error.";
-  }
+  if (!Input) return await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: "Tente inserindo alguma pergunta... com (!GPT (pergunta?)) ou marcando a mensagem ou ambas juntas :)" });
 
   switch (_args[1]) {
     case 'pdf':
@@ -67,14 +66,8 @@ export const GPT = async ({ client, _args, remoteJid, isQuotedMessage, messageTe
           documentMessage: dc2 = {}
         } = message || {}
 
-        const Documento =
-        dc1?.mimetype === 'application/pdf'? dc1 :
-        dc2?.mimetype === 'application/pdf'? dc2 : false
-
-        if (Documento === false) {
-          await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Não é um PDF ou não marcou nenhuma mensagem...' });
-          return "Error.";
-        }
+        const Documento = dc1?.mimetype === 'application/pdf'? dc1 : dc2?.mimetype === 'application/pdf'? dc2 : false
+        if (Documento === false) return await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Não é um PDF ou não marcou nenhuma mensagem...' });
 
         const requisitado = _args[2]? (_args.slice(2)).join(' ') : 'Resumir o máximo que puder.'
 
@@ -85,17 +78,10 @@ export const GPT = async ({ client, _args, remoteJid, isQuotedMessage, messageTe
         }
 
         const pdfBuffer = await promisify(Buffer)(await downloadContentFromMessage(quotedMessage.documentMessage, "document"));
-    
-        if (!pdfBuffer) {
-          await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Erro ao converter o PDF.' });
-          return "Error.";
-        }
+        if (!pdfBuffer) return await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Erro ao converter o PDF.' });
     
         const pdfFileName = getRandom(".pdf");
-        const writer = createWriteStream(pdfFileName, {
-          autoClose: true
-        });
-    
+        const writer = createWriteStream(pdfFileName, { autoClose: true });
         writer.write(pdfBuffer);
         writer.end();
     
@@ -118,10 +104,7 @@ export const GPT = async ({ client, _args, remoteJid, isQuotedMessage, messageTe
 
           try { unlink(pdfFileName, () => {}); } catch {}
 
-          if (!pagesData || pagesData.length === 0) {
-            await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'O PDF está vazio.' });
-            return "Error.";
-          }
+          if (!pagesData || pagesData.length === 0) return await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'O PDF está vazio.' });
     
           for (const index of (Array.from(new Set(pagesData.map(page => page.index))))) {
             if((Array.from(new Set(pagesData.map(page => page.text))))[index-1]){
@@ -144,21 +127,21 @@ export const GPT = async ({ client, _args, remoteJid, isQuotedMessage, messageTe
           }
 
           await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: `Leitura do arquivo "${Documento.title}" finalizada! Trazendo informações...` });
-          await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: `Resultado da leitura para "${requisitado}" no documento "${Documento.title}":\n\n${((await GPT4(`${requisitado}. Responda diretamente. Dado: "${(responses.join(' '))}".`)).data.choices[0].message.content.trim())}` });
-          return "Success.";
+          return await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: `Resultado da leitura para "${requisitado}" no documento "${Documento.title}":\n\n${((await GPT4(`${requisitado}. Responda diretamente. Dado: "${(responses.join(' '))}".`)).data.choices[0].message.content.trim())}` });
 
         })
-        writer.on('error', async (err) => {
-          await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Aconteceu um erro quando estava tentando baixar o PDF.' });
-          return "Error.";
+        writer.on('error', async () => {
+          return await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Aconteceu um erro quando estava tentando baixar o PDF.' });
         });
       } catch (error) {
-        await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Não consegui fazer nada, teve algum erro...' });
-        return "Error.";
+        return await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Não consegui fazer nada, teve algum erro...' });
       }
       break;
     case "foto":
       try {
+
+        if(!_args[2]) return await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Foto de quê?' }); 
+
         async function downloadImage(url, filename) {
           const response = await get(url, { responseType: "stream" });
           const writer = createWriteStream(filename, { autoClose: true });
@@ -167,107 +150,89 @@ export const GPT = async ({ client, _args, remoteJid, isQuotedMessage, messageTe
             response.data.pipe(writer);
 
             writer.on("finish", async () => {
-              await sendCaptionImageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: '', CaminhoImagem: image });
-              unlink(filename, () => { resolve(); });
-              return "Success.";
+              await sendCaptionImageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: '', CaminhoImagem: filename });
+              try { unlink(filename, () => { resolve(); }); } catch {}
+              return
             });
 
             writer.on("error", async (error) => {
-              await sendCaptionImageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Deu para baixar a foto não.', CaminhoImagem: image });
-              unlink(filename, () => { reject(error); });
-              return "Error.";
+              await sendCaptionImageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Deu para baixar a foto não.', CaminhoImagem: filename });
+              try { unlink(filename, () => { reject(error); }); } catch {}
+              return
             });
           });
         }
 
-        const image = getRandom(".jpeg");
-        await downloadImage((await DallE(Input)).data.data[0].url, image);
+        await downloadImage((await DallE(Input)).data.data[0].url, getRandom(".jpeg"));
 
       } catch {
-        await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Não consegui fazer nada, teve algum erro...' });
-        return "Error.";
+        return await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Não consegui fazer nada, teve algum erro...' });
       }
       break;
     case "audio":
 
       const {
         quotedMessage: {
-          audioMessage = {}
+          audioMessage = false
         } = {}
       } = messageQuoted || {}
 
+      if (!audioMessage) return await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Não marcou nenhum audio...' });
+
       if (isQuotedMessage && !!audioMessage) {
+
         (async function createAudio() {
           
-          const buffer = await downloadContentFromMessage(audioMessage,"audio");
-
           const INaudio = getRandom(".mp3");
           const OUTaudio = getRandom(".wav");
 
-          const writer = createWriteStream(INaudio, {
-            autoClose: true
-          });
+          const writer = createWriteStream(INaudio, { autoClose: true });
 
-          return new Promise((resolve) => {
-            buffer.pipe(writer);
+          return new Promise(async (resolve, reject) => {
+            (await downloadContentFromMessage(audioMessage,"audio")).pipe(writer);
 
             writer.on("finish", async () => {
 
-              const args = [
-                "-i",
-                INaudio,
-                "-acodec",
-                "pcm_s16le",
-                "-ac",
-                "1",
-                "-ar",
-                "16000",
-                OUTaudio
-              ];
-
-              const ffmpeg = spawn(path, args);
+              const ffmpeg = spawn(path, [ "-i", INaudio, "-acodec", "pcm_s16le", "-ac", "1", "-ar", "16000", OUTaudio ]);
 
               ffmpeg.on("exit", async () => {
-                const transcript = await Whisper(OUTaudio);
-                await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: transcript.data.text });
-                unlink(INaudio, () => { unlink(OUTaudio, () => { resolve(); }); });
-                return "Success.";
+                await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: (await Whisper(OUTaudio)).data.text });
+                try { unlink(INaudio, () => { unlink(OUTaudio, () => { resolve(); }); }); } catch {}
+                return
 
               });
 
               ffmpeg.on("error", async () => {
                 await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: "Vish... Deu ruim a tradução meu bom" });
-                unlink(INaudio, () => { unlink(OUTaudio, () => { resolve(); }); });
-                return "Error.";
-
+                try { unlink(INaudio, () => { unlink(OUTaudio, () => { reject(error); }); }); } catch {}
+                return
               });
             });
 
             writer.on("error", async () => {
               await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: "Deu para traduzir o audio não." });
-              unlink(INaudio, () => { unlink(OUTaudio, () => { resolve(); }); });
-              return "Error.";
+              try { unlink(INaudio, () => { unlink(OUTaudio, () => { reject(error); }); }); } catch {}
+              return
             });
+
           });
+
         })();
+
       }
       break;
     default:
       try {
-        await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: (await GPT4(Input)).data.choices[0].message.content.trim() });
-        return "Success.";
-
+        return await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: (await GPT4(Input)).data.choices[0].message.content.trim() });
       } catch (erro) {
         switch (erro?.response?.status) {
           case 429:
-            await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Muitas solicitações, aguarde.' });
-            return "Error.";
-            
+            return await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'Muitas solicitações, aguarde.' });
           default:
-            await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'API com erro.' });
-            return "Error.";
-
+            return await sendMessageQuoted({ Cliente: client, ClienteJid: remoteJid, ClienteTopo: messageAll, ClienteResposta: 'API com erro.' });
         }
       }
+    break
   }
+
 };
