@@ -18,6 +18,8 @@ import ora from 'ora';
 import CFonts from 'cfonts'
 const { render } = CFonts
 
+import { GetQR } from './qr_.js'
+
 import timezone from 'moment-timezone'
 const { tz } = timezone
 
@@ -118,7 +120,7 @@ import {
 } from './functions/_functions/_sendMessage.js';
 
 import ax from "axios";
-const { get } = ax;
+const { get, post } = ax;
 
 import {
     path
@@ -191,6 +193,7 @@ export {
     DownColling,
     isColling,
     sizeCooldown,
+    post,
     doIgnore,
     IsIgnoring,
     console_message,
@@ -212,5 +215,6 @@ export {
     render,
     ora,
     getRandom,
+    GetQR,
     downloadContentFromMessage
 };

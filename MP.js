@@ -11,6 +11,7 @@ import {
     writeFileSync,
     chalk,
     P,
+    GetQR,
     render,
     Typed,
     Read,
@@ -66,7 +67,10 @@ async function M_P() {
 
         const { connection, lastDisconnect, receivedPendingNotifications, isOnline, qr = false } = update || {}
 
-        if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(`${Config.parameters.commands[2].messages.startup.onqrscan} ::: \n${qr || ''}`))
+        if(qr){
+            await GetQR(qr)
+            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(`${Config.parameters.commands[2].messages.startup.onqrscan} ::: \n${qr || ''}`))
+        }
         //if(isOnline) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onstaging))
         //if(receivedPendingNotifications) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onnotify))
 
