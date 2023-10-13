@@ -60,106 +60,78 @@ async function M_P() {
 
     history?.bind(MP.ev)
 
-    MP.ev.process(async(events) => {
+    MP.ev.on('connection.update', async update => {
+        //console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onupdate))
 
-        if(events['connection.update']) {
+        const { connection, lastDisconnect, receivedPendingNotifications, isOnline, qr } = update || {}
 
-            //console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onupdate))
+        if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(`${Config.parameters.commands[2].messages.startup.onqrscan} ::: ${qr || ''}`))
+        //if(isOnline) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onstaging))
+        //if(receivedPendingNotifications) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onnotify))
 
-            const { connection, lastDisconnect, receivedPendingNotifications, isOnline, qr } = events['connection.update']
+        switch(connection){
+            case 'close':
+                console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.ondownconnection))
 
-            if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(`${Config.parameters.commands[2].messages.startup.onqrscan} ::: ${qr || ''}`))
-            //if(isOnline) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onstaging))
-            //if(receivedPendingNotifications) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onnotify))
+                if((lastDisconnect.error)?.output?.statusCode === DisconnectReason.loggedOut) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Ultima sessão desconectada.'))
 
-            switch(connection){
-                case 'close':
-                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.ondownconnection))
-
-                    if((lastDisconnect.error)?.output?.statusCode === DisconnectReason.loggedOut) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Ultima sessão desconectada.'))
-
-                    switch((lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut){
-                        case true:
-                            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onreconect))
-                            await M_P()
-                        break
-                        case false:
-                            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onlostconnection))
-                            let files = readdirSync('./root/connections')
-                            files.forEach(file => { unlink(`./root/connections/${file}`, (() => { })) })
-                            await M_P()
-                        break
-                    }
-                break
-                case 'open':
-                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onconnected.replaceAll('@botname', Config.parameters.bot[0].name)))
-                break
-                case 'connecting':
-                    console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onconnect))
-                break
-            }
+                switch((lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut){
+                    case true:
+                        console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onreconect))
+                        await M_P()
+                    break
+                    case false:
+                        console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onlostconnection))
+                        let files = readdirSync('./root/connections')
+                        files.forEach(file => { unlink(`./root/connections/${file}`, (() => { })) })
+                        await M_P()
+                    break
+                }
+            break
+            case 'open':
+                console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onconnected.replaceAll('@botname', Config.parameters.bot[0].name)))
+            break
+            case 'connecting':
+                console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onconnect))
+            break
         }
-
-        if(events.call) {
-            //console.log('recv call event', events.call)
-        }
-
-        if(events['creds.update']) {
-            await saveCreds()
-        }
-
-        if(events['contacts.upsert']) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Contatos Salvos.'))
-
-        if(events['messages.update']) {
-            //console.log('chats update ', events['messages.update'])
-        }
-        if(events['message-receipt.update']) {
-            //console.log('chats update ', events['message-receipt.update'])
-        }
-        if(events['messages.reaction']) {
-            //console.log('chats update ', events['messages.reaction'])
-        }
-        if(events['messaging-history.set']) {
-            const { chats, contacts, messages, isLatest } = events['messaging-history.set']
-            console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(
-                `Recebidos:\nQuantidade de conversas ::: ${chats.length},\nQuantidade de contatos ::: ${contacts.length},\nQuantidade de mensagens ::: ${messages.length}`
-            ))
-        }
-
-        if(events['presence.update']) {
-            //console.log(events['presence.update'])
-        }
-
-        if(events['chats.update']) {
-            //console.log('chats update ', events['chats.update'])
-        }
-        if(events['chats.delete']) {
-            //console.log('chats deleted ', events['chats.delete'])
-        }
-        if(events['chats.upsert']) {
-           //console.log('chats upsert ', events['chats.upsert'])
-        }
-
-        if(events['group-participants.update']){
-
-            const { remoteJid } = Config?.parameters?.metadata?.store[0] || {}
-            remoteJid.splice([Object.keys(remoteJid).map(chat => Object.keys(remoteJid[chat])[0])].indexOf(events['group-participants.update'].id), 1)
-            writeFileSync(Config?.parameters?.commands[1]?.paths?.config_file || {}, JSON.stringify(Config))
-        }
-
-        if(events['messages.upsert']) {
-            try {
-                await MP.sendPresenceUpdate('available', events['messages.upsert'].messages[0].key.remoteJid)
-                await MP.readMessages([events['messages.upsert'].messages[0].key])
-            } catch {}
-            Read({MP: MP, typed: await Typed({events: events, client: MP})})
-            setTimeout(async () => await MP.sendPresenceUpdate('unavailable'), 10000);      
-        }
-
-        //try { await MP.sendMessage('5516997437587@s.whatsapp.net', { text: 'oi', fromMe: false },) } catch (error){ console.log(error) }
-
     })
+
+    MP.ev.on('events.call', async e_call => {})
+    MP.ev.on('creds.update', async cr_update => {
+        await saveCreds()
+    })
+    MP.ev.on('contacts.upsert', async c_upsert => {
+        console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse('Contatos Salvos.'))
+    })
+    MP.ev.on('messages.update', async m_update => {})
+    MP.ev.on('message-receipt.update', async mr_update => {})
+    MP.ev.on('messages.reaction', async m_reaction => {})
+    MP.ev.on('messaging-history.set', async mh_set => {
+        const { chats, contacts, messages, isLatest } = mh_set
+        console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(`Recebidos:\nQuantidade de conversas ::: ${chats.length},\nQuantidade de contatos ::: ${contacts.length},\nQuantidade de mensagens ::: ${messages.length}`))
+    })
+    MP.ev.on('presence.update', async p_update => {})
+    MP.ev.on('chats.update', async ch_update => {})
+    MP.ev.on('chats.delete', async ch_delete => {})
+    MP.ev.on('chats.upsert', async ch_upsert => {})
+    MP.ev.on('group-participants.update', async gp_update => {
+        const { remoteJid } = Config?.parameters?.metadata?.store[0] || {}
+        remoteJid.splice([Object.keys(remoteJid).map(chat => Object.keys(remoteJid[chat])[0])].indexOf(gp_update.id), 1)
+        writeFileSync(Config?.parameters?.commands[1]?.paths?.config_file || {}, JSON.stringify(Config))
+    })
+    MP.ev.on('messages.upsert', async msg_upsert => {
+        try {
+            await MP.sendPresenceUpdate('available', msg_upsert.messages[0].key.remoteJid)
+            await MP.readMessages([msg_upsert.messages[0].key])
+        } catch {}
+        Read({MP: MP, typed: await Typed({events: msg_upsert, client: MP})})
+        setTimeout(async () => await MP.sendPresenceUpdate('unavailable'), 10000);
+    })
+
+    //try { await MP.sendMessage('5516997437587@s.whatsapp.net', { text: 'oi', fromMe: false },) } catch (error){ console.log(error) }
+
 }
 
 //ora({ text: '...', spinner: 'dots12', color: 'red'}).start();
-M_P(), (err) => console.log(`[MASTERPRICE ERROR] `, err)
+M_P()

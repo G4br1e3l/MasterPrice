@@ -26,7 +26,7 @@ export const Typed = async ({ events, client }) => {
         pushName: getName = undefined,
         broadcast: BC = undefined,
         ...Body
-    } = events['messages.upsert']?.messages[0] || {}
+    } = events?.messages[0] || {}
 
     if (Events) return `Event was detected! Code: ${Events}`
 
@@ -109,7 +109,7 @@ export const Typed = async ({ events, client }) => {
                 parameters:{
                     details: [
                         {
-                            messageAll: events['messages.upsert']?.messages[0],
+                            messageAll: events?.messages[0],
                             messageKey: Key ?? null,
                             messageId: Key?.id ?? null,
                             messageStatus: Status ?? null,
