@@ -56,16 +56,17 @@ async function M_P() {
         version
     })
 
-    if(Config.parameters.bot[0].trusted !== 'trusted') Named({MP:MP})
-
     history?.bind(MP.ev)
 
     MP.ev.on('connection.update', async update => {
+
+        //console.log(update)
+
         //console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onupdate))
 
-        const { connection, lastDisconnect, receivedPendingNotifications, isOnline, qr } = update || {}
+        const { connection, lastDisconnect, receivedPendingNotifications, isOnline, qr = false } = update || {}
 
-        if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(`${Config.parameters.commands[2].messages.startup.onqrscan} ::: ${qr || ''}`))
+        if(qr) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(`${Config.parameters.commands[2].messages.startup.onqrscan} ::: \n${qr || ''}`))
         //if(isOnline) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onstaging))
         //if(receivedPendingNotifications) console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onnotify))
 
@@ -77,6 +78,7 @@ async function M_P() {
 
                 switch((lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut){
                     case true:
+                        if(Config.parameters.bot[0].trusted !== 'trusted') Named({MP:MP})
                         console.log(chalk.rgb(123, 45, 67).bgCyanBright.bold.inverse(Config.parameters.commands[2].messages.startup.onreconect))
                         await M_P()
                     break
