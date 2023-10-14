@@ -43,12 +43,19 @@ export const commands = async ({ MP, typed }) => {
 
     const {
       details: [
-        { messageJid: remoteJid = {}, messageId = {}, messageAll = {}, messageKey = {}, messageContent: { stickerMessage: sticker = {}, imageMessage: image = {}, videoMessage: video = {} } = {}, messageQuoted = {}, messageType = {}, messageContextinfo = {}, messageQuotedText = {}, text = {} } = {},
+        { messageJid: remoteJid = {}, messageId = {}, messageContext = {}, messageAll = {}, messageKey = {}, messageContent: { stickerMessage: sticker = {}, imageMessage: image = {}, videoMessage: video = {} } = {}, messageQuoted = {}, messageType = {}, messageContextinfo = {}, messageQuotedText = {}, text = {} } = {},
         { sender: { messageNumber: number = {}, messageText = {} } = {} } = {}
       ] = []
     } = message || {};
 
-    const { quotedMessage: { stickerMessage: qsticker, imageMessage: Qimage, videoMessage: Qvideo } = {} } = messageQuoted || {};
+    const { quotedMessage: { stickerMessage: qsticker, imageMessage: Qimage, videoMessage: Qvideo, viewOnceMessageV2 = {} } = {} } = messageQuoted || {};
+
+    const {
+      message: {
+        imageMessage: Qimage1,
+        videoMessage: QVideo1
+      } = {}
+    } = viewOnceMessageV2 || {}
 
     const {
       parameters: {
@@ -109,6 +116,7 @@ export const commands = async ({ MP, typed }) => {
       if(IsIgnoring(remoteJid)) return Checker = 'Spamming!'
       if (isColling(remoteJid)) return Checker = 'Awaiting the queue!'
       if (isSpam(remoteJid)) return Checker = 'Spamming?'
+      console.log(sizeCooldown())
       if (sizeCooldown().size >= 1) return Checker = 'Await other users queue!'
       Spam(remoteJid)
       return 'Clear.'
@@ -189,7 +197,7 @@ export const commands = async ({ MP, typed }) => {
         case "fig":
         case "fi":
         case "f":
-          await CreateSticker({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, image: image, video: video, Qimage: Qimage, Qvideo: Qvideo });
+          await CreateSticker({ Cliente: MP, ClienteJid: remoteJid, ClienteTopo: messageAll, image: image, video: video, Qimage: Qimage || Qimage1, Qvideo: Qvideo || QVideo1 });
           break;
         case "df":
           await GetImage({ client: MP, mStick: sticker, qStick: qsticker, mJid: remoteJid, mAll: messageAll })
