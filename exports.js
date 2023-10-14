@@ -116,6 +116,7 @@ import {
     sendReaction,
     sendMessage,
     sendSticker,
+    sendCaptionVideo,
     sendCaptionImageQuoted
 } from './functions/_functions/_sendMessage.js';
 
@@ -206,6 +207,7 @@ export {
     Owned,
     getMessageText,
     detectMessageStatus,
+    sendCaptionVideo,
     sendReaction,
     sendMessageQuoted,
     sendCaptionImageQuoted,
