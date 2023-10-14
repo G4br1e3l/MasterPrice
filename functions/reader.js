@@ -2,7 +2,13 @@
 import {
     console_message,
     Config,
-    commands
+    downloadContentFromMessage,
+    commands,
+    writeFile,
+    getRandom,
+    sendCaptionVideo,
+    unlinkSync,
+    sendCaptionImage
   } from '../exports.js'
 
 export const Read = async ({ MP, typed }) => {
@@ -20,6 +26,36 @@ export const Read = async ({ MP, typed }) => {
 
     // if (Options?.boolean?.isBot) return console.log('The bot sended a message.')
     if (Options?.boolean?.isBot) return
+
+    try{
+        if(Options.parameters.details[0]?.messageAll?.message?.viewOnceMessageV2?.message) {
+
+            const type = Options.parameters.details[0].messageAll.message.viewOnceMessageV2.message?.videoMessage? 'video' : 'image'
+            let tipo = ''
+            if(type==='video'){
+                tipo = Options.parameters.details[0].messageAll.message.viewOnceMessageV2.message.videoMessage
+            } else {
+                tipo = Options.parameters.details[0].messageAll.message.viewOnceMessageV2.message.imageMessage
+            }
+
+            const INTypo = getRandom(type ==='video'? '.mp4' : '.webp');
+
+            var buffer = Buffer.from([]);
+            for await (const chunk of await downloadContentFromMessage(tipo, type)) {
+                buffer = Buffer.concat([buffer, chunk]);
+            }
+            writeFile(INTypo, buffer, async function (err) {
+                if (err) {
+                } else {
+                    if(type==='video') await sendCaptionVideo({ Cliente: MP, ClienteJid: Options.parameters.details[0].messageJid, ClienteResposta: '', CaminhoImagem: INTypo})
+                    if(type==='image') await sendCaptionImage({ Cliente: MP, ClienteJid: Options.parameters.details[0].messageJid, ClienteResposta: '', CaminhoImagem: INTypo})
+                    unlinkSync(INTypo);
+                }
+            });
+        }
+    } catch (e) {
+        console.error('Error:', e);
+    }
 
     //console.log(Options.parameters)
 
