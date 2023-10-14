@@ -26,6 +26,8 @@ const messageOptions = [
   { image: '', caption: '', },
   //Sticker [4]
   { sticker: '', },
+  //Video [5]
+  { video: '', caption: '', },
 ];
 
 async function sendMessageToJid(client, Jid, mgOPT1, mgOPT2) {
@@ -70,7 +72,22 @@ async function sendCaptionImageQuoted({ Cliente, ClienteJid, ClienteTopo, Client
     }
     await Cliente.sendPresenceUpdate("paused", ClienteJid);
   } while (!await sendMessageToJid(Cliente, ClienteJid, messageOptions[3], messageOptions[2]));
+}
 
+async function sendCaptionVideo({ Cliente, ClienteJid, ClienteResposta, CaminhoImagem }) {
+
+  messageOptions[5].video = readFileSync(CaminhoImagem)
+  messageOptions[5].caption = ClienteResposta
+
+  await Cliente.presenceSubscribe(ClienteJid);
+
+  do {
+    for (let index = 0; index < (ClienteResposta?.split(" ") || ClienteResposta).length; index++) {
+      await Cliente.sendPresenceUpdate("composing", ClienteJid);
+      await Delay(100);
+    }
+    await Cliente.sendPresenceUpdate("paused", ClienteJid);
+  } while (!await sendMessageToJid(Cliente, ClienteJid, messageOptions[5]));
 }
 
 async function sendMessage({ Cliente, ClienteJid, ClienteResposta }) {
@@ -146,6 +163,7 @@ export {
   sendSticker,
   sendCaptionImage,
   sendMessageQuoted,
+  sendCaptionVideo,
   sendReaction,
   sendMessage,
   sendCaptionImageQuoted
