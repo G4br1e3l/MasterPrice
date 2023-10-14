@@ -116,7 +116,6 @@ export const commands = async ({ MP, typed }) => {
       if(IsIgnoring(remoteJid)) return Checker = 'Spamming!'
       if (isColling(remoteJid)) return Checker = 'Awaiting the queue!'
       if (isSpam(remoteJid)) return Checker = 'Spamming?'
-      console.log(sizeCooldown())
       if (sizeCooldown().size >= 1) return Checker = 'Await other users queue!'
       Spam(remoteJid)
       return 'Clear.'
